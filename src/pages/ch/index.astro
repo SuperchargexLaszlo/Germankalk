@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const calcs = [
+  {href:'/ch/lohnrechner-schweiz',icon:'💰',title:'Lohnrechner Schweiz',desc:'Nettolohn CHF 2026 – AHV, PK, Quellensteuer',badge:'CH'},
+  {href:'/ch/mehrwertsteuer-rechner',icon:'🧾',title:'MWST Rechner CH',desc:'8,1% Normalsatz, 3,8% Hotel, 2,6% reduziert',badge:'CH'},
+  {href:'/ch/quellensteuer-rechner',icon:'📊',title:'Quellensteuer Rechner',desc:'Alle 26 Kantone – Tarife A/B ledig/verheiratet',badge:'CH'},
+  {href:'/de/bmi-rechner',icon:'⚖️',title:'BMI Rechner',desc:'Body-Mass-Index nach WHO berechnen',badge:''},
+  {href:'/de/kalorien-rechner',icon:'🍎',title:'Kalorienrechner',desc:'Täglichen Kalorienbedarf berechnen',badge:''},
+  {href:'/de/ssw-rechner',icon:'🤰',title:'SSW Rechner',desc:'Schwangerschaftswoche berechnen',badge:''},
+  {href:'/de/prozent-rechner',icon:'📐',title:'Prozentrechner',desc:'Prozente schnell berechnen',badge:''},
+  {href:'/de/umrechnung-cm-inch',icon:'📏',title:'cm ↔ Inch',desc:'Zentimeter, Zoll, Fuß umrechnen',badge:''},
+  {href:'/de/celsius-fahrenheit',icon:'🌡️',title:'°C ↔ °F',desc:'Celsius, Fahrenheit, Kelvin',badge:''},
+  {href:'/de/kg-lbs-rechner',icon:'⚖️',title:'kg ↔ lbs',desc:'Kilogramm und Pfund umrechnen',badge:''},
+];
+---
+<BaseLayout
+  title="Online Rechner Schweiz 2026 – Lohnrechner CHF, MWST & mehr"
+  description="Kostenlose Rechner für die Schweiz 2026: Lohnrechner CHF mit AHV und Quellensteuer, MWST 8,1%, BMI, Kalorien und mehr. Aktuell und kostenlos."
+  canonical="https://rechnerbox.eu/ch/"
+  hreflangCH="/ch/"
+>
+  <Header slot="header" />
+  <div class="max-w-5xl mx-auto px-4 py-10">
+    <div class="text-center mb-8">
+      <h1>🇨🇭 Online Rechner Schweiz 2026</h1>
+      <p class="text-gray-500 max-w-xl mx-auto">Rechner für die Schweiz – in CHF, mit AHV/IV, Quellensteuer und kantonalen Steuersätzen 2026.</p>
+    </div>
+
+    <div class="bg-red-50 border border-red-200 rounded-2xl p-5 mb-8">
+      <h2 class="text-base font-bold text-red-800 mb-3">🇨🇭 Schweiz im Überblick 2026</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        {[["MWST Normalsatz","8,1%"],["AHV AN-Anteil","4,35%"],["ALV","1,10%"],["Mindestlohn","20–23 CHF/h*"]].map(([l,v])=>(
+          <div class="bg-white rounded-xl p-3 border border-red-100 text-center">
+            <div class="text-gray-500 mb-0.5">{l}</div>
+            <div class="font-bold text-red-800 text-base">{v}</div>
+          </div>
+        ))}
+      </div>
+      <p class="text-xs text-gray-500 mt-2">* Kein nationaler Mindestlohn – kantonal unterschiedlich (z.B. Genf: 24,32 CHF/h)</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {calcs.map(c=>(
+        <a href={c.href} class="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-primary-200 p-5 transition-all flex items-start gap-3 relative">
+          {c.badge && <span class="absolute top-3 right-3 text-xs bg-primary-100 text-primary-700 px-1.5 py-0.5 rounded font-medium">{c.badge}</span>}
+          <span class="text-2xl">{c.icon}</span>
+          <div>
+            <div class="font-semibold text-gray-900 group-hover:text-primary-700 text-base mb-1 leading-tight">{c.title}</div>
+            <p class="text-sm text-gray-500">{c.desc}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <div class="mt-10 p-5 bg-yellow-50 rounded-2xl border border-yellow-100">
+      <h2 class="text-base font-semibold text-yellow-800 mb-2">⚠️ Hinweis zu CH-Steuern</h2>
+      <p class="text-sm text-yellow-700">Die Quellensteuer in der Schweiz ist kantonal unterschiedlich und abhängig von Einkommen, Zivilstand und Kirchensteuerpflicht. Für verbindliche Berechnungen wenden Sie sich an das kantonale Steueramt oder nutzen Sie die Steuerrechner der Kantone (z.B. <a href="https://www.zh.ch/de/steuern-finanzen/steuern/quellensteuer.html" class="underline" target="_blank" rel="noopener">Kanton Zürich</a>).</p>
+    </div>
+
+    <div class="mt-6 flex gap-4 justify-center">
+      <a href="/de/" class="text-sm px-4 py-2 bg-white border border-gray-200 rounded-xl hover:border-primary-300 text-gray-600 shadow-sm">🇩🇪 Deutschland</a>
+      <a href="/at/" class="text-sm px-4 py-2 bg-white border border-gray-200 rounded-xl hover:border-primary-300 text-gray-600 shadow-sm">🇦🇹 Österreich</a>
+    </div>
+  </div>
+  <Footer slot="footer" />
+</BaseLayout>

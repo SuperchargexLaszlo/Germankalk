@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+---
+<BaseLayout title="Dreisatz Rechner 2026 – Einfacher & Zusammengesetzter Dreisatz" description="Dreisatz online berechnen – direkt und indirekt. Mit Lösungsweg und Erklärung. Kostenloser Dreisatz-Rechner für Schule und Alltag 2026." canonical="https://rechnerbox.eu/de/dreisatz-rechner" hreflangDE="/de/dreisatz-rechner">
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Dreisatz Rechner</nav>
+    <h1>Dreisatz Rechner 2026</h1>
+    <p class="text-lg text-gray-600 mb-6">Dreisatz schnell berechnen – direkt (gleichsinnig) und indirekt (gegensinnig). Mit vollständigem Lösungsweg.</p>
+    <div class="calc-box">
+      <div class="mb-4">
+        <label class="calc-label">Dreisatz-Typ</label>
+        <select class="calc-select" id="d-type">
+          <option value="direct">Direkter Dreisatz (mehr → mehr)</option>
+          <option value="indirect">Indirekter Dreisatz (mehr → weniger)</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-3 gap-3 mb-2">
+        <div class="text-center text-sm font-medium text-gray-500">Menge</div>
+        <div class="text-center text-sm font-medium text-gray-500">=</div>
+        <div class="text-center text-sm font-medium text-gray-500">Wert</div>
+      </div>
+      <div class="grid grid-cols-3 gap-3 mb-2 items-center">
+        <input class="calc-input" type="number" id="d-m1" value="5"/>
+        <div class="text-center text-gray-400 font-bold">→</div>
+        <input class="calc-input" type="number" id="d-w1" value="20"/>
+      </div>
+      <div class="grid grid-cols-3 gap-3 mb-4 items-center">
+        <input class="calc-input" type="number" id="d-m2" value="8"/>
+        <div class="text-center text-gray-400 font-bold">→</div>
+        <div class="calc-input bg-primary-50 border-primary-300 font-bold text-primary-700" id="d-w2-show">?</div>
+      </div>
+      <button class="calc-btn" onclick="calcD()">Berechnen</button>
+      <div class="calc-result hidden" id="d-result">
+        <div class="result-value" id="d-ans">–</div>
+        <div class="result-label">Ergebnis</div>
+        <div class="mt-3 bg-white rounded-lg p-3 text-left text-sm text-gray-600 whitespace-pre-line" id="d-steps"></div>
+      </div>
+    </div>
+    <section class="mt-6"><h2>Dreisatz Formeln</h2>
+      <div class="grid grid-cols-2 gap-4 mt-3">
+        <div class="bg-blue-50 rounded-xl p-4 border border-blue-100"><div class="font-semibold text-blue-800 mb-1">Direkter Dreisatz</div><code class="text-xs">x = (m2 × w1) / m1</code><p class="text-xs text-blue-600 mt-1">Beispiel: 5 Äpfel → 2€, 8 Äpfel → 3,20€</p></div>
+        <div class="bg-orange-50 rounded-xl p-4 border border-orange-100"><div class="font-semibold text-orange-800 mb-1">Indirekter Dreisatz</div><code class="text-xs">x = (m1 × w1) / m2</code><p class="text-xs text-orange-600 mt-1">Beispiel: 4 Arbeiter → 6 Tage, 8 Arbeiter → 3 Tage</p></div>
+      </div>
+    </section>
+    <section class="mt-6"><h2>FAQ</h2><div class="space-y-3">
+      <div class="faq-item"><div class="faq-q">Wann verwende ich den direkten Dreisatz?</div><div class="faq-a">Den direkten (gleichsinnigen) Dreisatz verwenden Sie, wenn mehr von Größe A auch mehr von Größe B bedeutet. Beispiel: Mehr Kilometer → mehr Benzin.</div></div>
+      <div class="faq-item"><div class="faq-q">Was ist der Unterschied zum Dreisatz in der Schule?</div><div class="faq-a">Der Rechenweg ist identisch. In der Schule wird oft ein Zwischenschritt für "1 Einheit" verlangt. Unser Rechner zeigt beide Wege.</div></div>
+    </div></section>
+  </article>
+  <script>
+    (window as any).calcD=function(){
+      const m1=parseFloat((document.getElementById('d-m1') as HTMLInputElement).value);
+      const w1=parseFloat((document.getElementById('d-w1') as HTMLInputElement).value);
+      const m2=parseFloat((document.getElementById('d-m2') as HTMLInputElement).value);
+      const typ=(document.getElementById('d-type') as HTMLSelectElement).value;
+      if([m1,w1,m2].some(isNaN)||m1===0)return;
+      let ans:number;let steps:string;
+      if(typ==='direct'){
+        ans=m2*w1/m1;
+        steps='Schritt 1: 1 Einheit = '+w1+'/'+m1+' = '+(w1/m1).toFixed(4)+'\nSchritt 2: '+m2+' x '+(w1/m1).toFixed(4)+' = '+ans.toFixed(4);
+      } else {
+        ans=m1*w1/m2;
+        steps='Schritt 1: Gesamtwert = '+m1+' x '+w1+' = '+m1*w1+'\nSchritt 2: '+m1*w1+' / '+m2+' = '+ans.toFixed(4);
+      }
+      const r=document.getElementById('d-result')!;r.classList.remove('hidden');
+      document.getElementById('d-ans')!.textContent=ans.toFixed(4).replace(/\.?0+$/,'').replace('.',',');
+      document.getElementById('d-steps')!.textContent=steps;
+      document.getElementById('d-w2-show')!.textContent=ans.toFixed(2).replace('.',',');
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

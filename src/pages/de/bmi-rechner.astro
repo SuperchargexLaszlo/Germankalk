@@ -1,0 +1,60 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+---
+<BaseLayout title="BMI Rechner 2026 – Body-Mass-Index berechnen" description="BMI berechnen für Erwachsene, Frauen, Männer. WHO-Kategorien und Idealgewicht. Kostenloser BMI-Rechner 2026." canonical="https://rechnerbox.eu/de/bmi-rechner" hreflangDE="/de/bmi-rechner">
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › BMI Rechner</nav>
+    <h1>BMI Rechner 2026</h1>
+    <p class="text-lg text-gray-600 mb-6">Body-Mass-Index nach WHO-Standard – mit Idealgewicht und Einordnung.</p>
+    <div class="calc-box">
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div><label class="calc-label">Größe (cm)</label><input class="calc-input" type="number" id="bmi-h" value="175"/></div>
+        <div><label class="calc-label">Gewicht (kg)</label><input class="calc-input" type="number" id="bmi-w" value="70" step="0.1"/></div>
+      </div>
+      <button class="calc-btn" onclick="calcBMI()">BMI berechnen</button>
+      <div class="calc-result hidden" id="bmi-result">
+        <div class="grid grid-cols-3 gap-4 text-center mb-3">
+          <div><div class="result-value" id="bmi-val">–</div><div class="result-label">BMI</div></div>
+          <div><div class="result-value text-xl" id="bmi-cat">–</div><div class="result-label">Kategorie</div></div>
+          <div><div class="result-value text-xl" id="bmi-ideal">–</div><div class="result-label">Idealgewicht</div></div>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-3"><div class="h-3 rounded-full" id="bmi-bar" style="width:0%;background:#3b82f6"></div></div>
+      </div>
+    </div>
+    <section class="mt-6"><h2>BMI-Tabelle nach WHO</h2>
+      <table class="w-full text-sm border-collapse mt-3">
+        <thead><tr class="bg-gray-100"><th class="text-left px-3 py-2 border">Kategorie</th><th class="px-3 py-2 border text-center">BMI</th></tr></thead>
+        <tbody>
+          <tr><td class="px-3 py-2 border font-medium">Untergewicht</td><td class="px-3 py-2 border text-center">&lt; 18,5</td></tr>
+          <tr class="bg-green-50"><td class="px-3 py-2 border font-medium">Normalgewicht ✅</td><td class="px-3 py-2 border text-center">18,5 – 24,9</td></tr>
+          <tr><td class="px-3 py-2 border font-medium">Übergewicht</td><td class="px-3 py-2 border text-center">25 – 29,9</td></tr>
+          <tr><td class="px-3 py-2 border font-medium">Adipositas</td><td class="px-3 py-2 border text-center">&geq; 30</td></tr>
+        </tbody>
+      </table>
+    </section>
+    <section class="mt-6"><h2>FAQ</h2><div class="space-y-3">
+      <div class="faq-item"><div class="faq-q">Was ist ein normaler BMI?</div><div class="faq-a">Laut WHO gilt ein BMI zwischen 18,5 und 24,9 als Normalgewicht für Erwachsene.</div></div>
+      <div class="faq-item"><div class="faq-q">Wie berechne ich meinen BMI?</div><div class="faq-a">BMI = Gewicht (kg) / Größe (m)². Beispiel: 70 kg / (1,75)² = 22,9.</div></div>
+      <div class="faq-item"><div class="faq-q">Ist der BMI bei Frauen anders?</div><div class="faq-a">Die Formel ist gleich, aber Frauen haben bei gleichem BMI typischerweise mehr Körperfett als Männer. Der BMI ist daher nur ein Richtwert.</div></div>
+    </div></section>
+  </article>
+  <script>
+    (window as any).calcBMI=function(){
+      const h=parseFloat((document.getElementById('bmi-h') as HTMLInputElement).value)/100;
+      const w=parseFloat((document.getElementById('bmi-w') as HTMLInputElement).value);
+      if(!h||!w)return;
+      const bmi=w/(h*h);
+      const cats=[{max:18.5,l:'Untergewicht',c:'#f97316'},{max:25,l:'Normalgewicht ✅',c:'#22c55e'},{max:30,l:'Übergewicht',c:'#f59e0b'},{max:999,l:'Adipositas',c:'#ef4444'}];
+      const cat=cats.find(c=>bmi<c.max)||cats[3];
+      const r=document.getElementById('bmi-result')!;r.classList.remove('hidden');
+      document.getElementById('bmi-val')!.textContent=bmi.toFixed(1).replace('.',',');
+      document.getElementById('bmi-cat')!.textContent=cat!.l;
+      document.getElementById('bmi-ideal')!.textContent=(18.5*h*h).toFixed(1).replace('.',',')+' – '+(24.9*h*h).toFixed(1).replace('.',',')+' kg';
+      const bar=document.getElementById('bmi-bar')!;bar.style.width=Math.min(100,Math.max(0,(bmi-14)/30*100))+'%';bar.style.background=cat!.c;
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

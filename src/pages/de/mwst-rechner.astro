@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema={"@context":"https://schema.org","@type":"WebApplication","name":"MwSt Rechner","url":"https://rechnerbox.eu/de/mwst-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}};
+---
+<BaseLayout title="MwSt Rechner 2026 – Mehrwertsteuer berechnen Netto/Brutto" description="Mehrwertsteuer online berechnen: Netto zu Brutto oder Brutto zu Netto. 19% und 7% MwSt, aktuelle Sätze 2026. Kostenloser MwSt-Rechner." canonical="https://rechnerbox.eu/de/mwst-rechner" hreflangDE="/de/mwst-rechner" schema={schema}>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › MwSt Rechner</nav>
+    <h1>MwSt Rechner 2026 – Mehrwertsteuer berechnen</h1>
+    <p class="text-lg text-gray-600 mb-6">Mehrwertsteuer schnell und einfach berechnen – Netto zu Brutto oder Brutto zu Netto. Für 19%, 7% und andere Steuersätze.</p>
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+        <div><label class="calc-label">Betrag (€)</label><input class="calc-input" type="number" id="mwst-amt" value="100" step="0.01" /></div>
+        <div><label class="calc-label">MwSt-Satz</label>
+          <select class="calc-select" id="mwst-rate">
+            <option value="0.19">19% (Regelsteuersatz)</option>
+            <option value="0.07">7% (ermäßigt)</option>
+            <option value="0.05">5% (temporär)</option>
+            <option value="0.08">8% (Österreich)</option>
+          </select>
+        </div>
+        <div><label class="calc-label">Richtung</label>
+          <select class="calc-select" id="mwst-dir">
+            <option value="nb">Netto → Brutto</option>
+            <option value="bn">Brutto → Netto</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcMwst()">Berechnen</button>
+      <div class="calc-result hidden" id="mwst-result">
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div><div class="result-value" id="mwst-netto">–</div><div class="result-label">Nettobetrag</div></div>
+          <div><div class="result-value" id="mwst-tax">–</div><div class="result-label">MwSt-Betrag</div></div>
+          <div><div class="result-value" id="mwst-brutto">–</div><div class="result-label">Bruttobetrag</div></div>
+        </div>
+      </div>
+    </div>
+    <section class="mt-6"><h2>MwSt-Sätze Deutschland 2026</h2>
+      <p>Deutschland hat zwei Steuersätze: <strong>19% Regelsteuersatz</strong> für die meisten Waren und <strong>7% ermäßigter Satz</strong> für Lebensmittel, Bücher, Tickets und medizinische Produkte.</p>
+    </section>
+    <section class="mt-4"><h2>FAQ</h2><div class="space-y-3">
+      {[{q:"Wie berechne ich MwSt heraus?",a:"Brutto / 1,19 = Netto (bei 19%). MwSt = Brutto - Netto."},
+        {q:"Was fällt unter 7% MwSt?",a:"Lebensmittel, Bücher, Zeitungen, Nahverkehrstickets, Übernachtungen, kulturelle Veranstaltungen."},
+        {q:"Was kostet ein Produkt mit 19% MwSt wenn der Nettobetrag 100€ ist?",a:"100 € × 1,19 = 119 € Brutto. Die MwSt beträgt 19 €."},
+      ].map(f=>(<div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>))}
+    </div></section>
+  </article>
+  <script>
+    function fmt(n:number){return n.toFixed(2).replace('.',',')+' €';}
+    (window as any).calcMwst=function(){
+      const amt=parseFloat((document.getElementById('mwst-amt') as HTMLInputElement).value);
+      const rate=parseFloat((document.getElementById('mwst-rate') as HTMLSelectElement).value);
+      const dir=(document.getElementById('mwst-dir') as HTMLSelectElement).value;
+      if(isNaN(amt)||amt<=0)return;
+      let netto:number,tax:number,brutto:number;
+      if(dir==='nb'){netto=amt;brutto=amt*(1+rate);tax=brutto-netto;}
+      else{brutto=amt;netto=amt/(1+rate);tax=brutto-netto;}
+      const r=document.getElementById('mwst-result')!;r.classList.remove('hidden');
+      document.getElementById('mwst-netto')!.textContent=fmt(netto);
+      document.getElementById('mwst-tax')!.textContent=fmt(tax);
+      document.getElementById('mwst-brutto')!.textContent=fmt(brutto);
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

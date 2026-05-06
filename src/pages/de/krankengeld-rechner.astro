@@ -1,0 +1,174 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Krankengeld Rechner 2026","url":"https://rechnerbox.eu/de/krankengeld-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie wird Krankengeld 2026 berechnet?","acceptedAnswer":{"@type":"Answer","text":"Das Krankengeld beträgt 70% des Brutto-Regelentgelts, maximal 90% des Nettolohns. Die tägliche Beitragsbemessungsgrenze liegt 2026 bei 185,83 € (67.500 € / 365 Tage), das maximale Krankengeld damit bei 130,08 € täglich."}},
+    {"@type":"Question","name":"Wie lange bekomme ich Krankengeld?","acceptedAnswer":{"@type":"Answer","text":"Krankengeld wird für dieselbe Erkrankung maximal 78 Wochen (1,5 Jahre) innerhalb von 3 Jahren gezahlt. Danach kann das Arbeitsamt (Bürgergeld) einspringen, falls keine Arbeitsfähigkeit besteht."}},
+    {"@type":"Question","name":"Ab wann zahlt die Krankenkasse Krankengeld?","acceptedAnswer":{"@type":"Answer","text":"Die Krankenkasse zahlt Krankengeld ab dem 43. Tag der Arbeitsunfähigkeit – also nachdem die 6-wöchige Lohnfortzahlung durch den Arbeitgeber endet. Privatversicherte erhalten Krankentagegeld nach Vertrag."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Krankengeld Rechner 2026 – Krankengeld berechnen"
+  description="Krankengeld 2026 online berechnen: Wie viel bekomme ich bei Krankheit nach 6 Wochen? Tages- und Monatsbetrag, Beitragsbemessungsgrenze. Kostenlos."
+  canonical="https://rechnerbox.eu/de/krankengeld-rechner"
+  hreflangDE="/de/krankengeld-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Krankengeld Rechner
+    </nav>
+    <h1>Krankengeld Rechner 2026</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Berechnen Sie Ihr Krankengeld für 2026 – nach der 6-wöchigen Lohnfortzahlung des Arbeitgebers. Basiert auf der Beitragsbemessungsgrenze 2026 (67.500 €/Jahr).
+    </p>
+
+    <!-- Schnell-Antwort Box für Zero-Click SEO -->
+    <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-green-800 mb-1">💡 Kurzantwort: Krankengeld 2026</p>
+      <p class="text-sm text-green-700">= 70% Ihres Brutto-Regelentgelts, max. 90% des Nettolohns, max. <strong>130,08 €/Tag</strong> (= 3.902 €/Monat). Zahlt die GKV ab dem 43. Krankheitstag.</p>
+    </div>
+
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Bruttogehalt (€/Monat)</label>
+          <input class="calc-input" type="number" id="kg-brutto" value="3500" min="0" step="50" />
+        </div>
+        <div>
+          <label class="calc-label">Nettogehalt (€/Monat)</label>
+          <input class="calc-input" type="number" id="kg-netto" value="2350" min="0" step="50" />
+          <p class="text-xs text-gray-400 mt-1">→ <a href="/de/brutto-netto-rechner" class="text-primary-600 hover:underline">Netto nicht bekannt? Rechner →</a></p>
+        </div>
+        <div>
+          <label class="calc-label">Beschäftigungsart</label>
+          <select class="calc-select" id="kg-typ">
+            <option value="standard">Angestellt (Standard)</option>
+            <option value="kurzarbeit">Nach Kurzarbeit</option>
+            <option value="schwanger">Schwangerschaft / Mutterschutz</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Kinder (Beitragssatz PV)</label>
+          <select class="calc-select" id="kg-kinder">
+            <option value="0.01775">Kinderlos (PV +0,6% = 2,375%)</option>
+            <option value="0.01775" selected>1 Kind (PV 1,775%)</option>
+            <option value="0.01525">2+ Kinder (PV reduziert)</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcKG()">Krankengeld berechnen</button>
+      <div class="calc-result hidden" id="kg-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div><div class="result-value" id="kg-tag">–</div><div class="result-label">Krankengeld / Tag</div></div>
+          <div><div class="result-value text-2xl" id="kg-monat">–</div><div class="result-label">ca. / Monat</div></div>
+          <div><div class="result-value text-xl" id="kg-netto-out">–</div><div class="result-label">nach Abzügen</div></div>
+          <div><div class="result-value text-xl" id="kg-diff">–</div><div class="result-label">vs. Nettolohn</div></div>
+        </div>
+        <p class="text-xs text-gray-400 mt-2">Vom Krankengeld werden RV (9,3%), AV (1,3%) und PV abgezogen. Keine Lohnsteuer.</p>
+      </div>
+    </div>
+
+    <div class="info-box mt-4">
+      📌 <strong>Beitragsbemessungsgrenze KV/PV 2026:</strong> 67.500 €/Jahr = 5.625 €/Monat. Maximales Krankengeld: 130,08 €/Tag (= 3.902 €/30 Tage).
+    </div>
+
+    <section class="mt-8">
+      <h2>So wird das Krankengeld berechnet</h2>
+      <p>Die Berechnung des Krankengelds erfolgt in drei Schritten:</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
+        <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+          <div class="font-bold text-blue-800 mb-2">Schritt 1: Regelentgelt</div>
+          <p class="text-xs text-blue-700">Summe der letzten 12 Bruttogehälter ÷ 365 = tägliches Regelentgelt. Max. 185,83 €/Tag.</p>
+        </div>
+        <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+          <div class="font-bold text-blue-800 mb-2">Schritt 2: 70%-Regel</div>
+          <p class="text-xs text-blue-700">Krankengeld = Regelentgelt × 70%. Deckelung: max. 90% des Nettolohns (tgl.).</p>
+        </div>
+        <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+          <div class="font-bold text-blue-800 mb-2">Schritt 3: Abzüge</div>
+          <p class="text-xs text-blue-700">Vom Krankengeld werden RV (9,3%) und AV (1,3%) abgezogen. Keine Lohnsteuer, aber beeinflusst den Steuersatz (Progressionsvorbehalt).</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-6">
+      <h2>Beispielrechnung Krankengeld 2026</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border">Bruttogehalt/Monat</th>
+            <th class="text-center px-3 py-2 border">Krankengeld/Tag</th>
+            <th class="text-center px-3 py-2 border">Krankengeld/Monat</th>
+            <th class="text-center px-3 py-2 border">Nach Abzügen</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[[2000,46.58,1397,1239],[3000,69.86,2096,1860],[4000,93.15,2794,2480],[5000,116.44,3493,3101],[5625,130.08,3902,3463]].map(r => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-medium text-gray-800">{(r[0] as number).toLocaleString('de-DE')} €</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{(r[1] as number).toFixed(2).replace('.',',')} €</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{(r[2] as number).toLocaleString('de-DE')} €</td>
+                <td class="text-center px-3 py-2 border text-green-700 font-medium">{(r[3] as number).toLocaleString('de-DE')} €</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Krankengeld 2026</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wann bekomme ich Krankengeld statt Lohn?",a:"Der Arbeitgeber zahlt die ersten 6 Wochen (42 Tage) Ihren vollen Lohn fort. Ab dem 43. Tag übernimmt Ihre gesetzliche Krankenkasse das Krankengeld – bis zu 78 Wochen lang für dieselbe Erkrankung."},
+          {q:"Ist Krankengeld steuerpflichtig?",a:"Krankengeld ist direkt steuerfrei. Allerdings gilt der Progressionsvorbehalt: Das Krankengeld erhöht den Steuersatz für Ihre übrigen Einkünfte. Bei langer Krankenzeit kann dies zu einer Nachzahlung bei der Jahressteuererklärung führen."},
+          {q:"Bekomme ich Krankengeld auch bei Burnout oder psychischen Erkrankungen?",a:"Ja. Krankengeld wird für jede medizinisch anerkannte Erkrankung gezahlt – einschließlich psychischer Erkrankungen, Burnout und Suchterkrankungen. Ihr Arzt muss die Arbeitsunfähigkeit attestieren."},
+          {q:"Was passiert nach 78 Wochen Krankengeld?",a:"Nach Ablauf des Krankengelds (78 Wochen/1,5 Jahre) prüft die Rentenversicherung die Erwerbsminderung. Alternativ kann Bürgergeld beantragt werden. Betroffene sollten frühzeitig Rehabilitation beantragen."},
+        ].map(f => (
+          <div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>
+        ))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/brutto-netto-rechner',label:'Brutto-Netto'},{href:'/de/buergergeld-rechner',label:'Bürgergeld'},{href:'/de/tvoed-rechner',label:'TVöD Rechner'},{href:'/de/arbeitszeit-rechner',label:'Arbeitszeitrechner'},{href:'/de/minijob-rechner',label:'Minijob'},{href:'/de/urlaubsgeld-rechner',label:'Urlaubsgeld'}].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    function fmt(n: number) { return n.toFixed(2).replace('.',',')+' €'; }
+    (window as any).calcKG = function() {
+      const brutto = parseFloat((document.getElementById('kg-brutto') as HTMLInputElement).value)||0;
+      const netto  = parseFloat((document.getElementById('kg-netto') as HTMLInputElement).value)||0;
+      if (!brutto || !netto) return;
+      // Beitragsbemessungsgrenze 2026
+      const bbg_tag = 67500 / 365;
+      const regelentgelt_tag = Math.min(brutto / 30, bbg_tag);
+      const kg70 = regelentgelt_tag * 0.70;
+      const kg90netto = (netto / 30) * 0.90;
+      const kg_tag = Math.min(kg70, kg90netto);
+      // Abzüge: RV 9.3% + AV 1.3% = 10.6%
+      const abzug = kg_tag * 0.106;
+      const kg_netto_tag = kg_tag - abzug;
+      const kg_monat = kg_tag * 30;
+      const kg_netto_monat = kg_netto_tag * 30;
+      const diff = kg_netto_monat - netto;
+      const r = document.getElementById('kg-result')!; r.classList.remove('hidden');
+      document.getElementById('kg-tag')!.textContent = fmt(kg_tag);
+      document.getElementById('kg-monat')!.textContent = fmt(kg_monat);
+      document.getElementById('kg-netto-out')!.textContent = fmt(kg_netto_monat);
+      const diffEl = document.getElementById('kg-diff')!;
+      diffEl.textContent = (diff >= 0 ? '+' : '') + fmt(diff);
+      diffEl.className = 'result-value text-xl ' + (diff >= 0 ? 'text-green-600' : 'text-red-600');
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

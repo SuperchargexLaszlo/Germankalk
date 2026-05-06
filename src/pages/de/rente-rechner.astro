@@ -1,0 +1,260 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Rente Rechner 2026","url":"https://rechnerbox.eu/de/rente-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie hoch ist meine gesetzliche Rente 2026?","acceptedAnswer":{"@type":"Answer","text":"Die gesetzliche Rente errechnet sich aus Entgeltpunkten × Rentenwert × Zugangsfaktor. Der aktuelle Rentenwert (West) beträgt 2026 ca. 40,39 €/Entgeltpunkt. Wer 45 Jahre Durchschnittslohn verdient hat, erhält ca. 1.817 €/Monat brutto."}},
+    {"@type":"Question","name":"Wann kann ich in Rente gehen 2026?","acceptedAnswer":{"@type":"Answer","text":"Die Regelaltersgrenze liegt 2026 bei 67 Jahren (Jahrgang 1959+). Abschlagsfreie Frührente mit 63 Jahren ist möglich bei 45 Beitragsjahren (Rente für langjährig Versicherte). Pro Monat Frührentenbezug gibt es 0,3% Abzug."}},
+    {"@type":"Question","name":"Was sind Entgeltpunkte bei der Rente?","acceptedAnswer":{"@type":"Answer","text":"Entgeltpunkte zeigen, wie viel Sie relativ zum Durchschnittsverdienst verdient haben. 1 Entgeltpunkt = Beitragsjahr mit Durchschnittslohn (2026: ca. 45.358 €). Wer mehr verdient, sammelt mehr als 1 Punkt/Jahr, wer weniger verdient, weniger."}},
+    {"@type":"Question","name":"Wie viel Rente bekomme ich nach 40 Jahren?","acceptedAnswer":{"@type":"Answer","text":"Bei 40 Jahren mit Durchschnittslohn: 40 Entgeltpunkte × 40,39 €/EP = ca. 1.616 €/Monat brutto. Netto (nach Kranken-/Pflegeversicherung) ca. 1.400 €/Monat. Die genaue Auskunft gibt Ihre Renteninformation der DRV."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Rente Rechner 2026 – Gesetzliche Rente berechnen"
+  description="Gesetzliche Rente 2026 berechnen: Entgeltpunkte, Rentenwert 40,39 €, Rentenalter, Frührentenverlust. Mit Brutto-Netto-Rentenberechnung. Kostenloser Rentenrechner."
+  canonical="https://rechnerbox.eu/de/rente-rechner"
+  hreflangDE="/de/rente-rechner"
+  image="/og/og-rente.svg"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Rente Rechner
+    </nav>
+    <h1>Rente Rechner 2026 – Gesetzliche Rente berechnen</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Ihre voraussichtliche gesetzliche Rente 2026 berechnen – mit aktuellem Rentenwert (40,39 €/EP West), Frührentenabzügen und Brutto-Netto-Berechnung.
+    </p>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-blue-800 mb-1">📊 Rentenwert 2026</p>
+      <p class="text-sm text-blue-700">
+        Aktueller Rentenwert West: <strong>40,39 €/Entgeltpunkt</strong> (ab Juli 2025) ·
+        Ost: <strong>40,39 €</strong> (seit 2024 angeglichen) ·
+        Regelaltersgrenze: <strong>67 Jahre</strong>
+      </p>
+    </div>
+
+    <div class="calc-box">
+      <div class="flex flex-wrap gap-2 mb-5">
+        {[{id:'ep',l:'Über Entgeltpunkte'},{id:'lohn',l:'Über Gehalt'},{id:'fruh',l:'Frührente Abzug'}].map((t,i) => (
+          <button onclick={`setRMode('${t.id}')`} id={`rtab-${t.id}`}
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${i===0?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`}>{t.l}</button>
+        ))}
+      </div>
+
+      <!-- Mode 1: Entgeltpunkte bekannt (aus Rentenauskunft) -->
+      <div id="r-ep">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="calc-label">Entgeltpunkte (aus Rentenauskunft)</label>
+            <input class="calc-input" type="number" id="r-ep-val" value="38.5" step="0.1" />
+            <p class="text-xs text-gray-400 mt-1">Steht in Ihrer Renteninformation der DRV</p>
+          </div>
+          <div>
+            <label class="calc-label">Zugangsfaktor</label>
+            <select class="calc-select" id="r-ep-zf">
+              <option value="1.0">1,000 – Regelaltersrente (67)</option>
+              <option value="0.964">0,964 – Frührente mit 65 (4 Mon. früher)</option>
+              <option value="0.928">0,928 – Frührente mit 63 (Langj. Vers.)</option>
+              <option value="1.06">1,060 – Altersrente mit 68 (+1 Jahr)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 2: Gehalt-basiert -->
+      <div id="r-lohn" class="hidden">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="calc-label">Durchschnittlicher Bruttolohn/Jahr (€)</label>
+            <input class="calc-input" type="number" id="r-brutto" value="45000" step="1000" />
+            <p class="text-xs text-gray-400 mt-1">Durchschnittsverdienst 2026: ~45.358 €/Jahr</p>
+          </div>
+          <div>
+            <label class="calc-label">Beitragsjahre</label>
+            <input class="calc-input" type="number" id="r-jahre" value="40" min="1" max="55" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 3: Frührenten-Abzug -->
+      <div id="r-fruh" class="hidden">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="calc-label">Rente bei Regelalter 67 (€/Monat brutto)</label>
+            <input class="calc-input" type="number" id="r-regelrente" value="1800" step="50" />
+          </div>
+          <div>
+            <label class="calc-label">Gewünschtes Rentenalter</label>
+            <select class="calc-select" id="r-alter">
+              <option value="60">60 Jahre</option>
+              <option value="61">61 Jahre</option>
+              <option value="62">62 Jahre</option>
+              <option value="63" selected>63 Jahre (Langj. Versicherte)</option>
+              <option value="64">64 Jahre</option>
+              <option value="65">65 Jahre</option>
+              <option value="66">66 Jahre</option>
+              <option value="67">67 Jahre (Regelrente)</option>
+              <option value="68">68 Jahre (+Aufschlag)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calcRente()">Rente berechnen</button>
+
+      <div class="calc-result hidden" id="r-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center mb-3">
+          <div><div class="result-value" id="r-brutto-out">–</div><div class="result-label">Rente brutto/Mo.</div></div>
+          <div><div class="result-value text-2xl" id="r-netto-out">–</div><div class="result-label">Rente netto ca.</div></div>
+          <div><div class="result-value text-xl" id="r-abzug-out">–</div><div class="result-label">Abzüge/Aufschlag</div></div>
+          <div><div class="result-value text-xl" id="r-jahr-out">–</div><div class="result-label">Rente/Jahr brutto</div></div>
+        </div>
+        <div class="bg-white rounded-xl p-3 text-sm text-gray-600" id="r-info"></div>
+      </div>
+    </div>
+
+    <div class="info-box mt-4">
+      ⚠️ <strong>Hinweis:</strong> Dieser Rechner liefert Näherungswerte auf Basis des aktuellen Rentenwerts. Die verbindliche Rentenauskunft erhalten Sie von der <a href="https://www.deutsche-rentenversicherung.de" class="underline" target="_blank" rel="noopener">Deutschen Rentenversicherung (DRV)</a> – kostenlos per Post oder Online-Portal.
+    </div>
+
+    <section class="mt-8">
+      <h2>Rentenformel & Entgeltpunkte erklärt</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+        <div class="bg-gray-50 rounded-xl p-4 border">
+          <div class="font-bold text-gray-800 mb-2">Rentenformel</div>
+          <div class="font-mono text-sm text-primary-700 mb-2">Rente = EP × RF × ZF × RW</div>
+          <ul class="text-xs text-gray-600 space-y-1">
+            <li><strong>EP</strong> = Entgeltpunkte (aus DRV-Auskunft)</li>
+            <li><strong>RF</strong> = Rentenartfaktor (Altersrente = 1,0)</li>
+            <li><strong>ZF</strong> = Zugangsfaktor (Frührente &lt; 1,0)</li>
+            <li><strong>RW</strong> = Rentenwert (2026: <strong>40,39 €</strong>)</li>
+          </ul>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4 border">
+          <div class="font-bold text-gray-800 mb-2">Entgeltpunkte pro Jahr</div>
+          <div class="font-mono text-sm text-primary-700 mb-2">EP = Bruttolohn / Durchschnittslohn</div>
+          <ul class="text-xs text-gray-600 space-y-1">
+            <li>Durchschnittslohn 2026: ~45.358 €/Jahr</li>
+            <li>45.358 € Lohn = <strong>1,0 EP/Jahr</strong></li>
+            <li>30.000 € Lohn = <strong>0,66 EP/Jahr</strong></li>
+            <li>60.000 € Lohn = <strong>1,32 EP/Jahr</strong></li>
+            <li>Max. EP/Jahr: 2,0 (BBG = 90.600 €)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-8">
+      <h2>Rentenhöhe nach Beitragsjahren (2026)</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-center px-3 py-2 border">Beitragsjahre</th>
+            <th class="text-center px-3 py-2 border">Lohn = Ø (45.358 €)</th>
+            <th class="text-center px-3 py-2 border">Lohn = 30.000 €</th>
+            <th class="text-center px-3 py-2 border">Lohn = 60.000 €</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              [20,808,535,1077],[30,1212,802,1616],[35,1414,936,1885],
+              [40,1616,1069,2155],[45,1818,1203,2424],[50,2020,1337,2693],
+            ].map(r => (
+              <tr class="hover:bg-gray-50">
+                <td class="text-center px-3 py-2 border font-medium text-gray-800">{r[0]} Jahre</td>
+                <td class="text-center px-3 py-2 border text-primary-700 font-medium">{(r[1] as number).toLocaleString('de-DE')} €</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{(r[2] as number).toLocaleString('de-DE')} €</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{(r[3] as number).toLocaleString('de-DE')} €</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="text-xs text-gray-400 mt-1">Alle Werte: Brutto-Monatsrente bei Regelalter 67, Rentenwert 40,39 €</p>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Rente 2026</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wie viele Beitragsjahre brauche ich für die volle Rente?",a:"Es gibt keine 'volle Rente' nach einer bestimmten Anzahl Beitragsjahre – die Rente steigt mit jedem zusätzlichen Beitragsjahr. Für die abschlagsfreie Rente mit 63 Jahren brauchen Sie 45 Beitragsjahre. Die Mindestversicherungszeit (Wartezeit) beträgt 5 Jahre."},
+          {q:"Was passiert mit meiner Rente, wenn ich früher aufhöre zu arbeiten?",a:"Frührentner zahlen 0,3% Abzug pro Monat vor Regelalter 67. Bei 4 Jahren früher Rente (mit 63 statt 67): 4 Jahre × 12 Monate × 0,3% = 14,4% dauerhafter Abzug. Diese Abzüge gelten lebenslang."},
+          {q:"Ist die gesetzliche Rente brutto oder netto?",a:"Die gesetzliche Rente ist ein Bruttobetrag. Davon werden Krankenversicherung (7,3% + ggf. Zusatzbeitrag) und Pflegeversicherung (2,375%) abgezogen. Außerdem ist ein Teil der Rente steuerpflichtig (Kohortenprinzip)."},
+          {q:"Wie finde ich meine Entgeltpunkte heraus?",a:"Die DRV schickt ab dem 27. Lebensjahr regelmäßig Renteninformationen per Post. Online erhalten Sie Ihre Rentenauskunft jederzeit im DRV-Internetportal unter www.deutsche-rentenversicherung.de mit Ihrer Rentenversicherungsnummer."},
+        ].map(f => (
+          <div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>
+        ))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/brutto-netto-rechner',label:'Brutto-Netto'},{href:'/de/stundenlohn-rechner',label:'Stundenlohn'},{href:'/de/buergergeld-rechner',label:'Bürgergeld'},{href:'/de/elterngeld-rechner',label:'Elterngeld'},{href:'/de/krankengeld-rechner',label:'Krankengeld'},{href:'/de/arbeitszeit-rechner',label:'Arbeitszeit'}].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    const RENTENWERT = 40.39;
+    const DURCHSCHNITTSLOHN = 45358;
+    let rMode = 'ep';
+    const rModes = ['ep','lohn','fruh'];
+    function fmtE(n: number) { return n.toLocaleString('de-DE', {maximumFractionDigits: 0}) + ' €'; }
+    (window as any).setRMode = function(m: string) {
+      rMode = m; rModes.forEach(x => {
+        document.getElementById('r-' + x)?.classList.toggle('hidden', x !== m);
+        const t = document.getElementById('rtab-' + x);
+        if (t) t.className = `px-3 py-1.5 rounded-lg text-sm font-medium border transition ${x===m?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`;
+      });
+      document.getElementById('r-result')?.classList.add('hidden');
+    };
+    function toNetto(brutto: number): number {
+      // Rentenabzüge: KV 7.3% + Zusatz ~1.5% + PV 2.375%
+      return Math.round(brutto * (1 - 0.073 - 0.015 - 0.02375));
+    }
+    (window as any).calcRente = function() {
+      let brutto = 0, abzugTxt = '–', info = '';
+      if (rMode === 'ep') {
+        const ep = parseFloat((document.getElementById('r-ep-val') as HTMLInputElement).value) || 0;
+        const zf = parseFloat((document.getElementById('r-ep-zf') as HTMLSelectElement).value) || 1;
+        brutto = Math.round(ep * 1.0 * zf * RENTENWERT);
+        const pct = Math.round((1 - zf) * 100 * 10) / 10;
+        abzugTxt = zf < 1 ? `-${pct}%` : zf > 1 ? `+${Math.round((zf-1)*100)}%` : '0%';
+        info = `${ep} EP × ${zf} ZF × ${RENTENWERT} € RW = ${fmtE(brutto)} brutto/Monat.`;
+      } else if (rMode === 'lohn') {
+        const lohn = parseFloat((document.getElementById('r-brutto') as HTMLInputElement).value) || 0;
+        const jahre = parseFloat((document.getElementById('r-jahre') as HTMLInputElement).value) || 0;
+        const ep = (lohn / DURCHSCHNITTSLOHN) * jahre;
+        brutto = Math.round(ep * RENTENWERT);
+        abzugTxt = ep.toFixed(1) + ' EP';
+        info = `Ø ${lohn.toLocaleString('de-DE')} €/Jahr / ${DURCHSCHNITTSLOHN.toLocaleString('de-DE')} € × ${jahre} Jahre = ${ep.toFixed(2)} EP × ${RENTENWERT} € = ${fmtE(brutto)}/Monat brutto.`;
+      } else {
+        const regel = parseFloat((document.getElementById('r-regelrente') as HTMLInputElement).value) || 0;
+        const alter = parseInt((document.getElementById('r-alter') as HTMLSelectElement).value) || 67;
+        const monate = (67 - alter) * 12;
+        const zf = monate > 0 ? 1 - monate * 0.003 : 1 + (alter - 67) * 12 * 0.005;
+        brutto = Math.round(regel * zf);
+        const diff = brutto - regel;
+        abzugTxt = (diff >= 0 ? '+' : '') + fmtE(diff);
+        info = monate > 0
+          ? `${monate} Monate früher × 0,3% = ${(monate * 0.3).toFixed(1)}% Abzug lebenslang. Dauerhafter Verlust: ${fmtE(regel - brutto)}/Monat.`
+          : alter === 67
+          ? 'Regelaltersrente – kein Abzug.'
+          : `${(alter-67)*12} Monate später → +${((zf-1)*100).toFixed(1)}% Aufschlag lebenslang.`;
+      }
+      const r = document.getElementById('r-result')!; r.classList.remove('hidden');
+      document.getElementById('r-brutto-out')!.textContent = fmtE(brutto);
+      document.getElementById('r-netto-out')!.textContent = fmtE(toNetto(brutto));
+      document.getElementById('r-abzug-out')!.textContent = abzugTxt;
+      document.getElementById('r-jahr-out')!.textContent = fmtE(brutto * 12);
+      document.getElementById('r-info')!.textContent = info;
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

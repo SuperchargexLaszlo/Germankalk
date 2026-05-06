@@ -1,0 +1,164 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"PayPal Gebühren Rechner","url":"https://rechnerbox.eu/de/paypal-gebuehren-rechner","description":"PayPal Gebühren online berechnen – für Käufer, Verkäufer und Käuferschutz. Stand 2026.","applicationCategory":"FinanceApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie hoch sind die PayPal-Gebühren 2026?","acceptedAnswer":{"@type":"Answer","text":"Für gewerbliche Transaktionen berechnet PayPal 2,49% + 0,35€ bei inländischen Zahlungen (Stand 2026). Für den Käuferschutz kommen weitere Kosten hinzu."}},
+    {"@type":"Question","name":"Was kostet PayPal für Privatpersonen?","acceptedAnswer":{"@type":"Answer","text":"Zahlungen zwischen Privatpersonen innerhalb Deutschlands sind bei Zahlung per Guthaben oder Bankkonto kostenlos. Bei Kreditkartenzahlung fallen Gebühren an."}},
+    {"@type":"Question","name":"Wie berechne ich die PayPal-Gebühr bei einem Betrag?","acceptedAnswer":{"@type":"Answer","text":"Formel: Gebühr = Betrag × 0,0249 + 0,35€. Wenn der Käufer die Gebühr übernehmen soll: Aufpreis = (Betrag + 0,35) / (1 - 0,0249) - Betrag."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="PayPal Gebühren Rechner 2026 – Gebühren sofort berechnen"
+  description="PayPal Gebühren schnell und genau berechnen: Verkäufergebühr, Käuferschutz, Rückzahlung. Aktuell für 2026. Kostenlos und ohne Anmeldung."
+  canonical="https://rechnerbox.eu/de/paypal-gebuehren-rechner"
+  hreflangDE="/de/paypal-gebuehren-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> › 
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › 
+      PayPal Gebühren Rechner
+    </nav>
+    <h1>PayPal Gebühren Rechner 2026</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Berechnen Sie exakt, wie viel PayPal für Ihre Transaktion abzieht – als Käufer, Verkäufer oder bei Käuferschutz-Zahlungen. Alle Gebühren auf dem Stand <strong>Januar 2026</strong>.
+    </p>
+
+    <!-- CALCULATOR -->
+    <div class="calc-box" id="paypal-calc">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="calc-label" for="pp-amount">Betrag (€)</label>
+          <input class="calc-input" type="number" id="pp-amount" placeholder="100,00" min="0" step="0.01" value="100" />
+        </div>
+        <div>
+          <label class="calc-label" for="pp-type">Transaktionsart</label>
+          <select class="calc-select" id="pp-type">
+            <option value="domestic_commercial">Gewerblich (Inland) – 2,49% + 0,35€</option>
+            <option value="domestic_buyer_protection">Käuferschutz – 2,49% + 0,35€</option>
+            <option value="eu_commercial">EU-Zahlung – 3,49% + 0,35€</option>
+            <option value="micropayment">Kleinbetrag – 4,99% + 0,09€</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 mb-4">
+        <input type="checkbox" id="pp-reverse" class="w-4 h-4 accent-primary-600" />
+        <label for="pp-reverse" class="text-sm text-gray-600">Betrag soll nach Abzug der Gebühr erreicht werden (Aufschlag berechnen)</label>
+      </div>
+      <button class="calc-btn" onclick="calcPayPal()">Gebühr berechnen</button>
+      <div class="calc-result hidden" id="pp-result">
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <div class="result-value" id="pp-fee">–</div>
+            <div class="result-label">PayPal-Gebühr</div>
+          </div>
+          <div>
+            <div class="result-value" id="pp-net">–</div>
+            <div class="result-label">Sie erhalten</div>
+          </div>
+          <div>
+            <div class="result-value" id="pp-total">–</div>
+            <div class="result-label">Käufer zahlt</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO BOX -->
+    <div class="info-box mt-6">
+      <strong>💡 Hinweis:</strong> PayPal hat die Gebührenstruktur in Deutschland zuletzt im Oktober 2024 angepasst. Alle Angaben basieren auf den offiziellen Konditionen von Januar 2026.
+    </div>
+
+    <!-- CONTENT -->
+    <section class="mt-8">
+      <h2>PayPal Gebühren 2026 – Übersicht</h2>
+      <p>PayPal unterscheidet zwischen privaten und gewerblichen Transaktionen. Die wichtigsten Sätze auf einen Blick:</p>
+      <div class="overflow-x-auto my-4">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border border-gray-200">Transaktionsart</th>
+            <th class="px-3 py-2 border border-gray-200">% Anteil</th>
+            <th class="px-3 py-2 border border-gray-200">Fixbetrag</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr class="hover:bg-gray-50"><td class="px-3 py-2 border border-gray-200">Gewerblich (Inland)</td><td class="text-center px-3 py-2 border border-gray-200">2,49%</td><td class="text-center px-3 py-2 border border-gray-200">0,35€</td></tr>
+            <tr class="hover:bg-gray-50"><td class="px-3 py-2 border border-gray-200">EU-Zahlung</td><td class="text-center px-3 py-2 border border-gray-200">3,49%</td><td class="text-center px-3 py-2 border border-gray-200">0,35€</td></tr>
+            <tr class="hover:bg-gray-50"><td class="px-3 py-2 border border-gray-200">Micropayment (unter 10€)</td><td class="text-center px-3 py-2 border border-gray-200">4,99%</td><td class="text-center px-3 py-2 border border-gray-200">0,09€</td></tr>
+            <tr class="hover:bg-gray-50"><td class="px-3 py-2 border border-gray-200">Privat (Guthaben/Bank)</td><td class="text-center px-3 py-2 border border-gray-200 text-green-600 font-medium">0%</td><td class="text-center px-3 py-2 border border-gray-200 text-green-600 font-medium">kostenlos</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="mt-8">
+      <h2>Häufig gestellte Fragen</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wie hoch sind die PayPal-Gebühren 2026?", a:"Für gewerbliche Transaktionen berechnet PayPal 2,49% + 0,35 € bei inländischen Zahlungen (Stand 2026)."},
+          {q:"Zahle ich als Käufer PayPal-Gebühren?", a:"Nein, als Käufer sind PayPal-Zahlungen mit Käuferschutz kostenlos. Die Gebühren trägt der Verkäufer."},
+          {q:"Wie kann ich PayPal-Gebühren auf den Käufer umlegen?", a:"Nutzen Sie unseren Rechner mit der Option 'Aufschlag berechnen'. PayPal erlaubt dies in gewerblichen Transaktionen."},
+          {q:"Gibt es günstigere Alternativen zu PayPal?", a:"Ja: SEPA-Überweisung (kostenlos), Klarna (transaktionsabhängig) oder Stripe (1,5% + 0,25€ für europäische Karten)."},
+        ].map(f => (
+          <div class="faq-item">
+            <div class="faq-q">{f.q}</div>
+            <div class="faq-a">{f.a}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- RELATED -->
+    <section class="mt-10">
+      <h2>Weitere nützliche Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[
+          {href:'/de/prozent-rechner', label:'Prozentrechner'},
+          {href:'/de/mwst-rechner', label:'MwSt Rechner'},
+          {href:'/de/brutto-netto-rechner', label:'Brutto-Netto'},
+        ].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+
+  <script>
+    const RATES: Record<string,{pct:number,fix:number}> = {
+      domestic_commercial: {pct:0.0249, fix:0.35},
+      domestic_buyer_protection: {pct:0.0249, fix:0.35},
+      eu_commercial: {pct:0.0349, fix:0.35},
+      micropayment: {pct:0.0499, fix:0.09},
+    };
+    function fmt(n:number){ return n.toFixed(2).replace('.',',') + ' €'; }
+    (window as any).calcPayPal = function(){
+      const amt = parseFloat((document.getElementById('pp-amount') as HTMLInputElement).value);
+      const type = (document.getElementById('pp-type') as HTMLSelectElement).value;
+      const rev = (document.getElementById('pp-reverse') as HTMLInputElement).checked;
+      if(isNaN(amt)||amt<=0) return;
+      const {pct,fix} = RATES[type];
+      let fee:number, net:number, total:number;
+      if(rev){
+        total = (amt+fix)/(1-pct);
+        fee = total-amt; net = amt;
+      } else {
+        fee = amt*pct+fix; net = amt-fee; total = amt;
+      }
+      const r = document.getElementById('pp-result')!;
+      r.classList.remove('hidden');
+      document.getElementById('pp-fee')!.textContent = fmt(fee);
+      document.getElementById('pp-net')!.textContent = fmt(net);
+      document.getElementById('pp-total')!.textContent = fmt(total);
+    };
+    document.getElementById('pp-amount')?.addEventListener('keydown', e=>{ if(e.key==='Enter') (window as any).calcPayPal(); });
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

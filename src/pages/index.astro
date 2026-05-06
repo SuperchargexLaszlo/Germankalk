@@ -1,0 +1,114 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const categories = [
+  {
+    title: '💰 Gehalt & Steuern',
+    calcs: [
+      {href:'/de/brutto-netto-rechner',icon:'💶',title:'Brutto-Netto Rechner',desc:'Nettogehalt 2026 mit Steuerklasse berechnen',vol:'1,83 Mio.'},
+      {href:'/de/tvoed-rechner',icon:'🏢',title:'TVöD Rechner',desc:'Gehalt öffentlicher Dienst – Bund & Kommunen',vol:'90.500'},
+      {href:'/de/tv-l-rechner',icon:'🏫',title:'TV-L Rechner',desc:'Tarifvertrag Länder – Entgelttabelle 2026',vol:'60.500'},
+      {href:'/de/minijob-rechner',icon:'📋',title:'Minijob Rechner',desc:'Verdienst & Abgaben – Grenze 556 €/Monat',vol:'18.100'},
+      {href:'/de/urlaubsgeld-rechner',icon:'🌴',title:'Urlaubsgeld Rechner',desc:'Urlaubsgeld berechnen – TVöD, Metall, individuell',vol:'9.900'},
+      {href:'/de/krankengeld-rechner',icon:'🏥',title:'Krankengeld Rechner',desc:'Krankengeld ab dem 43. Krankheitstag',vol:'22.200'},
+    ]
+  },
+  {
+    title: '🧾 Steuern & Abgaben',
+    calcs: [
+      {href:'/de/mwst-rechner',icon:'🧾',title:'MwSt Rechner',desc:'Mehrwertsteuer 19%/7% Netto ↔ Brutto',vol:'60.500'},
+      {href:'/de/paypal-gebuehren-rechner',icon:'💳',title:'PayPal Gebühren',desc:'Exakte PayPal-Gebühren 2026 berechnen',vol:'90.500'},
+      {href:'/de/buergergeld-rechner',icon:'🏛️',title:'Bürgergeld 2026',desc:'Anspruch berechnen – Regelsatz 563 €/Mo',vol:'49.500'},
+    ]
+  },
+  {
+    title: '🏃 Gesundheit & Fitness',
+    calcs: [
+      {href:'/de/bmi-rechner',icon:'⚖️',title:'BMI Rechner',desc:'Body-Mass-Index nach WHO berechnen',vol:'823.000'},
+      {href:'/de/kalorien-rechner',icon:'🍎',title:'Kalorienrechner',desc:'Tagesbedarf nach Harris-Benedict berechnen',vol:'110.000'},
+      {href:'/de/pace-rechner',icon:'🏃',title:'Pace Rechner',desc:'Lauftempo, Pace & Finishzeit für Läufer',vol:'40.500'},
+      {href:'/de/ssw-rechner',icon:'🤰',title:'SSW Rechner',desc:'Schwangerschaftswoche & Geburtstermin',vol:'49.500'},
+    ]
+  },
+  {
+    title: '📐 Mathematik & Alltag',
+    calcs: [
+      {href:'/de/prozent-rechner',icon:'📐',title:'Prozentrechner',desc:'Prozent, Grundwert, Prozentsatz berechnen',vol:'301.000'},
+      {href:'/de/dreisatz-rechner',icon:'✖️',title:'Dreisatz Rechner',desc:'Direkt & indirekt – mit Lösungsweg',vol:'33.100'},
+      {href:'/de/arbeitszeit-rechner',icon:'⏱️',title:'Arbeitszeitrechner',desc:'Arbeitszeit & Überstunden berechnen',vol:'165.000'},
+    ]
+  },
+  {
+    title: '🏗️ Bau & Architektur',
+    calcs: [
+      {href:'/de/hoai-rechner',icon:'🏗️',title:'HOAI Rechner',desc:'Architektenhonorar nach HOAI 2021 berechnen',vol:'27.100'},
+    ]
+  },
+];
+
+const schema = {
+  "@context":"https://schema.org",
+  "@type":"WebSite",
+  "name":"RechnerBox",
+  "url":"https://rechnerbox.eu",
+  "description":"Kostenlose Online-Rechner für Deutschland, Österreich und die Schweiz",
+  "potentialAction":{"@type":"SearchAction","target":"https://rechnerbox.eu/?s={search_term_string}","query-input":"required name=search_term_string"}
+};
+---
+<BaseLayout
+  title="Kostenlose Online-Rechner 2026 – RechnerBox.eu"
+  description="Alle wichtigen Rechner kostenlos und aktuell: Brutto-Netto, TVöD, BMI, Kalorien, Prozent, PayPal & mehr. Deutschland, Österreich, Schweiz. Aktuell 2026."
+  schema={schema}
+>
+  <Header slot="header" />
+  <div class="max-w-5xl mx-auto px-4 py-10">
+    <div class="text-center mb-10">
+      <h1 class="text-4xl font-bold text-gray-900 mb-3">Kostenlose Online-Rechner 2026</h1>
+      <p class="text-lg text-gray-500 max-w-2xl mx-auto">Alle wichtigen Rechner für Deutschland, Österreich und die Schweiz – schnell, kostenlos und immer aktuell.</p>
+    </div>
+
+    {categories.map(cat => (
+      <div class="mb-10">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b border-gray-200">{cat.title}</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {cat.calcs.map(c => (
+            <a href={c.href} class="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-primary-200 p-5 transition-all">
+              <div class="flex items-start gap-3">
+                <span class="text-3xl">{c.icon}</span>
+                <div>
+                  <h3 class="font-semibold text-gray-900 group-hover:text-primary-700 text-base mb-1 leading-tight">{c.title}</h3>
+                  <p class="text-sm text-gray-500 leading-snug">{c.desc}</p>
+                  <span class="mt-2 inline-block text-xs text-primary-600 font-medium">{c.vol} Suchen/Monat →</span>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    ))}
+
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="text-center p-6 bg-blue-50 rounded-2xl border border-blue-100">
+        <div class="text-4xl mb-2">🇩🇪</div>
+        <div class="font-bold text-gray-800 mb-1">Deutschland</div>
+        <p class="text-xs text-gray-500 mb-3">EStG 2026, TVöD/TV-L, GKV-Beiträge</p>
+        <a href="/de/" class="text-xs text-primary-600 font-medium hover:underline">Alle DE-Rechner →</a>
+      </div>
+      <div class="text-center p-6 bg-green-50 rounded-2xl border border-green-100">
+        <div class="text-4xl mb-2">🇦🇹</div>
+        <div class="font-bold text-gray-800 mb-1">Österreich</div>
+        <p class="text-xs text-gray-500 mb-3">AT-Steuertarif, SV-Beiträge, Absetzbeträge</p>
+        <a href="/at/" class="text-xs text-primary-600 font-medium hover:underline">Alle AT-Rechner →</a>
+      </div>
+      <div class="text-center p-6 bg-yellow-50 rounded-2xl border border-yellow-100">
+        <div class="text-4xl mb-2">🇨🇭</div>
+        <div class="font-bold text-gray-800 mb-1">Schweiz</div>
+        <p class="text-xs text-gray-500 mb-3">CHF, AHV/IV, kantonale Quellensteuer</p>
+        <a href="/ch/" class="text-xs text-primary-600 font-medium hover:underline">Alle CH-Rechner →</a>
+      </div>
+    </div>
+  </div>
+  <Footer slot="footer" />
+</BaseLayout>

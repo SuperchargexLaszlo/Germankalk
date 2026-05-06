@@ -1,0 +1,103 @@
+---
+export interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  hreflangDE?: string;
+  hreflangAT?: string;
+  hreflangCH?: string;
+  schema?: object;
+  image?: string;
+  noindex?: boolean;
+}
+const {
+  title, description, canonical, hreflangDE, hreflangAT, hreflangCH,
+  schema, image = '/og/og-default.svg', noindex = false
+} = Astro.props;
+const siteUrl = 'https://rechnerbox.eu';
+const canonicalUrl = canonical ?? Astro.url.href;
+// x-default points to DE version if available, else site root
+const xDefault = hreflangDE ? siteUrl + hreflangDE : siteUrl + '/de/';
+---
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  {noindex ? <meta name="robots" content="noindex,nofollow" /> : <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large" />}
+  <link rel="canonical" href={canonicalUrl} />
+
+  <!-- hreflang -->
+  {hreflangDE && <link rel="alternate" hreflang="de-DE" href={siteUrl + hreflangDE} />}
+  {hreflangAT && <link rel="alternate" hreflang="de-AT" href={siteUrl + hreflangAT} />}
+  {hreflangCH && <link rel="alternate" hreflang="de-CH" href={siteUrl + hreflangCH} />}
+  {hreflangDE && <link rel="alternate" hreflang="de" href={siteUrl + hreflangDE} />}
+  <link rel="alternate" hreflang="x-default" href={xDefault} />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content={siteUrl + image} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="de_DE" />
+  <meta property="og:site_name" content="RechnerBox" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+
+  <!-- Schema.org -->
+  {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
+
+  <!-- Org Schema sitewide -->
+  <script type="application/ld+json">{JSON.stringify({
+    "@context":"https://schema.org",
+    "@type":"Organization",
+    "name":"RechnerBox",
+    "url":"https://rechnerbox.eu",
+    "logo":"https://rechnerbox.eu/favicon.svg",
+    "sameAs":[]
+  })}</script>
+
+  <!-- Google Search Console -->
+  <meta name="google-site-verification" content="sY8ZONHpG4RoIeXw5OqFggOq37WjX3DqXiKAh30JpZ8" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="sitemap" href="/sitemap-index.xml" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+
+  <!-- Google Analytics 4 – Placeholder (GA_MEASUREMENT_ID ersetzen) -->
+  <!-- Aktivieren: GA_MEASUREMENT_ID mit echtem Wert ersetzen, Kommentar entfernen -->
+  <!--
+  <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'GA_MEASUREMENT_ID');
+  </script>
+  -->
+
+  <!-- Google AdSense – Placeholder (Publisher-ID ersetzen) -->
+  <!-- Aktivieren: ca-pub-XXXXXXXXXX mit echter ID ersetzen, Kommentar entfernen -->
+  <!--
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX" crossorigin="anonymous"></script>
+  -->
+</head>
+<body class="flex flex-col min-h-screen bg-gray-50 text-gray-800 antialiased font-sans">
+  <slot name="header" />
+  <main class="flex-1">
+    <slot />
+  </main>
+  <slot name="footer" />
+</body>
+</html>

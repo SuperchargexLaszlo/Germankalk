@@ -1,0 +1,213 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Promille Rechner 2026","url":"https://rechnerbox.eu/de/promille-rechner","applicationCategory":"HealthApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie berechnet man Promille?","acceptedAnswer":{"@type":"Answer","text":"Nach der Widmark-Formel: Promille = (Alkohol in Gramm) / (Körpergewicht × r). Der Faktor r beträgt bei Männern 0,7 und bei Frauen 0,6. Pro Stunde baut der Körper ca. 0,1–0,15 Promille ab."}},
+    {"@type":"Question","name":"Ab wann ist man nicht mehr fahrtüchtig?","acceptedAnswer":{"@type":"Answer","text":"In Deutschland gilt: Ab 0,5 Promille ist das Fahren eine Ordnungswidrigkeit. Ab 1,6 Promille liegt absolute Fahruntüchtigkeit vor. Für Fahranfänger und unter 21 Jahren gilt die 0,0-Promille-Grenze."}},
+    {"@type":"Question","name":"Wie lange ist Alkohol im Blut nachweisbar?","acceptedAnswer":{"@type":"Answer","text":"Je nach Alkoholmenge: 0,5 Promille bauen sich in ca. 3–4 Stunden ab. 1,0 Promille benötigt ca. 7–8 Stunden. Die Abbaurate beträgt ca. 0,1–0,15 Promille pro Stunde."}},
+    {"@type":"Question","name":"Wie viel Promille hat ein Glas Bier?","acceptedAnswer":{"@type":"Answer","text":"Ein kleines Bier (0,3l, 4,8% Vol.) enthält ca. 11,4g Alkohol. Bei einem 80kg schweren Mann entspricht das ca. 0,20 Promille. Bei einer 60kg schweren Frau ca. 0,24 Promille."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Promille Rechner 2026 – Blutalkoholgehalt berechnen"
+  description="Promille berechnen nach Widmark-Formel: Alkohol in Blut, Abbauzeit und Fahrtüchtigkeit. Für Bier, Wein und Spirituosen. Kostenloser Promille-Rechner."
+  canonical="https://rechnerbox.eu/de/promille-rechner"
+  hreflangDE="/de/promille-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Promille Rechner
+    </nav>
+    <h1>Promille Rechner 2026 – Blutalkohol berechnen</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Blutalkoholgehalt nach der Widmark-Formel berechnen – mit Abbauzeit und Fahreignung. Gilt für Bier, Wein, Sekt und Spirituosen.
+    </p>
+
+    <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-red-800 mb-1">⚠️ Wichtiger Hinweis</p>
+      <p class="text-sm text-red-700">Dieser Rechner liefert <strong>Richtwerte</strong>. Der tatsächliche BAK-Wert kann je nach Metabolismus, Mahlzeiten und anderen Faktoren erheblich abweichen. Fahren Sie nie nach Alkoholkonsum – auch wenn der Rechner einen Wert unter 0,5‰ anzeigt.</p>
+    </div>
+
+    <div class="calc-box">
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Körpergewicht (kg)</label>
+          <input class="calc-input" type="number" id="pm-kg" value="75" min="40" max="200" />
+        </div>
+        <div>
+          <label class="calc-label">Geschlecht</label>
+          <select class="calc-select" id="pm-sex">
+            <option value="0.7">Männlich (Faktor 0,70)</option>
+            <option value="0.6">Weiblich (Faktor 0,60)</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Trinkverlauf (Stunden)</label>
+          <input class="calc-input" type="number" id="pm-dauer" value="2" min="0" max="12" step="0.5" />
+        </div>
+        <div>
+          <label class="calc-label">Stunden seit Ende des Trinkens</label>
+          <input class="calc-input" type="number" id="pm-nach" value="0" min="0" max="24" step="0.5" />
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="calc-label">Getränke</label>
+        <div class="space-y-2" id="pm-getraenke">
+          <div class="flex gap-2 items-center pm-row">
+            <select class="calc-select flex-1 text-sm" onchange="updateRow(this)">
+              <option value="0.33;4.9">Bier 0,33l (4,9%)</option>
+              <option value="0.5;4.9">Bier 0,5l (4,9%)</option>
+              <option value="0.1;12.5">Wein 0,1l (12,5%)</option>
+              <option value="0.2;12.5">Wein 0,2l (12,5%)</option>
+              <option value="0.15;11">Sekt 0,15l (11%)</option>
+              <option value="0.04;40">Schnaps 4cl (40%)</option>
+              <option value="0.02;40">Kurzer 2cl (40%)</option>
+              <option value="custom">Eigene Eingabe</option>
+            </select>
+            <input class="calc-input w-16 text-sm" type="number" placeholder="Anz." value="2" min="1" max="20" />
+            <span class="text-xs text-gray-400 w-20 pm-g-info">26,6g</span>
+            <button onclick="this.closest('.pm-row').remove()" class="text-red-400 hover:text-red-600 text-sm px-2">✕</button>
+          </div>
+        </div>
+        <button onclick="addRow()" class="mt-2 text-sm text-primary-600 hover:text-primary-800 font-medium">+ Getränk hinzufügen</button>
+      </div>
+
+      <button class="calc-btn" onclick="calcPM()">Promille berechnen</button>
+
+      <div class="calc-result hidden" id="pm-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center mb-3">
+          <div><div class="result-value" id="pm-bak">–</div><div class="result-label">BAK jetzt (‰)</div></div>
+          <div><div class="result-value text-2xl" id="pm-max">–</div><div class="result-label">BAK max. (‰)</div></div>
+          <div><div class="result-value text-xl" id="pm-abbau">–</div><div class="result-label">Nüchtern in</div></div>
+          <div><div class="result-value text-xl font-bold" id="pm-status">–</div><div class="result-label">Fahreignung</div></div>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-4 mb-1">
+          <div class="h-4 rounded-full transition-all" id="pm-bar" style="width:0%;background:#22c55e"></div>
+        </div>
+        <div class="flex justify-between text-xs text-gray-400"><span>0,0‰</span><span>0,5‰</span><span>1,0‰</span><span>1,6‰</span><span>3,0‰</span></div>
+      </div>
+    </div>
+
+    <section class="mt-8">
+      <h2>Promille-Grenzen Deutschland 2026</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border">BAK-Wert</th>
+            <th class="text-center px-3 py-2 border">Rechtliche Folge</th>
+            <th class="text-center px-3 py-2 border">Strafe</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              ["0,0 – 0,3 ‰","Keine Einschränkung (außer erkennbarer Fahrfehler)","–"],
+              ["0,0 ‰","Für Fahranfänger u. unter 21 Jahre (§ 24c StVG)","500 € + 1 Pkt. + 1 Monat Fahrverbot"],
+              ["0,3 ‰","Relative Fahruntüchtigkeit (bei Fahrfehler)","Straftat mögl. bei Unfall"],
+              ["0,5 ‰","Ordnungswidrigkeit (§ 24a StVG)","500 € + 2 Pkt. + 1 Monat Fahrverbot"],
+              ["1,1 ‰","Absolute Fahruntüchtigkeit (Pkw)","Straftat, Fahrerlaubnisentzug"],
+              ["1,6 ‰","Absolute Fahruntüchtigkeit + MPU-Pflicht","Führerscheinentzug mind. 6 Monate"],
+            ].map(r => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-semibold text-gray-800">{r[0]}</td>
+                <td class="px-3 py-2 border text-gray-600 text-xs">{r[1]}</td>
+                <td class="px-3 py-2 border text-red-600 text-xs">{r[2]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Promille Rechner</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wie viel Promille hat ein Bier?",a:"Ein 0,5l Bier (4,9% Vol.) enthält ca. 19,6g reinen Alkohol. Bei einem 80kg schweren Mann ergibt das ca. 0,35 Promille (vor Abbau). Bei einer 60kg schweren Frau sind es ca. 0,41 Promille."},
+          {q:"Wann bin ich nach Alkohol wieder nüchtern?",a:"Der Körper baut pro Stunde ca. 0,1–0,15 Promille ab. Nach 3 Gläsern Wein (ca. 1,5 Promille) dauert es ca. 10–15 Stunden, bis der BAK unter 0,0 fällt. Kaffee, Wasser oder Schlaf beschleunigen den Abbau nicht."},
+          {q:"Wie genau ist der Widmark-Rechner?",a:"Die Widmark-Formel ist eine Näherung mit ca. ±20% Ungenauigkeit. Faktoren wie voller oder leerer Magen, individuelle Enzyme (ADH) und Trinktempo können das Ergebnis erheblich beeinflussen."},
+          {q:"Darf ich nach einem Glas Wein noch Auto fahren?",a:"Rechtlich: Bei unter 0,5 Promille ist Fahren eine Ordnungswidrigkeit nur wenn Fahrfehler hinzukommen. Praktisch: Da die Berechnung ungenau ist und Alkohol die Reaktionsfähigkeit schon ab 0,2‰ beeinträchtigt, empfehlen wir: nach Alkohol nicht fahren."},
+        ].map(f => (
+          <div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>
+        ))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/bmi-rechner',label:'BMI Rechner'},{href:'/de/kalorien-rechner',label:'Kalorienrechner'},{href:'/de/sprit-rechner',label:'Spritrechner'},{href:'/de/pace-rechner',label:'Pace Rechner'},{href:'/de/vitamin-d-rechner',label:'Vitamin D'},{href:'/de/idealgewicht-rechner',label:'Idealgewicht'}].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    // Widmark formula: BAK = (Alkohol_g) / (Gewicht_kg × r) - Abbaurate × Zeit
+    const ABBAURATE = 0.125; // 0,1–0,15‰/h Mittelwert
+    function alkoholGramm(litre: number, vol: number) { return litre * vol / 100 * 0.8 * 1000; }
+    function parseGetraenk(sel: HTMLSelectElement) {
+      const [l,v] = sel.value.split(';').map(Number);
+      return {litre: l, vol: v};
+    }
+    function updateRow(sel: HTMLSelectElement) {
+      const row = sel.closest('.pm-row')!;
+      if(sel.value==='custom') return;
+      const {litre,vol} = parseGetraenk(sel);
+      const anzEl = row.querySelector('input') as HTMLInputElement;
+      const anz = parseFloat(anzEl.value)||1;
+      const info = row.querySelector('.pm-g-info')!;
+      info.textContent = (alkoholGramm(litre,vol)*anz).toFixed(1)+'g';
+    }
+    function addRow() {
+      const cont = document.getElementById('pm-getraenke')!;
+      const tmpl = cont.querySelector('.pm-row')!.cloneNode(true) as HTMLElement;
+      const inp = tmpl.querySelector('input') as HTMLInputElement; inp.value='1';
+      const sel = tmpl.querySelector('select') as HTMLSelectElement;
+      sel.addEventListener('change', ()=>updateRow(sel));
+      inp.addEventListener('input', ()=>updateRow(sel));
+      cont.appendChild(tmpl);
+    }
+    document.querySelectorAll<HTMLSelectElement>('.pm-row select').forEach(s=>s.addEventListener('change',()=>updateRow(s)));
+    document.querySelectorAll<HTMLInputElement>('.pm-row input').forEach(i=>i.addEventListener('input',()=>{
+      const sel=i.closest('.pm-row')?.querySelector('select') as HTMLSelectElement;if(sel)updateRow(sel);
+    }));
+    (window as any).calcPM = function() {
+      const kg=parseFloat((document.getElementById('pm-kg') as HTMLInputElement).value)||75;
+      const r=parseFloat((document.getElementById('pm-sex') as HTMLSelectElement).value)||0.7;
+      const dauer=parseFloat((document.getElementById('pm-dauer') as HTMLInputElement).value)||0;
+      const nach=parseFloat((document.getElementById('pm-nach') as HTMLInputElement).value)||0;
+      let totalG=0;
+      document.querySelectorAll<HTMLElement>('.pm-row').forEach(row=>{
+        const sel=row.querySelector('select') as HTMLSelectElement;
+        const anz=parseFloat(row.querySelector('input')?.value||'0')||0;
+        if(sel.value==='custom')return;
+        const {litre,vol}=parseGetraenk(sel);
+        totalG+=alkoholGramm(litre,vol)*anz;
+      });
+      if(totalG<=0){alert('Bitte Getränke eingeben.');return;}
+      const bak_max=totalG/(kg*r);
+      const abbau_waehrend=Math.min(bak_max, dauer*ABBAURATE*0.5); // halbe Rate während Trinken
+      const bak_nach_trinken=Math.max(0,bak_max-abbau_waehrend);
+      const bak_jetzt=Math.max(0,bak_nach_trinken-nach*ABBAURATE);
+      const nuchtern_h=bak_jetzt>0?bak_jetzt/ABBAURATE:0;
+      let status='✅ Fahrgeeignet',color='#22c55e';
+      if(bak_jetzt>=1.6){status='🚫 Abs. Fahruntüchtig';color='#7f1d1d';}
+      else if(bak_jetzt>=1.1){status='🚫 Abs. Fahruntüchtig';color='#dc2626';}
+      else if(bak_jetzt>=0.5){status='⚠️ Nicht fahren!';color='#ea580c';}
+      else if(bak_jetzt>=0.3){status='⚠️ Vorsicht!';color='#d97706';}
+      const res=document.getElementById('pm-result')!;res.classList.remove('hidden');
+      document.getElementById('pm-bak')!.textContent=bak_jetzt.toFixed(2).replace('.',',')+' ‰';
+      document.getElementById('pm-max')!.textContent=bak_max.toFixed(2).replace('.',',')+' ‰';
+      document.getElementById('pm-abbau')!.textContent=nuchtern_h>0?nuchtern_h.toFixed(1).replace('.',',')+' h':'Nüchtern';
+      const statEl=document.getElementById('pm-status')!;statEl.textContent=status;statEl.style.color=color;
+      const bar=document.getElementById('pm-bar')!;
+      bar.style.width=Math.min(100,bak_jetzt/3*100)+'%';bar.style.background=color;
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

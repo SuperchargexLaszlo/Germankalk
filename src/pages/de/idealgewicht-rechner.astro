@@ -1,0 +1,172 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Idealgewicht Rechner 2026","url":"https://rechnerbox.eu/de/idealgewicht-rechner","applicationCategory":"HealthApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie berechne ich mein Idealgewicht?","acceptedAnswer":{"@type":"Answer","text":"Es gibt verschiedene Formeln: Broca-Formel: Idealgewicht = Körpergröße (cm) – 100 (Männer) bzw. – 10% (Frauen). BMI-Methode: Idealgewicht = BMI 22 × Körpergröße² (m). Hamwi-Formel: 48 kg + 2,7 kg je 2,5 cm über 152 cm (Männer)."}},
+    {"@type":"Question","name":"Ist das Idealgewicht für Frauen und Männer unterschiedlich?","acceptedAnswer":{"@type":"Answer","text":"Ja. Frauen haben bei gleicher Größe einen höheren Körperfettanteil und ein geringeres Idealgewicht nach Broca. Die BMI-basierte Methode unterscheidet nicht nach Geschlecht, ist aber weniger körperfettbezogen."}},
+    {"@type":"Question","name":"Welche Formel ist die genaueste für das Idealgewicht?","acceptedAnswer":{"@type":"Answer","text":"Keine Formel ist universell genau. Die BMI-Methode (18,5–24,9) ist am weitesten verbreitet, berücksichtigt aber keine Muskelmasse. Die Broca-Formel ist einfach, überschätzt oft das Gewicht großer Personen."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Idealgewicht Rechner 2026 – Broca, BMI, Hamwi Formel"
+  description="Idealgewicht berechnen nach Broca, BMI und Hamwi-Formel. Für Frauen und Männer, alle Körpergrößen. Vergleich aller Methoden. Kostenloser Idealgewicht-Rechner."
+  canonical="https://rechnerbox.eu/de/idealgewicht-rechner"
+  hreflangDE="/de/idealgewicht-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Idealgewicht Rechner
+    </nav>
+    <h1>Idealgewicht Rechner 2026 – alle Formeln im Vergleich</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Ihr Idealgewicht nach allen gängigen Methoden berechnen: Broca-Formel, BMI-Methode und Hamwi-Formel – für Frauen und Männer.
+    </p>
+
+    <div class="calc-box">
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Körpergröße (cm)</label>
+          <input class="calc-input" type="number" id="ig-h" value="175" min="140" max="220" />
+        </div>
+        <div>
+          <label class="calc-label">Aktuelles Gewicht (kg)</label>
+          <input class="calc-input" type="number" id="ig-w" value="78" step="0.1" />
+        </div>
+        <div>
+          <label class="calc-label">Geschlecht</label>
+          <select class="calc-select" id="ig-sex">
+            <option value="m">Männlich</option>
+            <option value="f">Weiblich</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcIG()">Idealgewicht berechnen</button>
+      <div class="calc-result hidden" id="ig-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center mb-4">
+          <div><div class="result-value" id="ig-broca">–</div><div class="result-label">Broca (kg)</div></div>
+          <div><div class="result-value text-2xl" id="ig-bmi">–</div><div class="result-label">BMI-Methode (kg)</div></div>
+          <div><div class="result-value text-xl" id="ig-hamwi">–</div><div class="result-label">Hamwi (kg)</div></div>
+          <div><div class="result-value text-xl" id="ig-diff">–</div><div class="result-label">Differenz</div></div>
+        </div>
+        <div class="bg-white rounded-xl p-3 text-sm">
+          <div class="font-semibold text-gray-700 mb-2">Ihr BMI: <span id="ig-bmi-val" class="text-primary-700">–</span></div>
+          <div class="w-full bg-gray-200 rounded-full h-3">
+            <div class="h-3 rounded-full" id="ig-bmi-bar" style="width:0%;background:#22c55e"></div>
+          </div>
+          <div class="flex justify-between text-xs text-gray-400 mt-1"><span>16</span><span>18,5</span><span>25</span><span>30</span><span>40</span></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="mt-8">
+      <h2>Idealgewicht-Tabelle nach Größe (Broca-Formel)</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border">Größe</th>
+            <th class="text-center px-3 py-2 border">Mann (Broca)</th>
+            <th class="text-center px-3 py-2 border">Frau (Broca)</th>
+            <th class="text-center px-3 py-2 border">BMI 22 (neutral)</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              [160,60,54,56.3],[165,65,58.5,59.9],[170,70,63,65.3],[175,75,67.5,67.4],[180,80,72,71.3],[185,85,76.5,75.3],[190,90,81,79.4],
+            ].map(r => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-medium text-gray-800">{r[0]} cm</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{r[1]} kg</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{r[2]} kg</td>
+                <td class="text-center px-3 py-2 border text-primary-700">{r[3]} kg</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-6">
+      <h2>Formeln im Vergleich</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+        <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+          <div class="font-bold text-blue-800 mb-2">Broca-Formel</div>
+          <p class="text-xs text-blue-700 mb-2"><strong>Mann:</strong> Größe (cm) – 100<br/><strong>Frau:</strong> (Größe – 100) × 0,9</p>
+          <p class="text-xs text-blue-600">Einfach, aber überschätzt bei Körpergrößen über 180 cm.</p>
+        </div>
+        <div class="bg-green-50 rounded-xl p-4 border border-green-100">
+          <div class="font-bold text-green-800 mb-2">BMI-Methode</div>
+          <p class="text-xs text-green-700 mb-2"><strong>Ideal-BMI 22:</strong><br/>Gewicht = 22 × Größe² (in m)</p>
+          <p class="text-xs text-green-600">International anerkannt, kein Geschlechtsunterschied, ignoriert Muskelmasse.</p>
+        </div>
+        <div class="bg-purple-50 rounded-xl p-4 border border-purple-100">
+          <div class="font-bold text-purple-800 mb-2">Hamwi-Formel</div>
+          <p class="text-xs text-purple-700 mb-2"><strong>Mann:</strong> 48 + 2,7 je 2,5 cm > 152<br/><strong>Frau:</strong> 45,4 + 2,3 je 2,5 cm > 152</p>
+          <p class="text-xs text-purple-600">Wird in der Klinischen Ernährungsmedizin verwendet (USA).</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Idealgewicht</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Warum weichen die Formeln so stark voneinander ab?",a:"Jede Formel wurde für einen anderen Zweck entwickelt. Die Broca-Formel ist eine grobe klinische Faustregel, die BMI-Methode ist epidemiologisch fundiert, die Hamwi-Formel stammt aus der US-amerikanischen Klinischen Ernährungsmedizin. Das 'wahre' Idealgewicht hängt von Körperzusammensetzung, Knochendichte und Muskelmasse ab."},
+          {q:"Kann ich muskulös sein und trotzdem 'übergewichtig' nach BMI sein?",a:"Ja. Da Muskeln schwerer sind als Fett, können sehr muskulöse Personen (z.B. Kraftsportler) einen BMI > 25 haben, ohne gesundheitlich übergewichtig zu sein. In solchen Fällen ist der Körperfettanteil ein besserer Indikator."},
+          {q:"Was ist der gesündeste BMI?",a:"Studien zeigen, dass ein BMI zwischen 22 und 24,9 mit dem geringsten Krankheitsrisiko verbunden ist. Leichtes Übergewicht (BMI 25–27) kann im Alter sogar vorteilhaft sein ('Adipositasparadox')."},
+        ].map(f => (
+          <div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>
+        ))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/bmi-rechner',label:'BMI Rechner'},{href:'/de/kalorien-rechner',label:'Kalorienrechner'},{href:'/de/vitamin-d-rechner',label:'Vitamin D'},{href:'/de/pace-rechner',label:'Pace Rechner'},{href:'/de/promille-rechner',label:'Promille'},{href:'/de/ssw-rechner',label:'SSW Rechner'}].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    function fmt(n:number,d=1){return n.toFixed(d).replace('.',',');}
+    (window as any).calcIG=function(){
+      const h=parseFloat((document.getElementById('ig-h') as HTMLInputElement).value)||175;
+      const w=parseFloat((document.getElementById('ig-w') as HTMLInputElement).value)||0;
+      const sex=(document.getElementById('ig-sex') as HTMLSelectElement).value;
+      const hm=h/100;
+      // Broca
+      const broca_raw=h-100;
+      const broca=sex==='m'?broca_raw:broca_raw*0.9;
+      // BMI 22
+      const bmiIdeal=22*hm*hm;
+      // Hamwi (in cm, US-Formel)
+      const hInch=(h-152)/2.54;
+      const hamwi=sex==='m'?48+2.7*Math.max(0,hInch/2.54*2.5/2.5):45.4+2.3*Math.max(0,hInch/2.54*2.5/2.5);
+      // Aktueller BMI
+      const bmi=w>0?w/(hm*hm):0;
+      const diff=w>0?w-Math.round((broca+bmiIdeal)/2):null;
+      const r=document.getElementById('ig-result')!;r.classList.remove('hidden');
+      document.getElementById('ig-broca')!.textContent=fmt(broca)+' kg';
+      document.getElementById('ig-bmi')!.textContent=fmt(bmiIdeal)+' kg';
+      document.getElementById('ig-hamwi')!.textContent=fmt(hamwi)+' kg';
+      if(diff!==null){
+        const dEl=document.getElementById('ig-diff')!;
+        dEl.textContent=(diff>0?'+':'')+fmt(diff)+' kg';
+        dEl.style.color=Math.abs(diff)<5?'#16a34a':diff>0?'#dc2626':'#2563eb';
+      } else { document.getElementById('ig-diff')!.textContent='–'; }
+      if(bmi>0){
+        document.getElementById('ig-bmi-val')!.textContent=fmt(bmi);
+        const cats=[{max:18.5,c:'#f97316'},{max:25,c:'#22c55e'},{max:30,c:'#f59e0b'},{max:999,c:'#ef4444'}];
+        const cat=cats.find(c=>bmi<c.max)||cats[3];
+        const bar=document.getElementById('ig-bmi-bar')!;
+        bar.style.width=Math.min(100,(bmi-16)/24*100)+'%';bar.style.background=cat.c;
+      }
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

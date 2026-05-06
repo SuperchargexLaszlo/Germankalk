@@ -1,0 +1,178 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"cm in Inch Rechner 2026","url":"https://rechnerbox.eu/de/umrechnung-cm-inch","applicationCategory":"UtilitiesApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie viel cm sind 1 Inch?","acceptedAnswer":{"@type":"Answer","text":"1 Inch (Zoll) = 2,54 Zentimeter. Umgekehrt: 1 cm = 0,3937 Inch. Formel: cm × 0,3937 = Inch."}},
+    {"@type":"Question","name":"Wie groß ist 6 Fuß in cm?","acceptedAnswer":{"@type":"Answer","text":"6 Fuß = 182,88 cm. 1 Fuß = 30,48 cm, 1 Fuß = 12 Inch. Formel: Fuß × 30,48 = cm."}},
+    {"@type":"Question","name":"Was ist 5 Fuß 10 Inch in cm?","acceptedAnswer":{"@type":"Answer","text":"5 Fuß 10 Inch = (5 × 30,48) + (10 × 2,54) = 152,4 + 25,4 = 177,8 cm."}},
+    {"@type":"Question","name":"Wie rechne ich Inch in cm um?","acceptedAnswer":{"@type":"Answer","text":"Inch × 2,54 = Zentimeter. Beispiel: 10 Inch × 2,54 = 25,4 cm. Oder: Fuß × 12 + Inch, dann × 2,54."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="cm in Inch umrechnen 2026 – Zoll, Fuß, Yard Rechner"
+  description="Zentimeter in Inch (Zoll), Fuß und Yard umrechnen. Körpergröße, Bildschirmdiagonale, TV-Größen. Kostenloser cm-Inch-Rechner mit Umrechnungstabelle."
+  canonical="https://rechnerbox.eu/de/umrechnung-cm-inch"
+  hreflangDE="/de/umrechnung-cm-inch"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › cm in Inch
+    </nav>
+    <h1>cm in Inch umrechnen – Zentimeter, Zoll, Fuß</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Zentimeter in Inch (Zoll), Fuß und Yard umrechnen – und umgekehrt. Für Körpergröße, TV-Diagonale, Reifengrößen und mehr.
+    </p>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-blue-800 mb-1">💡 Schnellformel</p>
+      <p class="text-sm text-blue-700"><strong>1 Inch = 2,54 cm</strong> · <strong>1 Fuß = 30,48 cm</strong> · <strong>1 Yard = 91,44 cm</strong> · <strong>1 cm = 0,3937 Inch</strong></p>
+    </div>
+
+    <div class="calc-box">
+      <div class="flex flex-wrap gap-2 mb-5">
+        {[{id:'czm',l:'cm → Inch/Fuß'},{id:'izc',l:'Inch → cm'},{id:'fzc',l:'Fuß+Inch → cm'},{id:'tv',l:'TV-Diagonale'}].map((t,i)=>(
+          <button onclick={`setCIMode('${t.id}')`} id={`citab-${t.id}`}
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${i===0?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`}>{t.l}</button>
+        ))}
+      </div>
+
+      <div id="ci-czm">
+        <div class="mb-4"><label class="calc-label">Zentimeter (cm)</label>
+          <input class="calc-input" type="number" id="ci-cm" value="175" step="0.1" /></div>
+      </div>
+      <div id="ci-izc" class="hidden">
+        <div class="mb-4"><label class="calc-label">Inch (Zoll)</label>
+          <input class="calc-input" type="number" id="ci-inch" value="10" step="0.01" /></div>
+      </div>
+      <div id="ci-fzc" class="hidden">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div><label class="calc-label">Fuß</label><input class="calc-input" type="number" id="ci-fuss" value="5" min="0" /></div>
+          <div><label class="calc-label">Inch</label><input class="calc-input" type="number" id="ci-finch" value="10" min="0" max="11" /></div>
+        </div>
+      </div>
+      <div id="ci-tv" class="hidden">
+        <div class="mb-4">
+          <label class="calc-label">TV-Diagonale (Inch)</label>
+          <select class="calc-select" id="ci-tv-sel">
+            <option value="32">32 Zoll</option><option value="40">40 Zoll</option>
+            <option value="43">43 Zoll</option><option value="50">50 Zoll</option>
+            <option value="55" selected>55 Zoll</option><option value="65">65 Zoll</option>
+            <option value="75">75 Zoll</option><option value="85">85 Zoll</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calcCI()">Umrechnen</button>
+      <div class="calc-result hidden" id="ci-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center" id="ci-res-grid"></div>
+      </div>
+    </div>
+
+    <section class="mt-8">
+      <h2>Umrechnungstabelle cm ↔ Inch</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="px-3 py-2 border text-center">cm</th><th class="px-3 py-2 border text-center">Inch</th>
+            <th class="px-3 py-2 border text-center">Fuß+Inch</th><th class="px-3 py-2 border text-center">Yard</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[[1,0.39,'0\'1"',0.011],[5,1.97,'0\'2"',0.055],[10,3.94,'0\'4"',0.109],[30,11.81,'0\'12"',0.328],
+              [100,39.37,'3\'3"',1.094],[150,59.06,'4\'11"',1.640],[175,68.90,'5\'9"',1.913],[180,70.87,'5\'11"',1.969],[200,78.74,'6\'7"',2.187]].map(r=>(
+              <tr class="hover:bg-gray-50">
+                {r.map((c,i)=><td class={`px-3 py-2 border text-center ${i===0?'font-medium text-gray-800':'text-gray-600'}`}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8">
+      <h2>Körpergrößen-Tabelle Fuß/Inch in cm</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100"><th class="px-3 py-2 border text-center">Fuß/Inch</th><th class="px-3 py-2 border text-center">cm</th><th class="px-3 py-2 border text-center">Fuß/Inch</th><th class="px-3 py-2 border text-center">cm</th></tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[["5'0\"",152.4,"5'9\"",175.3],["5'2\"",157.5,"5'10\"",177.8],["5'4\"",162.6,"5'11\"",180.3],
+              ["5'6\"",167.6,"6'0\"",182.9],["5'7\"",170.2,"6'2\"",187.9],["5'8\"",172.7,"6'4\"",193.0]].map(r=>(
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border text-center font-medium text-primary-700">{r[0]}</td>
+                <td class="px-3 py-2 border text-center text-gray-600">{r[1]} cm</td>
+                <td class="px-3 py-2 border text-center font-medium text-primary-700">{r[2]}</td>
+                <td class="px-3 py-2 border text-center text-gray-600">{r[3]} cm</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – cm und Inch</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wie groß ist 5 Fuß 9 Inch in cm?",a:"5 Fuß 9 Inch = (5 × 30,48) + (9 × 2,54) = 152,4 + 22,86 = 175,26 cm. Das ist in Deutschland eine sehr durchschnittliche Körpergröße für Männer."},
+          {q:"Wie groß ist ein 55-Zoll-Fernseher in cm?",a:"55 Inch × 2,54 = 139,7 cm Bilddiagonale. Bei 16:9 Format ergibt das eine Breite von ca. 121,8 cm und eine Höhe von ca. 68,5 cm."},
+          {q:"Was bedeutet Zoll bei Reifengrößen?",a:"Bei Reifengrößen (z.B. 195/65 R15) ist 'R15' der Felgendurchmesser in Zoll. 15 Zoll × 2,54 = 38,1 cm Felgendurchmesser."},
+          {q:"Warum benutzen die USA noch Inch statt cm?",a:"Die USA, Liberia und Myanmar sind die einzigen Länder, die das imperiale Maßsystem noch nicht offiziell auf SI (Metrisches System) umgestellt haben. Historisch liegt das an der britischen Kolonialtradition."},
+        ].map(f=>(<div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Umrechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/kg-lbs-rechner',label:'kg ↔ lbs'},{href:'/de/celsius-fahrenheit',label:'°C ↔ °F'},{href:'/de/prozent-rechner',label:'Prozentrechner'},{href:'/de/idealgewicht-rechner',label:'Idealgewicht'},{href:'/de/bmi-rechner',label:'BMI Rechner'},{href:'/de/dreisatz-rechner',label:'Dreisatz'}].map(r=>(
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    let ciMode='czm';
+    const ciModes=['czm','izc','fzc','tv'];
+    function fmtN(n:number,d=2){return n.toFixed(d).replace('.',',');}
+    (window as any).setCIMode=function(m:string){
+      ciMode=m; ciModes.forEach(x=>{
+        document.getElementById('ci-'+x)?.classList.toggle('hidden',x!==m);
+        const t=document.getElementById('citab-'+x);
+        if(t)t.className=`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${x===m?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`;
+      });
+      document.getElementById('ci-result')?.classList.add('hidden');
+    };
+    function toFussInch(cm:number){const totalInch=cm/2.54;const f=Math.floor(totalInch/12);const i=totalInch%12;return `${f}' ${fmtN(i,1)}"`;}
+    function showGrid(items:{v:string,l:string}[]){
+      document.getElementById('ci-res-grid')!.innerHTML=items.map(i=>`<div><div class="result-value text-xl">${i.v}</div><div class="result-label">${i.l}</div></div>`).join('');
+      document.getElementById('ci-result')!.classList.remove('hidden');
+    }
+    (window as any).calcCI=function(){
+      if(ciMode==='czm'){
+        const cm=parseFloat((document.getElementById('ci-cm') as HTMLInputElement).value)||0;
+        showGrid([{v:fmtN(cm/2.54)+' in',l:'Inch (Zoll)'},{v:toFussInch(cm),l:'Fuß + Inch'},{v:fmtN(cm/91.44)+' yd',l:'Yard'},{v:fmtN(cm/100)+' m',l:'Meter'}]);
+      } else if(ciMode==='izc'){
+        const inch=parseFloat((document.getElementById('ci-inch') as HTMLInputElement).value)||0;
+        const cm=inch*2.54;
+        showGrid([{v:fmtN(cm)+' cm',l:'Zentimeter'},{v:fmtN(cm/1000,4)+' m',l:'Meter'},{v:toFussInch(cm),l:'Fuß + Inch'},{v:fmtN(cm/91.44,3)+' yd',l:'Yard'}]);
+      } else if(ciMode==='fzc'){
+        const f=parseFloat((document.getElementById('ci-fuss') as HTMLInputElement).value)||0;
+        const i=parseFloat((document.getElementById('ci-finch') as HTMLInputElement).value)||0;
+        const cm=(f*12+i)*2.54;
+        showGrid([{v:fmtN(cm)+' cm',l:'Zentimeter'},{v:fmtN(cm/100,2)+' m',l:'Meter'},{v:fmtN((f*12+i),2)+' in',l:'Gesamt Inch'},{v:fmtN(cm/91.44,3)+' yd',l:'Yard'}]);
+      } else {
+        const inch=parseFloat((document.getElementById('ci-tv-sel') as HTMLSelectElement).value);
+        const diag=inch*2.54;
+        const w=diag/Math.sqrt(1+9/16/1);
+        const breite=Math.sqrt(diag*diag*16/25);
+        const hoehe=Math.sqrt(diag*diag*9/25);
+        showGrid([{v:fmtN(diag)+' cm',l:'Diagonale'},{v:fmtN(breite)+' cm',l:'Breite (16:9)'},{v:fmtN(hoehe)+' cm',l:'Höhe (16:9)'},{v:fmtN(breite*hoehe/10000,1)+' dm²',l:'Bildfläche'}]);
+      }
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

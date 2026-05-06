@@ -1,0 +1,175 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Celsius Fahrenheit Rechner 2026","url":"https://rechnerbox.eu/de/celsius-fahrenheit","applicationCategory":"UtilitiesApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie rechne ich Celsius in Fahrenheit um?","acceptedAnswer":{"@type":"Answer","text":"Formel: °F = (°C × 9/5) + 32. Beispiel: 20°C = (20 × 1,8) + 32 = 68°F. Schnellformel: °C × 2 + 30 ≈ °F (Näherung)."}},
+    {"@type":"Question","name":"Was ist 37 Grad Celsius in Fahrenheit (Körpertemperatur)?","acceptedAnswer":{"@type":"Answer","text":"37°C = 98,6°F. Das ist die normale menschliche Körpertemperatur. Fieber beginnt ab ca. 38°C = 100,4°F."}},
+    {"@type":"Question","name":"Bei welcher Temperatur sind Celsius und Fahrenheit gleich?","acceptedAnswer":{"@type":"Answer","text":"Bei -40 Grad sind Celsius und Fahrenheit identisch: -40°C = -40°F. Das ist der einzige Schnittpunkt der beiden Skalen."}},
+    {"@type":"Question","name":"Wie rechne ich Fahrenheit in Celsius um?","acceptedAnswer":{"@type":"Answer","text":"Formel: °C = (°F − 32) × 5/9. Beispiel: 98,6°F = (98,6 − 32) × 5/9 = 37°C."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Celsius in Fahrenheit umrechnen 2026 – °C °F Kelvin Rechner"
+  description="Celsius in Fahrenheit umrechnen und umgekehrt. Auch Kelvin, Rankine und Réaumur. Körpertemperatur, Backofen, Wetter. Kostenloser Temperatur-Rechner."
+  canonical="https://rechnerbox.eu/de/celsius-fahrenheit"
+  hreflangDE="/de/celsius-fahrenheit"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Celsius ↔ Fahrenheit
+    </nav>
+    <h1>Celsius in Fahrenheit umrechnen – Temperatur Rechner</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Celsius (°C) in Fahrenheit (°F), Kelvin (K) und Rankine umrechnen – und umgekehrt. Mit Referenztabelle für Alltag, Kochen und Reisen.
+    </p>
+
+    <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-orange-800 mb-1">💡 Schnellformeln</p>
+      <p class="text-sm text-orange-700">
+        <strong>°C → °F:</strong> × 1,8 + 32 &nbsp;·&nbsp;
+        <strong>°F → °C:</strong> (−32) × 0,556 &nbsp;·&nbsp;
+        <strong>°C → K:</strong> + 273,15 &nbsp;·&nbsp;
+        <strong>Näherung:</strong> °C × 2 + 30 ≈ °F
+      </p>
+    </div>
+
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Celsius (°C)</label>
+          <input class="calc-input" type="number" id="temp-c" value="20" step="0.1" oninput="syncTemp('c')" />
+        </div>
+        <div>
+          <label class="calc-label">Fahrenheit (°F)</label>
+          <input class="calc-input" type="number" id="temp-f" value="68" step="0.1" oninput="syncTemp('f')" />
+        </div>
+        <div>
+          <label class="calc-label">Kelvin (K)</label>
+          <input class="calc-input" type="number" id="temp-k" value="293.15" step="0.1" oninput="syncTemp('k')" />
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcTemp()">Alle Einheiten berechnen</button>
+      <div class="calc-result hidden" id="temp-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div><div class="result-value" id="tr-c">–</div><div class="result-label">Celsius (°C)</div></div>
+          <div><div class="result-value text-2xl" id="tr-f">–</div><div class="result-label">Fahrenheit (°F)</div></div>
+          <div><div class="result-value text-xl" id="tr-k">–</div><div class="result-label">Kelvin (K)</div></div>
+          <div><div class="result-value text-xl" id="tr-ra">–</div><div class="result-label">Rankine (°R)</div></div>
+        </div>
+        <div class="mt-3 p-2 bg-white rounded-lg text-xs text-gray-500 text-center" id="tr-note"></div>
+      </div>
+    </div>
+
+    <section class="mt-8">
+      <h2>Temperatur-Referenztabelle °C ↔ °F</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border">Situation</th>
+            <th class="text-center px-3 py-2 border">°Celsius</th>
+            <th class="text-center px-3 py-2 border">°Fahrenheit</th>
+            <th class="text-center px-3 py-2 border">Kelvin</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              ["Absoluter Nullpunkt","-273,15","-459,67","0"],
+              ["Trockenes Eis","-78,5","-109,3","194,65"],
+              ["Wassergefrierung","0","32","273,15"],
+              ["Kühlschrank","4","39,2","277,15"],
+              ["Körpertemp. normal","37","98,6","310,15"],
+              ["Fieber","38,5","101,3","311,65"],
+              ["Backofen (niedrig)","150","302","423,15"],
+              ["Backofen (mittel)","200","392","473,15"],
+              ["Wasserkochen","100","212","373,15"],
+            ].map(r=>(
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-medium text-gray-800">{r[0]}</td>
+                <td class="text-center px-3 py-2 border text-blue-700 font-medium">{r[1]}</td>
+                <td class="text-center px-3 py-2 border text-orange-700 font-medium">{r[2]}</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{r[3]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8">
+      <h2>Backofentemperaturen – °C, °F und Gasstufen</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-orange-50 text-gray-700"><th class="text-left px-3 py-2 border">Bezeichnung</th><th class="text-center px-3 py-2 border">°C</th><th class="text-center px-3 py-2 border">°F</th><th class="text-center px-3 py-2 border">Gasstufe</th></tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[["Sehr niedrig","100","212","1"],["Niedrig","150","302","2"],["Mittel-niedrig","175","347","3"],["Mittel","190","375","4"],["Mittel-hoch","200","400","5"],["Hoch","220","428","6"],["Sehr hoch","250","482","7"],["Extrem","275","527","8"]].map(r=>(
+              <tr class="hover:bg-orange-50">{r.map((c,i)=><td class={`px-3 py-2 border ${i===0?'font-medium text-gray-800':'text-center text-gray-600'}`}>{c}</td>)}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Celsius und Fahrenheit</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Was ist 98,6°F in Celsius?",a:"98,6°F entspricht genau 37°C – der normalen menschlichen Körpertemperatur. Fieber beginnt ab etwa 100,4°F = 38°C."},
+          {q:"Warum benutzen die USA Fahrenheit?",a:"Die USA übernahmen das britische Maßsystem zur Kolonialzeit. Daniel Gabriel Fahrenheit entwickelte die Skala 1724. Sie wurde in den USA nie durch Celsius ersetzt, obwohl mehrere Anläufe zur Metrifikation scheiterten."},
+          {q:"Wie warm sind 72°F in Celsius?",a:"72°F = (72 − 32) × 5/9 = 40 × 0,556 = 22,2°C. Eine komfortable Raumtemperatur."},
+          {q:"Was ist die kälteste mögliche Temperatur?",a:"Der absolute Nullpunkt liegt bei 0 Kelvin = -273,15°C = -459,67°F. Bei dieser Temperatur hören alle thermischen Bewegungen auf. In der Praxis kann er nur asymptotisch erreicht werden."},
+        ].map(f=>(<div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Umrechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/umrechnung-cm-inch',label:'cm ↔ Inch'},{href:'/de/kg-lbs-rechner',label:'kg ↔ lbs'},{href:'/de/prozent-rechner',label:'Prozentrechner'},{href:'/de/dreisatz-rechner',label:'Dreisatz'},{href:'/de/bmi-rechner',label:'BMI Rechner'},{href:'/de/flaeche-rechner',label:'Fläche berechnen'}].map(r=>(
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    function fmtT(n:number){return n.toFixed(2).replace('.',',');}
+    function getCelsius():number{return parseFloat((document.getElementById('temp-c') as HTMLInputElement).value)||0;}
+    function fromC(c:number){
+      const f=c*9/5+32; const k=c+273.15; const ra=(c+273.15)*9/5;
+      return {c,f,k,ra};
+    }
+    (window as any).syncTemp=function(from:string){
+      let c=0;
+      if(from==='c')c=parseFloat((document.getElementById('temp-c') as HTMLInputElement).value)||0;
+      else if(from==='f'){const f=parseFloat((document.getElementById('temp-f') as HTMLInputElement).value)||0;c=(f-32)*5/9;}
+      else{const k=parseFloat((document.getElementById('temp-k') as HTMLInputElement).value)||0;c=k-273.15;}
+      const {f,k}=fromC(c);
+      if(from!=='c')(document.getElementById('temp-c') as HTMLInputElement).value=fmtT(c);
+      if(from!=='f')(document.getElementById('temp-f') as HTMLInputElement).value=fmtT(f);
+      if(from!=='k')(document.getElementById('temp-k') as HTMLInputElement).value=fmtT(k);
+    };
+    (window as any).calcTemp=function(){
+      const c=getCelsius();const {f,k,ra}=fromC(c);
+      const r=document.getElementById('temp-result')!;r.classList.remove('hidden');
+      document.getElementById('tr-c')!.textContent=fmtT(c)+' °C';
+      document.getElementById('tr-f')!.textContent=fmtT(f)+' °F';
+      document.getElementById('tr-k')!.textContent=fmtT(k)+' K';
+      document.getElementById('tr-ra')!.textContent=fmtT(ra)+' °R';
+      let note='';
+      if(c<-50)note='⚠️ Extremkälte (kälter als Trockenes Eis)';
+      else if(c<0)note='❄️ Frost – unter dem Gefrierpunkt';
+      else if(c<10)note='🥶 Sehr kalt';
+      else if(c<20)note='😐 Kühl';
+      else if(c<27)note='😊 Angenehm';
+      else if(c<35)note='🌡️ Warm bis heiß';
+      else if(c<38)note='🥵 Sehr heiß';
+      else if(c<=42)note='🚨 Fieber';
+      else note='⚠️ Lebensgefährlich heiß';
+      document.getElementById('tr-note')!.textContent=note;
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

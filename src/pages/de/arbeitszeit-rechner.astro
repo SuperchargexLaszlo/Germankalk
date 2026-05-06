@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+---
+<BaseLayout title="Arbeitszeitrechner 2026 – Arbeitszeit & Überstunden berechnen" description="Arbeitszeit berechnen: Stunden, Minuten, Überstunden und Pausen. Für Schichtarbeit, Teilzeit und Vollzeit. Kostenloser Arbeitszeitrechner 2026." canonical="https://rechnerbox.eu/de/arbeitszeit-rechner" hreflangDE="/de/arbeitszeit-rechner">
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Arbeitszeitrechner</nav>
+    <h1>Arbeitszeitrechner 2026</h1>
+    <p class="text-lg text-gray-600 mb-6">Arbeitszeit, Überstunden und Nettostunden inkl. Pausen schnell und einfach berechnen.</p>
+    <div class="calc-box">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+        <div><label class="calc-label">Arbeitsbeginn</label><input class="calc-input" type="time" id="az-start" value="08:00"/></div>
+        <div><label class="calc-label">Arbeitsende</label><input class="calc-input" type="time" id="az-end" value="17:00"/></div>
+        <div><label class="calc-label">Pause (min)</label><input class="calc-input" type="number" id="az-pause" value="30" min="0"/></div>
+        <div><label class="calc-label">Sollzeit (h)</label><input class="calc-input" type="number" id="az-soll" value="8" step="0.5" min="0"/></div>
+      </div>
+      <button class="calc-btn" onclick="calcAZ()">Arbeitszeit berechnen</button>
+      <div class="calc-result hidden" id="az-result">
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div><div class="result-value" id="az-brutto">–</div><div class="result-label">Bruttozeit</div></div>
+          <div><div class="result-value text-green-600" id="az-netto">–</div><div class="result-label">Nettozeit</div></div>
+          <div><div class="result-value" id="az-uber">–</div><div class="result-label">Überstunden</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="info-box mt-4">💡 <strong>Gesetzliche Pausenregelung:</strong> Bei 6–9 Stunden Arbeitszeit sind mindestens 30 Minuten Pause vorgeschrieben. Bei mehr als 9 Stunden: mindestens 45 Minuten.</div>
+    <section class="mt-6"><h2>FAQ</h2><div class="space-y-3">
+      <div class="faq-item"><div class="faq-q">Wie viele Stunden darf ich maximal arbeiten?</div><div class="faq-a">Laut Arbeitszeitgesetz (ArbZG) beträgt die maximale Arbeitszeit 8 Stunden täglich, kann aber auf 10 Stunden ausgedehnt werden, wenn innerhalb von 6 Monaten der Durchschnitt 8 h nicht überschreitet.</div></div>
+      <div class="faq-item"><div class="faq-q">Zählen Pausen zur Arbeitszeit?</div><div class="faq-a">Nein. Ruhepausen werden nicht als Arbeitszeit gewertet und nicht vergütet. Ruhezeiten zwischen zwei Arbeitstagen müssen mindestens 11 Stunden betragen.</div></div>
+    </div></section>
+  </article>
+  <script>
+    function minsToHHMM(m:number){const abs=Math.abs(m);const h=Math.floor(abs/60);const min=abs%60;return (m<0?'-':'')+(h+'h '+(min?min+'min':''));}
+    (window as any).calcAZ=function(){
+      const [sh,sm]=(document.getElementById('az-start') as HTMLInputElement).value.split(':').map(Number);
+      const [eh,em]=(document.getElementById('az-end') as HTMLInputElement).value.split(':').map(Number);
+      const pause=parseInt((document.getElementById('az-pause') as HTMLInputElement).value)||0;
+      const soll=parseFloat((document.getElementById('az-soll') as HTMLInputElement).value)||8;
+      let brutto=(eh*60+em)-(sh*60+sm);if(brutto<0)brutto+=1440;
+      const netto=brutto-pause;const uber=netto-soll*60;
+      const r=document.getElementById('az-result')!;r.classList.remove('hidden');
+      document.getElementById('az-brutto')!.textContent=minsToHHMM(brutto);
+      document.getElementById('az-netto')!.textContent=minsToHHMM(netto);
+      const uEl=document.getElementById('az-uber')!;uEl.textContent=(uber>=0?'+':'')+minsToHHMM(uber);
+      uEl.style.color=uber>0?'#16a34a':uber<0?'#dc2626':'#6b7280';
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

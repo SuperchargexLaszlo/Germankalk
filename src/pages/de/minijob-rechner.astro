@@ -1,0 +1,203 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Minijob Rechner 2026","url":"https://rechnerbox.eu/de/minijob-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie viel darf ich im Minijob 2026 verdienen?","acceptedAnswer":{"@type":"Answer","text":"Die Minijob-Grenze 2026 liegt bei 556 € pro Monat (entspricht dem Mindestlohn von 12,82 €/h × 43,33 Stunden). Wer dauerhaft mehr verdient, wird in die Gleitzone (Midijob) eingestuft."}},
+    {"@type":"Question","name":"Was zahlt der Arbeitgeber beim Minijob?","acceptedAnswer":{"@type":"Answer","text":"Der Arbeitgeber zahlt beim gewerblichen Minijob pauschal 28% auf das Minijob-Entgelt: 13% Rentenversicherung, 13% Krankenversicherung, 2% Pauschalsteuer. Dazu kommt der Beitrag zur gesetzlichen Unfallversicherung."}},
+    {"@type":"Question","name":"Was verdient der Minijobber netto?","acceptedAnswer":{"@type":"Answer","text":"Minijobber erhalten ihren vollen Verdienst ohne Abzüge, wenn der Arbeitgeber die Pauschalbeiträge trägt. Ausnahme: Eigener RV-Beitrag (3,6%) wird abgezogen, wenn keine Befreiung beantragt wurde."}},
+    {"@type":"Question","name":"Was ist der Unterschied zwischen Minijob und Midijob?","acceptedAnswer":{"@type":"Answer","text":"Minijob: bis 556 €/Monat, pauschale Arbeitgeberbeiträge. Midijob (Gleitzone): 556,01 bis 2.000 €/Monat, reduzierte Arbeitnehmerbeiträge. Ab 2.001 € gilt das normale Sozialversicherungsrecht."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Minijob Rechner 2026 – Verdienst, Stunden & Abgaben berechnen"
+  description="Minijob 2026 berechnen: Verdienst, Arbeitsstunden, Arbeitgeber-Abgaben und Midijob-Grenze. Minijob-Grenze 556 €/Monat. Kostenloser Minijob-Rechner."
+  canonical="https://rechnerbox.eu/de/minijob-rechner"
+  hreflangDE="/de/minijob-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Minijob Rechner
+    </nav>
+    <h1>Minijob Rechner 2026 – Verdienst & Abgaben</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Berechnen Sie Ihren Minijob-Verdienst 2026, die maximalen Arbeitsstunden und alle Arbeitgeber-Abgaben. Minijob-Grenze: <strong>556 €/Monat</strong> (Mindestlohn 12,82 €/h).
+    </p>
+
+    <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-green-800 mb-1">💡 Minijob-Grenze 2026</p>
+      <p class="text-sm text-green-700">Max. <strong>556 € / Monat</strong> (6.672 €/Jahr). Bei Mindestlohn 12,82 €/h = max. <strong>43,4 Stunden/Monat</strong>.</p>
+    </div>
+
+    <div class="calc-box">
+      <div class="flex flex-wrap gap-2 mb-5">
+        {[{id:'stunden',l:'Stunden → Verdienst'},{id:'verdienst',l:'Verdienst → Stunden'},{id:'ag-kosten',l:'AG-Gesamtkosten'}].map((t,i) => (
+          <button onclick={`setMJMode('${t.id}')`} id={`mjtab-${t.id}`}
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${i===0?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`}>{t.l}</button>
+        ))}
+      </div>
+
+      <!-- Mode: Stunden → Verdienst -->
+      <div id="mj-stunden">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="calc-label">Stunden pro Monat</label>
+            <input class="calc-input" type="number" id="mj-h" value="40" min="1" max="50" step="0.5" />
+          </div>
+          <div>
+            <label class="calc-label">Stundenlohn (€)</label>
+            <input class="calc-input" type="number" id="mj-lohn" value="13.00" min="12.82" step="0.01" />
+            <p class="text-xs text-gray-400 mt-1">Mindestlohn 2026: 12,82 €/h</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode: Verdienst → Stunden -->
+      <div id="mj-verdienst" class="hidden">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="calc-label">Monatsverdienst (€)</label>
+            <input class="calc-input" type="number" id="mj-v" value="500" min="0" max="556" />
+          </div>
+          <div>
+            <label class="calc-label">Stundenlohn (€)</label>
+            <input class="calc-input" type="number" id="mj-v-lohn" value="13.00" min="12.82" step="0.01" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode: AG-Kosten -->
+      <div id="mj-ag-kosten" class="hidden">
+        <div class="mb-4">
+          <label class="calc-label">Monatsverdienst Minijobber (€)</label>
+          <input class="calc-input" type="number" id="mj-ag-v" value="500" min="0" max="556" />
+          <p class="text-xs text-gray-400 mt-1">Max. 556 € für Minijob. Über 556 € = Midijob/Sozialversicherungspflicht.</p>
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calcMJ()">Berechnen</button>
+
+      <div class="calc-result hidden" id="mj-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center" id="mj-res-grid"></div>
+        <p class="text-xs text-gray-400 mt-2" id="mj-res-note"></p>
+      </div>
+    </div>
+
+    <div class="info-box mt-4">
+      📌 <strong>Arbeitgeber-Abgaben Minijob 2026:</strong> KV 13% + RV 13% + Pauschsteuer 2% + UV (ca. 1,6%) + Umlage U1/U2/Insolvenzgeld (ca. 1,7%) = ca. <strong>31,3%</strong> auf den Verdienst.
+    </div>
+
+    <section class="mt-8">
+      <h2>Minijob vs. Midijob vs. Normalbeschäftigung</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border">Art</th>
+            <th class="text-center px-3 py-2 border">Verdienstgrenze</th>
+            <th class="text-center px-3 py-2 border">AN-Beiträge</th>
+            <th class="text-center px-3 py-2 border">Lohnsteuer</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              ["Minijob","bis 556 €/Mo","nur opt. RV 3,6%","pauschal 2% (AG)"],
+              ["Midijob (Gleitzone)","556–2.000 €/Mo","reduziert","normal"],
+              ["Normalbeschäftigung","ab 2.001 €/Mo","volle SV-Beiträge","normal"],
+            ].map(r => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-medium text-gray-800">{r[0]}</td>
+                {r.slice(1).map(c => <td class="text-center px-3 py-2 border text-gray-600">{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Minijob 2026</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wie viele Stunden darf ich im Minijob arbeiten?",a:"Im Minijob 2026 gibt es keine gesetzlich festgelegte maximale Stundenzahl. Entscheidend ist der Verdienst: max. 556 €/Monat. Bei Mindestlohn (12,82 €/h) sind das ca. 43 Stunden monatlich."},
+          {q:"Darf ich mehrere Minijobs gleichzeitig haben?",a:"Ja, allerdings werden mehrere Minijob-Verdienste zusammengerechnet. Überschreiten sie zusammen 556 €/Monat, wird der Zweitjob sozialversicherungspflichtig. Ausnahme: Ein Minijob neben einem Hauptberuf."},
+          {q:"Bekomme ich Urlaub als Minijobber?",a:"Ja. Minijobber haben denselben gesetzlichen Urlaubsanspruch wie Vollzeitbeschäftigte (24 Werktage bei 6-Tage-Woche), anteilig berechnet auf ihre Arbeitstage pro Woche."},
+          {q:"Kann ich mich von der Rentenversicherungspflicht befreien lassen?",a:"Minijobber zahlen optional 3,6% RV-Eigenanteil (= voller RV-Schutz). Sie können sich befreien lassen – verlieren dann aber die Rentenansprüche. Ein Antrag auf Befreiung ist beim Arbeitgeber zu stellen."},
+        ].map(f => (
+          <div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>
+        ))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/brutto-netto-rechner',label:'Brutto-Netto'},{href:'/de/stundenlohn-rechner',label:'Stundenlohn'},{href:'/de/arbeitszeit-rechner',label:'Arbeitszeitrechner'},{href:'/de/urlaubsgeld-rechner',label:'Urlaubsgeld'},{href:'/de/krankengeld-rechner',label:'Krankengeld'},{href:'/de/buergergeld-rechner',label:'Bürgergeld'}].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    let mjMode = 'stunden';
+    const mjModes = ['stunden','verdienst','ag-kosten'];
+    const MINDESTLOHN = 12.82;
+    const MJ_GRENZE = 556;
+    function fmt(n: number, dec=2) { return n.toFixed(dec).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
+    function fmtE(n: number) { return fmt(n)+' €'; }
+    (window as any).setMJMode = function(m: string) {
+      mjMode = m;
+      mjModes.forEach(x => {
+        document.getElementById('mj-'+x)?.classList.toggle('hidden', x!==m);
+        const tab = document.getElementById('mjtab-'+x);
+        if(tab) tab.className = `px-3 py-1.5 rounded-lg text-sm font-medium border transition ${x===m?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`;
+      });
+      document.getElementById('mj-result')?.classList.add('hidden');
+    };
+    function showRes(items: {v:string,l:string}[], note='') {
+      const grid = document.getElementById('mj-res-grid')!;
+      grid.innerHTML = items.map(i => `<div><div class="result-value text-xl">${i.v}</div><div class="result-label">${i.l}</div></div>`).join('');
+      document.getElementById('mj-res-note')!.textContent = note;
+      document.getElementById('mj-result')!.classList.remove('hidden');
+    }
+    (window as any).calcMJ = function() {
+      if (mjMode === 'stunden') {
+        const h = parseFloat((document.getElementById('mj-h') as HTMLInputElement).value)||0;
+        const lohn = parseFloat((document.getElementById('mj-lohn') as HTMLInputElement).value)||MINDESTLOHN;
+        const verdienst = h * lohn;
+        const status = verdienst <= MJ_GRENZE ? '✅ Minijob' : verdienst <= 2000 ? '⚡ Midijob' : '❌ Über Grenze';
+        const ag = verdienst * 0.313;
+        showRes([
+          {v:fmtE(verdienst),l:'Verdienst/Monat'},
+          {v:fmtE(verdienst*0.964),l:'Netto (ohne opt. RV)'},
+          {v:fmtE(ag),l:'AG-Abgaben (31,3%)'},
+          {v:status,l:'Status'},
+        ], `Max. Stunden bei ${fmt(lohn)} €/h: ${fmt(MJ_GRENZE/lohn,1)} h/Monat`);
+      } else if (mjMode === 'verdienst') {
+        const v = parseFloat((document.getElementById('mj-v') as HTMLInputElement).value)||0;
+        const lohn = parseFloat((document.getElementById('mj-v-lohn') as HTMLInputElement).value)||MINDESTLOHN;
+        const h = v / lohn;
+        const restPuffer = MJ_GRENZE - v;
+        showRes([
+          {v:fmt(h,1)+' h',l:'Stunden/Monat'},
+          {v:fmtE(v),l:'Brutto = Netto*'},
+          {v:fmtE(restPuffer > 0 ? restPuffer : 0),l:'Puffer bis Grenze'},
+          {v:fmtE(v*0.313),l:'AG-Abgaben'},
+        ], '* Bei Befreiung von der opt. RV');
+      } else {
+        const v = parseFloat((document.getElementById('mj-ag-v') as HTMLInputElement).value)||0;
+        const ag_kv = v*0.13, ag_rv = v*0.13, ag_st = v*0.02, ag_uv = v*0.016, ag_uml = v*0.017;
+        const gesamt = v + ag_kv + ag_rv + ag_st + ag_uv + ag_uml;
+        showRes([
+          {v:fmtE(v),l:'AN-Verdienst'},
+          {v:fmtE(ag_kv+ag_rv),l:'KV+RV Pauschale'},
+          {v:fmtE(ag_st+ag_uv+ag_uml),l:'Steuer+UV+Umlage'},
+          {v:fmtE(gesamt),l:'AG-Gesamtkosten'},
+        ], 'KV 13% + RV 13% + Pauschalsteuer 2% + UV 1,6% + Umlagen 1,7%');
+      }
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

@@ -1,0 +1,71 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+---
+<BaseLayout title="SSW Rechner 2026 – Schwangerschaftswoche berechnen" description="Aktuelle Schwangerschaftswoche (SSW) und voraussichtlicher Geburtstermin berechnen. Schnell, kostenlos, genau. SSW Rechner 2026." canonical="https://rechnerbox.eu/de/ssw-rechner" hreflangDE="/de/ssw-rechner">
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › SSW Rechner</nav>
+    <h1>SSW Rechner 2026 – Schwangerschaftswoche berechnen</h1>
+    <p class="text-lg text-gray-600 mb-6">Berechnen Sie Ihre aktuelle Schwangerschaftswoche (SSW) und den voraussichtlichen Geburtstermin (ET) – basierend auf dem ersten Tag der letzten Periode.</p>
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Letzter Menstruationsbeginn (LMP)</label>
+          <input class="calc-input" type="date" id="ssw-lmp"/>
+        </div>
+        <div>
+          <label class="calc-label">Zykluslänge (Tage)</label>
+          <input class="calc-input" type="number" id="ssw-cycle" value="28" min="21" max="45"/>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcSSW()">Schwangerschaftswoche berechnen</button>
+      <div class="calc-result hidden" id="ssw-result">
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div><div class="result-value" id="ssw-week">–</div><div class="result-label">Aktuelle SSW</div></div>
+          <div><div class="result-value text-xl" id="ssw-tri">–</div><div class="result-label">Trimester</div></div>
+          <div><div class="result-value text-xl" id="ssw-et">–</div><div class="result-label">Geburtstermin (ET)</div></div>
+        </div>
+        <div class="mt-3 bg-white rounded-lg p-3">
+          <div class="text-xs text-gray-500">Tage bis zum ET: <span class="font-semibold text-primary-700" id="ssw-days">–</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="info-box mt-4">💡 Die Schwangerschaftswoche wird in der Regel ab dem ersten Tag der letzten Menstruationsblutung gerechnet – nicht ab der Befruchtung.</div>
+    <section class="mt-6"><h2>Trimester-Übersicht</h2>
+      <div class="grid grid-cols-3 gap-3 mt-3">
+        <div class="bg-blue-50 rounded-xl p-3 text-center"><div class="font-bold text-blue-700 text-lg">1. Tri</div><div class="text-xs text-blue-600">SSW 1–12</div></div>
+        <div class="bg-purple-50 rounded-xl p-3 text-center"><div class="font-bold text-purple-700 text-lg">2. Tri</div><div class="text-xs text-purple-600">SSW 13–27</div></div>
+        <div class="bg-pink-50 rounded-xl p-3 text-center"><div class="font-bold text-pink-700 text-lg">3. Tri</div><div class="text-xs text-pink-600">SSW 28–40</div></div>
+      </div>
+    </section>
+    <section class="mt-6"><h2>FAQ</h2><div class="space-y-3">
+      <div class="faq-item"><div class="faq-q">Wann ist die Schwangerschaft abgeschlossen?</div><div class="faq-a">Eine Schwangerschaft dauert durchschnittlich 40 SSW (280 Tage) ab dem ersten Tag der letzten Periode. Der errechnete Geburtstermin ist ein Richtwert – nur 5% der Babys kommen genau an diesem Tag.</div></div>
+      <div class="faq-item"><div class="faq-q">Was bedeutet SSW+X?</div><div class="faq-a">SSW+X bedeutet: Sie befinden sich in der Xten Woche plus X Tage. Z.B. 12+3 = 12. SSW, 3. Tag – also 87. Tag der Schwangerschaft.</div></div>
+    </div></section>
+  </article>
+  <script>
+    (window as any).calcSSW=function(){
+      const lmp=new Date((document.getElementById('ssw-lmp') as HTMLInputElement).value);
+      const cycle=parseInt((document.getElementById('ssw-cycle') as HTMLInputElement).value)||28;
+      if(isNaN(lmp.getTime()))return;
+      const adj=cycle-28;
+      const et=new Date(lmp);et.setDate(et.getDate()+280+adj);
+      const today=new Date();
+      const diffDays=Math.floor((today.getTime()-lmp.getTime())/86400000);
+      const sswFull=Math.floor(diffDays/7);const sswDay=diffDays%7;
+      const tri=sswFull<13?'1. Trimester':sswFull<28?'2. Trimester':'3. Trimester';
+      const daysToET=Math.round((et.getTime()-today.getTime())/86400000);
+      const etStr=et.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+      const r=document.getElementById('ssw-result')!;r.classList.remove('hidden');
+      document.getElementById('ssw-week')!.textContent=sswFull+'+'+sswDay+' SSW';
+      document.getElementById('ssw-tri')!.textContent=tri;
+      document.getElementById('ssw-et')!.textContent=etStr;
+      document.getElementById('ssw-days')!.textContent=daysToET>0?daysToET+' Tage':'Termin überschritten';
+    };
+    const d=new Date();d.setDate(d.getDate()-56);
+    (document.getElementById('ssw-lmp') as HTMLInputElement).value=d.toISOString().split('T')[0];
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

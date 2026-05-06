@@ -1,0 +1,187 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Einkommensteuer Rechner Österreich 2026","url":"https://rechnerbox.eu/at/einkommensteuer-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie hoch ist die Einkommensteuer in Österreich 2026?","acceptedAnswer":{"@type":"Answer","text":"In Österreich gilt 2026 ein progressiver Steuertarif: bis 12.816 € steuerfrei, 12.817–20.818 € = 20%, 20.819–34.835 € = 30%, 34.836–66.612 € = 40%, 66.613–99.266 € = 48%, 99.267–1.000.000 € = 50%, über 1.000.000 € = 55%."}},
+    {"@type":"Question","name":"Was ist der Unterschied zwischen Lohnsteuer und Einkommensteuer in Österreich?","acceptedAnswer":{"@type":"Answer","text":"Die Lohnsteuer ist eine Vorauszahlung auf die Einkommensteuer, die der Arbeitgeber monatlich abführt. Am Jahresende wird im Zuge der Arbeitnehmerveranlagung (Steuerausgleich) abgerechnet. Für Selbstständige und Unternehmer gilt die Einkommensteuerveranlagung."}},
+    {"@type":"Question","name":"Wann muss ich in Österreich eine Steuererklärung abgeben?","acceptedAnswer":{"@type":"Answer","text":"Arbeitnehmer müssen nur dann eine Einkommensteuererklärung (Arbeitnehmerveranlagung) abgeben, wenn das Finanzamt dazu auffordert oder Nebeneinkünfte über 730 € erzielt wurden. Freiwillig lohnt sie sich meist wegen Rückerstattungen."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Einkommensteuer Rechner Österreich 2026 – Steuer berechnen"
+  description="Österreichische Einkommensteuer 2026 online berechnen. Progressiver Steuertarif, Absetzbeträge und Nettoeinkommen für Arbeitnehmer und Selbstständige."
+  canonical="https://rechnerbox.eu/at/einkommensteuer-rechner"
+  hreflangAT="/at/einkommensteuer-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/at/" class="hover:text-primary-600">Österreich</a> › Einkommensteuer Rechner
+    </nav>
+    <h1>Einkommensteuer Rechner Österreich 2026</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Österreichische Einkommensteuer 2026 berechnen – für Arbeitnehmer und Selbstständige. Aktueller Progressionstarif, Absetzbeträge und effektiver Steuersatz.
+    </p>
+
+    <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-red-800 mb-1">🇦🇹 AT Steuertarif 2026</p>
+      <p class="text-sm text-red-700">Bis 12.816 € steuerfrei · 12.817–20.818 € = <strong>20%</strong> · 20.819–34.835 € = <strong>30%</strong> · 34.836–66.612 € = <strong>40%</strong> · bis 99.266 € = <strong>48%</strong> · ab 99.267 € = <strong>50%</strong></p>
+    </div>
+
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Jahreseinkommen brutto (€)</label>
+          <input class="calc-input" type="number" id="est-jb" value="45000" step="500" />
+        </div>
+        <div>
+          <label class="calc-label">Art der Tätigkeit</label>
+          <select class="calc-select" id="est-typ">
+            <option value="an">Arbeitnehmer (Lohnsteuerpflichtig)</option>
+            <option value="se">Selbstständig / Gewerblich</option>
+            <option value="beamte">Beamter (Dienstrecht)</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Alleinverdiener/Alleinerzieher?</label>
+          <select class="calc-select" id="est-av">
+            <option value="0">Nein</option>
+            <option value="364">Alleinverdiener (+364 €)</option>
+            <option value="669">Alleinerziehend 1 Kind (+669 €)</option>
+            <option value="939">Alleinerziehend 2 Kinder (+939 €)</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Sonderausgaben / Werbungskosten (€/Jahr)</label>
+          <input class="calc-input" type="number" id="est-wk" value="0" min="0" />
+          <p class="text-xs text-gray-400 mt-1">Pauschale 132 €/Jahr wird automatisch berücksichtigt</p>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcESt()">Einkommensteuer berechnen</button>
+      <div class="calc-result hidden" id="est-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div><div class="result-value" id="est-steuer">–</div><div class="result-label">Jahressteuer</div></div>
+          <div><div class="result-value text-2xl" id="est-eff">–</div><div class="result-label">Effektivsteuersatz</div></div>
+          <div><div class="result-value text-xl" id="est-netto-j">–</div><div class="result-label">Netto / Jahr</div></div>
+          <div><div class="result-value text-xl" id="est-netto-m">–</div><div class="result-label">Netto / Monat</div></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="mt-8">
+      <h2>Österreichischer Einkommensteuertarif 2026</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border">Einkommensstufe</th>
+            <th class="text-center px-3 py-2 border">Steuersatz</th>
+            <th class="text-center px-3 py-2 border">Steuer auf Stufe</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              ["0 – 12.816 €","0%","0 €"],
+              ["12.817 – 20.818 €","20%","bis 1.600 €"],
+              ["20.819 – 34.835 €","30%","bis 4.205 €"],
+              ["34.836 – 66.612 €","40%","bis 12.716 €"],
+              ["66.613 – 99.266 €","48%","bis 15.672 €"],
+              ["99.267 – 1.000.000 €","50%","–"],
+              ["über 1.000.000 €","55%","–"],
+            ].map(r => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-medium text-gray-800">{r[0]}</td>
+                <td class="text-center px-3 py-2 border font-semibold text-primary-700">{r[1]}</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{r[2]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8">
+      <h2>Wichtige Absetzbeträge 2026</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100"><th class="text-left px-3 py-2 border">Absetzbetrag</th><th class="text-center px-3 py-2 border">Betrag/Jahr</th><th class="text-center px-3 py-2 border">Für wen</th></tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              ["Allgemeiner Absetzbetrag (AVAB)","1.684 €","alle AN"],
+              ["Verkehrsabsetzbetrag","463 €","alle AN"],
+              ["Pensionistenabsetzbetrag","954 €","Pensionisten"],
+              ["Alleinverdienerabsetzbetrag","364 €","Verheiratete, 1 Partner < 6.937 €/J"],
+              ["Alleinerzieherabsetzbetrag","669 € / 939 €","Alleinerziehende"],
+              ["Familienbonus Plus","2.000 €/Kind","pro Kind unter 18"],
+              ["Kindermehrbetrag","700 €","Geringverdiener mit Kindern"],
+            ].map(r => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-medium text-gray-800">{r[0]}</td>
+                <td class="text-center px-3 py-2 border text-green-700 font-medium">{r[1]}</td>
+                <td class="text-center px-3 py-2 border text-gray-600 text-xs">{r[2]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Einkommensteuer Österreich 2026</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Was ist der Unterschied zwischen Grenzsteuersatz und Effektivsteuersatz?",a:"Der Grenzsteuersatz gilt nur für den letzten Euro Ihres Einkommens (z.B. 40% für Einkommen zwischen 34.836 und 66.612 €). Der Effektivsteuersatz ist der Durchschnitt – also wie viel Prozent Sie tatsächlich von Ihrem Gesamteinkommen zahlen."},
+          {q:"Was ist die Arbeitnehmerveranlagung in Österreich?",a:"Die Arbeitnehmerveranlagung (früher: Steuerausgleich) ist die jährliche Steuerabrechnung für Arbeitnehmer. Sie können dabei Werbungskosten, Sonderausgaben und außergewöhnliche Belastungen geltend machen und oft eine Rückerstattung erhalten. Einreichung via FinanzOnline möglich."},
+          {q:"Wann lohnt sich der freiwillige Steuerausgleich?",a:"Fast immer – besonders wenn Sie Werbungskosten über 132 € haben, Kirchenbeiträge, Spendenabsetzbeträge, Sonderausgaben (z.B. Topfsonderausgaben), oder wenn Sie nur teilweise im Jahr beschäftigt waren."},
+          {q:"Was kostet mich ein zusätzlicher Nebenjob steuerlich?",a:"Nebeneinkünfte bis 730 €/Jahr sind steuerfrei (Freigrenze). Darüber werden sie mit dem persönlichen Grenzsteuersatz besteuert und sind in der Einkommensteuererklärung anzugeben."},
+        ].map(f => (
+          <div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>
+        ))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/at/brutto-netto-rechner',label:'Brutto-Netto AT'},{href:'/at/pendlerpauschale-rechner',label:'Pendlerpauschale'},{href:'/de/mwst-rechner',label:'MwSt Rechner'},{href:'/de/brutto-netto-rechner',label:'Brutto-Netto DE'},{href:'/de/minijob-rechner',label:'Minijob'},{href:'/de/krankengeld-rechner',label:'Krankengeld'}].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    function calcATEst(jbe: number, avab: number, wk: number): number {
+      const zvE = Math.max(0, jbe - Math.max(132, wk) - 463 - 1684 - avab);
+      if (zvE <= 0) return 0;
+      if (zvE <= 12816) return 0;
+      if (zvE <= 20818) return (zvE-12816)*0.2;
+      if (zvE <= 34835) return 1600+(zvE-20818)*0.3;
+      if (zvE <= 66612) return 5805+(zvE-34835)*0.4;
+      if (zvE <= 99266) return 18517+(zvE-66612)*0.48;
+      if (zvE <= 1000000) return 34188+(zvE-99266)*0.5;
+      return 484622+(zvE-1000000)*0.55;
+    }
+    function fmt(n: number, d=2) { return n.toFixed(d).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.')+' €'; }
+    (window as any).calcESt = function() {
+      const jb = parseFloat((document.getElementById('est-jb') as HTMLInputElement).value)||0;
+      const avab = parseFloat((document.getElementById('est-av') as HTMLSelectElement).value)||0;
+      const wk = parseFloat((document.getElementById('est-wk') as HTMLInputElement).value)||0;
+      if (!jb) return;
+      // Also subtract SV for AN (approx. 18.12%)
+      const typ = (document.getElementById('est-typ') as HTMLSelectElement).value;
+      const jbe = typ==='an' ? jb*(1-0.1882) : jb; // rough SV deduction for AN
+      const steuer = calcATEst(jbe, avab, wk);
+      const sv = typ==='an' ? jb*0.1882 : 0;
+      const netto = jb - steuer - sv;
+      const eff = steuer/jb*100;
+      const r = document.getElementById('est-result')!; r.classList.remove('hidden');
+      document.getElementById('est-steuer')!.textContent = fmt(steuer);
+      document.getElementById('est-eff')!.textContent = eff.toFixed(1).replace('.',',')+' %';
+      document.getElementById('est-netto-j')!.textContent = fmt(netto);
+      document.getElementById('est-netto-m')!.textContent = fmt(netto/12);
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

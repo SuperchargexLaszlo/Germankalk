@@ -1,0 +1,220 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+// Quellensteuer-Tarife 2026 (AN verheiratet ohne Kinder, Monatsbrutto → Satz approximiert)
+// Quellen: kantonale Quellensteuer-Tarifordnungen
+const KANTONE = [
+  { kz:'ZH', name:'Zürich', tarife:{single:[{bis:3000,rate:0.072},{bis:5000,rate:0.123},{bis:8000,rate:0.168},{bis:12000,rate:0.211},{bis:999999,rate:0.248}], married:[{bis:4000,rate:0.035},{bis:6000,rate:0.072},{bis:10000,rate:0.118},{bis:15000,rate:0.158},{bis:999999,rate:0.199}]}},
+  { kz:'BE', name:'Bern', tarife:{single:[{bis:3000,rate:0.062},{bis:5000,rate:0.108},{bis:8000,rate:0.145},{bis:12000,rate:0.189},{bis:999999,rate:0.228}], married:[{bis:4000,rate:0.028},{bis:6000,rate:0.062},{bis:10000,rate:0.105},{bis:15000,rate:0.141},{bis:999999,rate:0.175}]}},
+  { kz:'LU', name:'Luzern', tarife:{single:[{bis:3000,rate:0.055},{bis:5000,rate:0.097},{bis:8000,rate:0.132},{bis:12000,rate:0.171},{bis:999999,rate:0.210}], married:[{bis:4000,rate:0.024},{bis:6000,rate:0.055},{bis:10000,rate:0.095},{bis:15000,rate:0.129},{bis:999999,rate:0.160}]}},
+  { kz:'UR', name:'Uri', tarife:{single:[{bis:3000,rate:0.048},{bis:5000,rate:0.085},{bis:8000,rate:0.115},{bis:12000,rate:0.149},{bis:999999,rate:0.182}], married:[{bis:4000,rate:0.020},{bis:6000,rate:0.048},{bis:10000,rate:0.082},{bis:15000,rate:0.112},{bis:999999,rate:0.139}]}},
+  { kz:'SZ', name:'Schwyz', tarife:{single:[{bis:3000,rate:0.042},{bis:5000,rate:0.074},{bis:8000,rate:0.101},{bis:12000,rate:0.131},{bis:999999,rate:0.160}], married:[{bis:4000,rate:0.018},{bis:6000,rate:0.042},{bis:10000,rate:0.072},{bis:15000,rate:0.098},{bis:999999,rate:0.121}]}},
+  { kz:'OW', name:'Obwalden', tarife:{single:[{bis:3000,rate:0.044},{bis:5000,rate:0.078},{bis:8000,rate:0.106},{bis:12000,rate:0.138},{bis:999999,rate:0.168}], married:[{bis:4000,rate:0.019},{bis:6000,rate:0.044},{bis:10000,rate:0.076},{bis:15000,rate:0.103},{bis:999999,rate:0.128}]}},
+  { kz:'NW', name:'Nidwalden', tarife:{single:[{bis:3000,rate:0.040},{bis:5000,rate:0.071},{bis:8000,rate:0.096},{bis:12000,rate:0.125},{bis:999999,rate:0.152}], married:[{bis:4000,rate:0.017},{bis:6000,rate:0.040},{bis:10000,rate:0.069},{bis:15000,rate:0.093},{bis:999999,rate:0.115}]}},
+  { kz:'GL', name:'Glarus', tarife:{single:[{bis:3000,rate:0.053},{bis:5000,rate:0.093},{bis:8000,rate:0.127},{bis:12000,rate:0.164},{bis:999999,rate:0.200}], married:[{bis:4000,rate:0.022},{bis:6000,rate:0.053},{bis:10000,rate:0.091},{bis:15000,rate:0.124},{bis:999999,rate:0.153}]}},
+  { kz:'ZG', name:'Zug', tarife:{single:[{bis:3000,rate:0.038},{bis:5000,rate:0.067},{bis:8000,rate:0.091},{bis:12000,rate:0.118},{bis:999999,rate:0.144}], married:[{bis:4000,rate:0.016},{bis:6000,rate:0.038},{bis:10000,rate:0.065},{bis:15000,rate:0.088},{bis:999999,rate:0.109}]}},
+  { kz:'FR', name:'Freiburg', tarife:{single:[{bis:3000,rate:0.068},{bis:5000,rate:0.119},{bis:8000,rate:0.162},{bis:12000,rate:0.210},{bis:999999,rate:0.254}], married:[{bis:4000,rate:0.030},{bis:6000,rate:0.068},{bis:10000,rate:0.117},{bis:15000,rate:0.158},{bis:999999,rate:0.196}]}},
+  { kz:'SO', name:'Solothurn', tarife:{single:[{bis:3000,rate:0.064},{bis:5000,rate:0.112},{bis:8000,rate:0.152},{bis:12000,rate:0.197},{bis:999999,rate:0.239}], married:[{bis:4000,rate:0.028},{bis:6000,rate:0.064},{bis:10000,rate:0.110},{bis:15000,rate:0.149},{bis:999999,rate:0.184}]}},
+  { kz:'BS', name:'Basel-Stadt', tarife:{single:[{bis:3000,rate:0.082},{bis:5000,rate:0.143},{bis:8000,rate:0.194},{bis:12000,rate:0.251},{bis:999999,rate:0.302}], married:[{bis:4000,rate:0.036},{bis:6000,rate:0.082},{bis:10000,rate:0.141},{bis:15000,rate:0.190},{bis:999999,rate:0.235}]}},
+  { kz:'BL', name:'Basel-Landschaft', tarife:{single:[{bis:3000,rate:0.073},{bis:5000,rate:0.128},{bis:8000,rate:0.174},{bis:12000,rate:0.225},{bis:999999,rate:0.272}], married:[{bis:4000,rate:0.032},{bis:6000,rate:0.073},{bis:10000,rate:0.126},{bis:15000,rate:0.170},{bis:999999,rate:0.210}]}},
+  { kz:'SH', name:'Schaffhausen', tarife:{single:[{bis:3000,rate:0.066},{bis:5000,rate:0.115},{bis:8000,rate:0.157},{bis:12000,rate:0.203},{bis:999999,rate:0.246}], married:[{bis:4000,rate:0.029},{bis:6000,rate:0.066},{bis:10000,rate:0.113},{bis:15000,rate:0.154},{bis:999999,rate:0.190}]}},
+  { kz:'AR', name:'Appenzell A.Rh.', tarife:{single:[{bis:3000,rate:0.058},{bis:5000,rate:0.102},{bis:8000,rate:0.138},{bis:12000,rate:0.179},{bis:999999,rate:0.218}], married:[{bis:4000,rate:0.025},{bis:6000,rate:0.058},{bis:10000,rate:0.099},{bis:15000,rate:0.135},{bis:999999,rate:0.166}]}},
+  { kz:'AI', name:'Appenzell I.Rh.', tarife:{single:[{bis:3000,rate:0.049},{bis:5000,rate:0.086},{bis:8000,rate:0.117},{bis:12000,rate:0.151},{bis:999999,rate:0.185}], married:[{bis:4000,rate:0.021},{bis:6000,rate:0.049},{bis:10000,rate:0.084},{bis:15000,rate:0.115},{bis:999999,rate:0.141}]}},
+  { kz:'SG', name:'St. Gallen', tarife:{single:[{bis:3000,rate:0.067},{bis:5000,rate:0.118},{bis:8000,rate:0.160},{bis:12000,rate:0.207},{bis:999999,rate:0.251}], married:[{bis:4000,rate:0.029},{bis:6000,rate:0.067},{bis:10000,rate:0.115},{bis:15000,rate:0.156},{bis:999999,rate:0.192}]}},
+  { kz:'GR', name:'Graubünden', tarife:{single:[{bis:3000,rate:0.059},{bis:5000,rate:0.104},{bis:8000,rate:0.141},{bis:12000,rate:0.183},{bis:999999,rate:0.222}], married:[{bis:4000,rate:0.026},{bis:6000,rate:0.059},{bis:10000,rate:0.101},{bis:15000,rate:0.137},{bis:999999,rate:0.170}]}},
+  { kz:'AG', name:'Aargau', tarife:{single:[{bis:3000,rate:0.063},{bis:5000,rate:0.110},{bis:8000,rate:0.149},{bis:12000,rate:0.193},{bis:999999,rate:0.234}], married:[{bis:4000,rate:0.027},{bis:6000,rate:0.063},{bis:10000,rate:0.108},{bis:15000,rate:0.146},{bis:999999,rate:0.181}]}},
+  { kz:'TG', name:'Thurgau', tarife:{single:[{bis:3000,rate:0.061},{bis:5000,rate:0.107},{bis:8000,rate:0.145},{bis:12000,rate:0.188},{bis:999999,rate:0.228}], married:[{bis:4000,rate:0.027},{bis:6000,rate:0.061},{bis:10000,rate:0.105},{bis:15000,rate:0.142},{bis:999999,rate:0.175}]}},
+  { kz:'TI', name:'Tessin', tarife:{single:[{bis:3000,rate:0.088},{bis:5000,rate:0.154},{bis:8000,rate:0.209},{bis:12000,rate:0.270},{bis:999999,rate:0.326}], married:[{bis:4000,rate:0.038},{bis:6000,rate:0.088},{bis:10000,rate:0.152},{bis:15000,rate:0.205},{bis:999999,rate:0.253}]}},
+  { kz:'VD', name:'Waadt', tarife:{single:[{bis:3000,rate:0.091},{bis:5000,rate:0.159},{bis:8000,rate:0.216},{bis:12000,rate:0.279},{bis:999999,rate:0.337}], married:[{bis:4000,rate:0.040},{bis:6000,rate:0.091},{bis:10000,rate:0.157},{bis:15000,rate:0.212},{bis:999999,rate:0.261}]}},
+  { kz:'VS', name:'Wallis', tarife:{single:[{bis:3000,rate:0.075},{bis:5000,rate:0.132},{bis:8000,rate:0.179},{bis:12000,rate:0.232},{bis:999999,rate:0.281}], married:[{bis:4000,rate:0.033},{bis:6000,rate:0.075},{bis:10000,rate:0.130},{bis:15000,rate:0.175},{bis:999999,rate:0.216}]}},
+  { kz:'NE', name:'Neuenburg', tarife:{single:[{bis:3000,rate:0.094},{bis:5000,rate:0.164},{bis:8000,rate:0.223},{bis:12000,rate:0.288},{bis:999999,rate:0.348}], married:[{bis:4000,rate:0.041},{bis:6000,rate:0.094},{bis:10000,rate:0.162},{bis:15000,rate:0.219},{bis:999999,rate:0.270}]}},
+  { kz:'GE', name:'Genf', tarife:{single:[{bis:3000,rate:0.109},{bis:5000,rate:0.191},{bis:8000,rate:0.259},{bis:12000,rate:0.335},{bis:999999,rate:0.404}], married:[{bis:4000,rate:0.047},{bis:6000,rate:0.109},{bis:10000,rate:0.188},{bis:15000,rate:0.254},{bis:999999,rate:0.313}]}},
+  { kz:'JU', name:'Jura', tarife:{single:[{bis:3000,rate:0.087},{bis:5000,rate:0.152},{bis:8000,rate:0.206},{bis:12000,rate:0.266},{bis:999999,rate:0.322}], married:[{bis:4000,rate:0.038},{bis:6000,rate:0.087},{bis:10000,rate:0.149},{bis:15000,rate:0.201},{bis:999999,rate:0.248}]}},
+];
+---
+<BaseLayout
+  title="Quellensteuer Rechner Schweiz 2026 – Alle 26 Kantone"
+  description="Schweizer Quellensteuer 2026 für alle 26 Kantone berechnen. Ledig, verheiratet, mit/ohne Kinder. Quellensteuer-Tarife aktuell. Kostenloser CH-Quellensteuerrechner."
+  canonical="https://rechnerbox.eu/ch/quellensteuer-rechner"
+  hreflangCH="/ch/quellensteuer-rechner"
+  image="/og/og-quellensteuer.svg"
+  schema={{
+    "@context":"https://schema.org",
+    "@type":"WebApplication",
+    "name":"Quellensteuer Rechner Schweiz 2026",
+    "url":"https://rechnerbox.eu/ch/quellensteuer-rechner",
+    "applicationCategory":"FinanceApplication",
+    "offers":{"@type":"Offer","price":"0","priceCurrency":"CHF"}
+  }}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/ch/" class="hover:text-primary-600">Schweiz</a> › Quellensteuer Rechner
+    </nav>
+    <h1>Quellensteuer Rechner Schweiz 2026 – Alle Kantone</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Schweizer Quellensteuer 2026 für alle 26 Kantone berechnen – für Ausländer ohne C-Ausweis (Niederlassungsbewilligung). Mit Vergleich aller Kantone.
+    </p>
+
+    <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-red-800 mb-1">🇨🇭 Was ist die Quellensteuer?</p>
+      <p class="text-sm text-red-700">Ausländische Arbeitnehmer <strong>ohne C-Ausweis</strong> werden direkt vom Lohn besteuert (Quellensteuer). Der Arbeitgeber führt den Betrag ab. Schweizer Bürger und C-Ausweis-Inhaber reichen ordentliche Steuererklärung ein.</p>
+    </div>
+
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Kanton</label>
+          <select class="calc-select" id="qst-kanton">
+            {KANTONE.map(k => <option value={k.kz}>{k.name} ({k.kz})</option>)}
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Bruttogehalt (CHF/Monat)</label>
+          <input class="calc-input" type="number" id="qst-brutto" value="7000" step="100" />
+        </div>
+        <div>
+          <label class="calc-label">Zivilstand / Tarif</label>
+          <select class="calc-select" id="qst-tarif">
+            <option value="single">Ledig / Alleinstehend (Tarif A)</option>
+            <option value="married">Verheiratet, Partner nicht erwerbstätig (Tarif B)</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Kinder (Abzug pro Kind)</label>
+          <select class="calc-select" id="qst-kinder">
+            <option value="0">Keine Kinder</option>
+            <option value="1">1 Kind</option>
+            <option value="2">2 Kinder</option>
+            <option value="3">3+ Kinder</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcQST()">Quellensteuer berechnen</button>
+      <div class="calc-result hidden" id="qst-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center mb-3">
+          <div><div class="result-value" id="qst-betrag">–</div><div class="result-label">Quellensteuer</div></div>
+          <div><div class="result-value text-2xl" id="qst-rate">–</div><div class="result-label">Effektivsatz</div></div>
+          <div><div class="result-value text-xl" id="qst-netto">–</div><div class="result-label">Netto nach QST*</div></div>
+          <div><div class="result-value text-xl" id="qst-year">–</div><div class="result-label">QST / Jahr</div></div>
+        </div>
+        <p class="text-xs text-gray-400 text-center">* Nur Quellensteuerabzug, ohne AHV/BVG etc.</p>
+      </div>
+    </div>
+
+    <section class="mt-8">
+      <h2>Quellensteuer-Vergleich: Alle 26 Kantone (7.000 CHF/Monat, ledig)</h2>
+      <p class="text-sm text-gray-500 mb-3">Sortiert nach Steuersatz – von niedrig zu hoch</p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse" id="qst-table">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border">Kanton</th>
+            <th class="text-center px-3 py-2 border">Satz (ca.)</th>
+            <th class="text-center px-3 py-2 border">QST/Monat</th>
+            <th class="text-center px-3 py-2 border">Netto/Monat</th>
+          </tr></thead>
+          <tbody id="qst-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Quellensteuer Schweiz 2026</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wer ist quellensteuerPFLICHTIG in der Schweiz?",a:"Ausländische Arbeitnehmer mit Aufenthaltsbewilligung B, L, F oder N – ohne C-Ausweis. Auch Grenzgänger (G-Ausweis) unterliegen der Quellensteuer, können aber in bestimmten Fällen im Wohnsitzstaat besteuert werden."},
+          {q:"Kann ich einen Abzug für Berufskosten oder Versicherungen geltend machen?",a:"Ja, seit 2021 können Quellensteuerpflichtige eine nachträgliche ordentliche Veranlagung (NOV) beantragen, wenn das Einkommen 120.000 CHF/Jahr übersteigt. Darunter können Berufskosten über eine Tarifkorrektur geltend gemacht werden."},
+          {q:"Wie ändert sich die Quellensteuer wenn ich heirate?",a:"Heirat ändert den Quellensteuer-Tarif. Verheiratete werden meist nach dem günstigeren B-Tarif besteuert (Alleinverdiener) oder nach dem Doppelverdiener-Tarif C, falls beide erwerbstätig sind. Der Arbeitgeber muss informiert werden."},
+          {q:"Was passiert, wenn ich den C-Ausweis bekomme?",a:"Mit dem C-Ausweis entfällt die Quellensteuer. Sie wechseln zur ordentlichen Veranlagung und reichen eine normale Steuererklärung ein. Dies kann vor- oder nachteilig sein – je nach Kanton und Einkommenssituation."},
+        ].map(f => (
+          <div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>
+        ))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/ch/lohnrechner-schweiz',label:'Lohnrechner CH'},{href:'/ch/mehrwertsteuer-rechner',label:'MWST CH 8,1%'},{href:'/de/brutto-netto-rechner',label:'Brutto-Netto DE'},{href:'/at/einkommensteuer-rechner',label:'ESt Österreich'},{href:'/de/prozent-rechner',label:'Prozentrechner'},{href:'/ch/',label:'Alle CH-Rechner'}].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    const KANTONE_DATA = {
+      ZH:{single:[{bis:3000,rate:0.072},{bis:5000,rate:0.123},{bis:8000,rate:0.168},{bis:12000,rate:0.211},{bis:999999,rate:0.248}],married:[{bis:4000,rate:0.035},{bis:6000,rate:0.072},{bis:10000,rate:0.118},{bis:15000,rate:0.158},{bis:999999,rate:0.199}]},
+      BE:{single:[{bis:3000,rate:0.062},{bis:5000,rate:0.108},{bis:8000,rate:0.145},{bis:12000,rate:0.189},{bis:999999,rate:0.228}],married:[{bis:4000,rate:0.028},{bis:6000,rate:0.062},{bis:10000,rate:0.105},{bis:15000,rate:0.141},{bis:999999,rate:0.175}]},
+      LU:{single:[{bis:3000,rate:0.055},{bis:5000,rate:0.097},{bis:8000,rate:0.132},{bis:12000,rate:0.171},{bis:999999,rate:0.210}],married:[{bis:4000,rate:0.024},{bis:6000,rate:0.055},{bis:10000,rate:0.095},{bis:15000,rate:0.129},{bis:999999,rate:0.160}]},
+      UR:{single:[{bis:3000,rate:0.048},{bis:5000,rate:0.085},{bis:8000,rate:0.115},{bis:12000,rate:0.149},{bis:999999,rate:0.182}],married:[{bis:4000,rate:0.020},{bis:6000,rate:0.048},{bis:10000,rate:0.082},{bis:15000,rate:0.112},{bis:999999,rate:0.139}]},
+      SZ:{single:[{bis:3000,rate:0.042},{bis:5000,rate:0.074},{bis:8000,rate:0.101},{bis:12000,rate:0.131},{bis:999999,rate:0.160}],married:[{bis:4000,rate:0.018},{bis:6000,rate:0.042},{bis:10000,rate:0.072},{bis:15000,rate:0.098},{bis:999999,rate:0.121}]},
+      OW:{single:[{bis:3000,rate:0.044},{bis:5000,rate:0.078},{bis:8000,rate:0.106},{bis:12000,rate:0.138},{bis:999999,rate:0.168}],married:[{bis:4000,rate:0.019},{bis:6000,rate:0.044},{bis:10000,rate:0.076},{bis:15000,rate:0.103},{bis:999999,rate:0.128}]},
+      NW:{single:[{bis:3000,rate:0.040},{bis:5000,rate:0.071},{bis:8000,rate:0.096},{bis:12000,rate:0.125},{bis:999999,rate:0.152}],married:[{bis:4000,rate:0.017},{bis:6000,rate:0.040},{bis:10000,rate:0.069},{bis:15000,rate:0.093},{bis:999999,rate:0.115}]},
+      GL:{single:[{bis:3000,rate:0.053},{bis:5000,rate:0.093},{bis:8000,rate:0.127},{bis:12000,rate:0.164},{bis:999999,rate:0.200}],married:[{bis:4000,rate:0.022},{bis:6000,rate:0.053},{bis:10000,rate:0.091},{bis:15000,rate:0.124},{bis:999999,rate:0.153}]},
+      ZG:{single:[{bis:3000,rate:0.038},{bis:5000,rate:0.067},{bis:8000,rate:0.091},{bis:12000,rate:0.118},{bis:999999,rate:0.144}],married:[{bis:4000,rate:0.016},{bis:6000,rate:0.038},{bis:10000,rate:0.065},{bis:15000,rate:0.088},{bis:999999,rate:0.109}]},
+      FR:{single:[{bis:3000,rate:0.068},{bis:5000,rate:0.119},{bis:8000,rate:0.162},{bis:12000,rate:0.210},{bis:999999,rate:0.254}],married:[{bis:4000,rate:0.030},{bis:6000,rate:0.068},{bis:10000,rate:0.117},{bis:15000,rate:0.158},{bis:999999,rate:0.196}]},
+      SO:{single:[{bis:3000,rate:0.064},{bis:5000,rate:0.112},{bis:8000,rate:0.152},{bis:12000,rate:0.197},{bis:999999,rate:0.239}],married:[{bis:4000,rate:0.028},{bis:6000,rate:0.064},{bis:10000,rate:0.110},{bis:15000,rate:0.149},{bis:999999,rate:0.184}]},
+      BS:{single:[{bis:3000,rate:0.082},{bis:5000,rate:0.143},{bis:8000,rate:0.194},{bis:12000,rate:0.251},{bis:999999,rate:0.302}],married:[{bis:4000,rate:0.036},{bis:6000,rate:0.082},{bis:10000,rate:0.141},{bis:15000,rate:0.190},{bis:999999,rate:0.235}]},
+      BL:{single:[{bis:3000,rate:0.073},{bis:5000,rate:0.128},{bis:8000,rate:0.174},{bis:12000,rate:0.225},{bis:999999,rate:0.272}],married:[{bis:4000,rate:0.032},{bis:6000,rate:0.073},{bis:10000,rate:0.126},{bis:15000,rate:0.170},{bis:999999,rate:0.210}]},
+      SH:{single:[{bis:3000,rate:0.066},{bis:5000,rate:0.115},{bis:8000,rate:0.157},{bis:12000,rate:0.203},{bis:999999,rate:0.246}],married:[{bis:4000,rate:0.029},{bis:6000,rate:0.066},{bis:10000,rate:0.113},{bis:15000,rate:0.154},{bis:999999,rate:0.190}]},
+      AR:{single:[{bis:3000,rate:0.058},{bis:5000,rate:0.102},{bis:8000,rate:0.138},{bis:12000,rate:0.179},{bis:999999,rate:0.218}],married:[{bis:4000,rate:0.025},{bis:6000,rate:0.058},{bis:10000,rate:0.099},{bis:15000,rate:0.135},{bis:999999,rate:0.166}]},
+      AI:{single:[{bis:3000,rate:0.049},{bis:5000,rate:0.086},{bis:8000,rate:0.117},{bis:12000,rate:0.151},{bis:999999,rate:0.185}],married:[{bis:4000,rate:0.021},{bis:6000,rate:0.049},{bis:10000,rate:0.084},{bis:15000,rate:0.115},{bis:999999,rate:0.141}]},
+      SG:{single:[{bis:3000,rate:0.067},{bis:5000,rate:0.118},{bis:8000,rate:0.160},{bis:12000,rate:0.207},{bis:999999,rate:0.251}],married:[{bis:4000,rate:0.029},{bis:6000,rate:0.067},{bis:10000,rate:0.115},{bis:15000,rate:0.156},{bis:999999,rate:0.192}]},
+      GR:{single:[{bis:3000,rate:0.059},{bis:5000,rate:0.104},{bis:8000,rate:0.141},{bis:12000,rate:0.183},{bis:999999,rate:0.222}],married:[{bis:4000,rate:0.026},{bis:6000,rate:0.059},{bis:10000,rate:0.101},{bis:15000,rate:0.137},{bis:999999,rate:0.170}]},
+      AG:{single:[{bis:3000,rate:0.063},{bis:5000,rate:0.110},{bis:8000,rate:0.149},{bis:12000,rate:0.193},{bis:999999,rate:0.234}],married:[{bis:4000,rate:0.027},{bis:6000,rate:0.063},{bis:10000,rate:0.108},{bis:15000,rate:0.146},{bis:999999,rate:0.181}]},
+      TG:{single:[{bis:3000,rate:0.061},{bis:5000,rate:0.107},{bis:8000,rate:0.145},{bis:12000,rate:0.188},{bis:999999,rate:0.228}],married:[{bis:4000,rate:0.027},{bis:6000,rate:0.061},{bis:10000,rate:0.105},{bis:15000,rate:0.142},{bis:999999,rate:0.175}]},
+      TI:{single:[{bis:3000,rate:0.088},{bis:5000,rate:0.154},{bis:8000,rate:0.209},{bis:12000,rate:0.270},{bis:999999,rate:0.326}],married:[{bis:4000,rate:0.038},{bis:6000,rate:0.088},{bis:10000,rate:0.152},{bis:15000,rate:0.205},{bis:999999,rate:0.253}]},
+      VD:{single:[{bis:3000,rate:0.091},{bis:5000,rate:0.159},{bis:8000,rate:0.216},{bis:12000,rate:0.279},{bis:999999,rate:0.337}],married:[{bis:4000,rate:0.040},{bis:6000,rate:0.091},{bis:10000,rate:0.157},{bis:15000,rate:0.212},{bis:999999,rate:0.261}]},
+      VS:{single:[{bis:3000,rate:0.075},{bis:5000,rate:0.132},{bis:8000,rate:0.179},{bis:12000,rate:0.232},{bis:999999,rate:0.281}],married:[{bis:4000,rate:0.033},{bis:6000,rate:0.075},{bis:10000,rate:0.130},{bis:15000,rate:0.175},{bis:999999,rate:0.216}]},
+      NE:{single:[{bis:3000,rate:0.094},{bis:5000,rate:0.164},{bis:8000,rate:0.223},{bis:12000,rate:0.288},{bis:999999,rate:0.348}],married:[{bis:4000,rate:0.041},{bis:6000,rate:0.094},{bis:10000,rate:0.162},{bis:15000,rate:0.219},{bis:999999,rate:0.270}]},
+      GE:{single:[{bis:3000,rate:0.109},{bis:5000,rate:0.191},{bis:8000,rate:0.259},{bis:12000,rate:0.335},{bis:999999,rate:0.404}],married:[{bis:4000,rate:0.047},{bis:6000,rate:0.109},{bis:10000,rate:0.188},{bis:15000,rate:0.254},{bis:999999,rate:0.313}]},
+      JU:{single:[{bis:3000,rate:0.087},{bis:5000,rate:0.152},{bis:8000,rate:0.206},{bis:12000,rate:0.266},{bis:999999,rate:0.322}],married:[{bis:4000,rate:0.038},{bis:6000,rate:0.087},{bis:10000,rate:0.149},{bis:15000,rate:0.201},{bis:999999,rate:0.248}]},
+    } as Record<string,{single:{bis:number,rate:number}[],married:{bis:number,rate:number}[]}>;
+    const KANTON_NAMES: Record<string,string> = {ZH:'Zürich',BE:'Bern',LU:'Luzern',UR:'Uri',SZ:'Schwyz',OW:'Obwalden',NW:'Nidwalden',GL:'Glarus',ZG:'Zug',FR:'Freiburg',SO:'Solothurn',BS:'Basel-Stadt',BL:'Basel-Landschaft',SH:'Schaffhausen',AR:'Appenzell A.Rh.',AI:'Appenzell I.Rh.',SG:'St. Gallen',GR:'Graubünden',AG:'Aargau',TG:'Thurgau',TI:'Tessin',VD:'Waadt',VS:'Wallis',NE:'Neuenburg',GE:'Genf',JU:'Jura'};
+    function getRate(kz: string, brutto: number, tarif: 'single'|'married'): number {
+      const t = KANTONE_DATA[kz]?.[tarif];
+      if (!t) return 0;
+      const found = t.find(b => brutto <= b.bis);
+      return found ? found.rate : t[t.length-1].rate;
+    }
+    function fmtCHF(n: number) { return n.toLocaleString('de-CH', {maximumFractionDigits:0}) + ' CHF'; }
+    function fmtPct(r: number) { return (r*100).toFixed(1).replace('.',',') + ' %'; }
+    // Build comparison table on load
+    function buildTable(brutto=7000) {
+      const tbody = document.getElementById('qst-tbody')!;
+      const rows = Object.entries(KANTONE_DATA).map(([kz]) => {
+        const r = getRate(kz, brutto, 'single');
+        return {kz, name:KANTON_NAMES[kz], rate:r, qst:Math.round(brutto*r)};
+      }).sort((a,b) => a.rate - b.rate);
+      tbody.innerHTML = rows.map((r, i) => {
+        const color = r.rate < 0.09 ? 'text-green-700' : r.rate < 0.17 ? 'text-orange-600' : 'text-red-600';
+        return `<tr class="hover:bg-gray-50 ${i===0?'bg-green-50':''}">
+          <td class="px-3 py-2 border font-medium text-gray-800">${r.name} (${r.kz})</td>
+          <td class="text-center px-3 py-2 border ${color} font-bold">${fmtPct(r.rate)}</td>
+          <td class="text-center px-3 py-2 border text-gray-600">${fmtCHF(r.qst)}</td>
+          <td class="text-center px-3 py-2 border text-gray-600">${fmtCHF(brutto - r.qst)}</td>
+        </tr>`;
+      }).join('');
+    }
+    buildTable();
+    (window as any).calcQST = function() {
+      const kz = (document.getElementById('qst-kanton') as HTMLSelectElement).value;
+      const brutto = parseFloat((document.getElementById('qst-brutto') as HTMLInputElement).value) || 0;
+      const tarif = (document.getElementById('qst-tarif') as HTMLSelectElement).value as 'single'|'married';
+      const kinder = parseInt((document.getElementById('qst-kinder') as HTMLSelectElement).value) || 0;
+      let rate = getRate(kz, brutto, tarif);
+      // Kinderabzug: grob -1.5% pro Kind
+      rate = Math.max(0, rate - kinder * 0.015);
+      const qst = Math.round(brutto * rate);
+      const netto = brutto - qst;
+      const r = document.getElementById('qst-result')!; r.classList.remove('hidden');
+      document.getElementById('qst-betrag')!.textContent = fmtCHF(qst);
+      document.getElementById('qst-rate')!.textContent = fmtPct(rate);
+      document.getElementById('qst-netto')!.textContent = fmtCHF(netto);
+      document.getElementById('qst-year')!.textContent = fmtCHF(qst * 12);
+      buildTable(brutto);
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

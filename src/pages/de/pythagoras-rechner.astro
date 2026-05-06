@@ -1,0 +1,191 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Pythagoras Rechner 2026","url":"https://rechnerbox.eu/de/pythagoras-rechner","applicationCategory":"EducationalApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Was besagt der Satz des Pythagoras?","acceptedAnswer":{"@type":"Answer","text":"Im rechtwinkligen Dreieck gilt: a² + b² = c², wobei c die Hypotenuse (längste Seite, gegenüber dem rechten Winkel) und a, b die Katheten sind."}},
+    {"@type":"Question","name":"Wie berechne ich die Hypotenuse?","acceptedAnswer":{"@type":"Answer","text":"c = √(a² + b²). Beispiel: a=3, b=4 → c = √(9+16) = √25 = 5."}},
+    {"@type":"Question","name":"Was ist ein pythagoreisches Tripel?","acceptedAnswer":{"@type":"Answer","text":"Ein pythagoreisches Tripel sind drei ganze Zahlen a, b, c die a²+b²=c² erfüllen. Bekannte Tripel: (3,4,5), (5,12,13), (8,15,17), (7,24,25)."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Pythagoras Rechner 2026 – Satz des Pythagoras berechnen"
+  description="Satz des Pythagoras berechnen: Hypotenuse oder Kathete aus zwei Seiten. Mit Formel, Lösungsweg und Anwendungsbeispielen. Kostenloser Pythagoras-Rechner."
+  canonical="https://rechnerbox.eu/de/pythagoras-rechner"
+  hreflangDE="/de/pythagoras-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Pythagoras Rechner
+    </nav>
+    <h1>Pythagoras Rechner 2026 – a² + b² = c²</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Berechnen Sie die fehlende Seite eines rechtwinkligen Dreiecks nach dem Satz des Pythagoras – mit vollständigem Lösungsweg.
+    </p>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-blue-800 mb-1">📐 Satz des Pythagoras</p>
+      <p class="text-sm text-blue-700 font-mono"><strong>a² + b² = c²</strong></p>
+      <p class="text-sm text-blue-600 mt-1">a, b = Katheten (die kürzeren Seiten) · c = Hypotenuse (längste Seite, gegenüber dem 90°-Winkel)</p>
+    </div>
+
+    <div class="calc-box">
+      <div class="mb-4">
+        <label class="calc-label">Welche Seite berechnen?</label>
+        <select class="calc-select" id="py-mode">
+          <option value="c">Hypotenuse c berechnen (aus a und b)</option>
+          <option value="a">Kathete a berechnen (aus b und c)</option>
+          <option value="b">Kathete b berechnen (aus a und c)</option>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4 mb-4" id="py-inputs">
+        <div id="py-a-wrap">
+          <label class="calc-label">Kathete a</label>
+          <input class="calc-input" type="number" id="py-a" value="3" min="0" step="any" />
+        </div>
+        <div id="py-b-wrap">
+          <label class="calc-label">Kathete b</label>
+          <input class="calc-input" type="number" id="py-b" value="4" min="0" step="any" />
+        </div>
+        <div id="py-c-wrap">
+          <label class="calc-label text-gray-400">Hypotenuse c</label>
+          <div class="calc-input bg-primary-50 border-primary-300 font-bold text-primary-700 flex items-center">?</div>
+        </div>
+      </div>
+
+      <!-- SVG Triangle visualization -->
+      <div class="flex justify-center mb-4">
+        <svg viewBox="0 0 240 180" width="240" height="180" class="opacity-80">
+          <polygon points="20,160 200,160 200,40" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+          <text x="100" y="178" text-anchor="middle" class="text-xs" fill="#1d4ed8" font-size="14" font-weight="bold">a</text>
+          <text x="212" y="105" text-anchor="middle" fill="#1d4ed8" font-size="14" font-weight="bold">b</text>
+          <text x="95" y="90" text-anchor="middle" fill="#dc2626" font-size="14" font-weight="bold">c</text>
+          <rect x="185" y="145" width="15" height="15" fill="none" stroke="#3b82f6" stroke-width="1.5"/>
+        </svg>
+      </div>
+
+      <button class="calc-btn" onclick="calcPY()">Berechnen</button>
+      <div class="calc-result hidden" id="py-result">
+        <div class="grid grid-cols-3 gap-3 text-center mb-3">
+          <div><div class="result-value" id="py-ra">–</div><div class="result-label">Kathete a</div></div>
+          <div><div class="result-value" id="py-rb">–</div><div class="result-label">Kathete b</div></div>
+          <div><div class="result-value text-red-600" id="py-rc">–</div><div class="result-label">Hypotenuse c</div></div>
+        </div>
+        <div class="bg-white rounded-xl p-3 text-sm text-gray-600 text-left font-mono leading-relaxed" id="py-steps"></div>
+      </div>
+    </div>
+
+    <section class="mt-8">
+      <h2>Bekannte pythagoreische Tripel</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-center px-3 py-2 border">Kathete a</th>
+            <th class="text-center px-3 py-2 border">Kathete b</th>
+            <th class="text-center px-3 py-2 border">Hypotenuse c</th>
+            <th class="text-center px-3 py-2 border">Prüfung</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[[3,4,5],[5,12,13],[8,15,17],[7,24,25],[20,21,29],[9,40,41],[12,35,37],[28,45,53]].map(([a,b,c])=>(
+              <tr class="hover:bg-gray-50 cursor-pointer" onclick={`document.getElementById('py-a').value='${a}';document.getElementById('py-b').value='${b}';document.getElementById('py-mode').value='c';calcPY()`}>
+                <td class="text-center px-3 py-2 border text-blue-700 font-medium">{a}</td>
+                <td class="text-center px-3 py-2 border text-blue-700 font-medium">{b}</td>
+                <td class="text-center px-3 py-2 border text-red-600 font-bold">{c}</td>
+                <td class="text-center px-3 py-2 border text-gray-500 text-xs">{a}²+{b}²={a*a+b*b}={c}²</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="text-xs text-gray-400 mt-1">Auf eine Zeile klicken → sofort berechnen</p>
+      </div>
+    </section>
+
+    <section class="mt-8">
+      <h2>Anwendungen des Satzes von Pythagoras</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+        {[
+          {icon:"📐",title:"Dachdecker & Bau",desc:"Dachneigung, Sparrenlänge, Wanddiagonale – überall wo rechte Winkel vorkommen."},
+          {icon:"🗺️",title:"Navigation & GPS",desc:"Luftlinienberechnung zwischen zwei Punkten (vereinfacht, auf kleinen Distanzen)."},
+          {icon:"📺",title:"Bildschirmdiagonale",desc:"Breite 92cm, Höhe 52cm → Diagonale = √(92²+52²) = 106cm ≈ 42 Zoll."},
+          {icon:"🏗️",title:"Statik & Ingenieurwesen",desc:"Kräftedreiecke, Vektoraddition, Wandverstrebungen, Leiternlängenmessung."},
+        ].map(e=>(
+          <div class="bg-gray-50 rounded-xl p-4 border">
+            <div class="font-semibold text-gray-800 mb-1">{e.icon} {e.title}</div>
+            <p class="text-sm text-gray-600">{e.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Pythagoras</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wann gilt der Satz des Pythagoras nicht?",a:"Der Satz gilt nur für rechtwinklige Dreiecke (mit einem 90°-Winkel). Für allgemeine Dreiecke gilt der allgemeine Kosinussatz: c² = a² + b² − 2ab·cos(γ)."},
+          {q:"Wie finde ich heraus, ob ein Dreieck rechtwinklig ist?",a:"Wenn a² + b² = c² gilt (wobei c die längste Seite ist), ist das Dreieck rechtwinklig. Beispiel: 5² + 12² = 25 + 144 = 169 = 13² → rechtwinklig."},
+          {q:"Was ist der Unterschied zwischen Kathete und Hypotenuse?",a:"Die Hypotenuse ist die längste Seite des rechtwinkligen Dreiecks und liegt dem rechten Winkel gegenüber. Die beiden anderen Seiten heißen Katheten (üblicherweise a und b bezeichnet)."},
+        ].map(f=>(<div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/flaeche-rechner',label:'Fläche berechnen'},{href:'/de/dreisatz-rechner',label:'Dreisatz'},{href:'/de/prozent-rechner',label:'Prozentrechner'},{href:'/de/hoai-rechner',label:'HOAI Rechner'},{href:'/de/u-wert-rechner',label:'U-Wert Rechner'},{href:'/de/celsius-fahrenheit',label:'Temperatur'}].map(r=>(
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    function fmtN(n:number){return n.toFixed(6).replace(/\.?0+$/,'').replace('.',',');}
+    (window as any).calcPY=function(){
+      const mode=(document.getElementById('py-mode') as HTMLSelectElement).value;
+      const getVal=(id:string)=>parseFloat((document.getElementById(id) as HTMLInputElement)?.value||'0')||0;
+      let a=getVal('py-a'),b=getVal('py-b'),c=0,steps='';
+      if(mode==='c'){
+        if(!a||!b)return;
+        c=Math.sqrt(a*a+b*b);
+        steps=`c² = a² + b²\nc² = ${a}² + ${b}²\nc² = ${a*a} + ${b*b}\nc² = ${a*a+b*b}\nc = √${a*a+b*b}\nc = ${fmtN(c)}`;
+      } else if(mode==='a'){
+        c=getVal('py-c-input')||getVal('py-a');
+        const cV=parseFloat((document.getElementById('py-c-input') as HTMLInputElement)?.value||'0');
+        if(!b||!cV)return;
+        c=cV; a=Math.sqrt(c*c-b*b);
+        steps=`a² = c² - b²\na² = ${c}² - ${b}²\na² = ${c*c} - ${b*b}\na² = ${c*c-b*b}\na = ${fmtN(a)}`;
+      } else {
+        const cV=parseFloat((document.getElementById('py-c-input') as HTMLInputElement)?.value||'0');
+        if(!a||!cV)return;
+        c=cV; b=Math.sqrt(c*c-a*a);
+        steps=`b² = c² - a²\nb² = ${c}² - ${a}²\nb² = ${c*c} - ${a*a}\nb² = ${c*c-a*a}\nb = ${fmtN(b)}`;
+      }
+      if(mode==='c') c=Math.sqrt(a*a+b*b);
+      const r=document.getElementById('py-result')!;r.classList.remove('hidden');
+      document.getElementById('py-ra')!.textContent=fmtN(a);
+      document.getElementById('py-rb')!.textContent=fmtN(b);
+      document.getElementById('py-rc')!.textContent=fmtN(c);
+      document.getElementById('py-steps')!.textContent=steps;
+    };
+    // Update input fields based on mode
+    document.getElementById('py-mode')?.addEventListener('change',function(){
+      const m=(this as HTMLSelectElement).value;
+      const grid=document.getElementById('py-inputs')!;
+      // Simplified: show/hide c input
+      grid.innerHTML=`
+        <div id="py-a-wrap"><label class="calc-label">${m==='a'?'Kathete a (gesamt = ?)':'Kathete a'}</label>
+          <input class="calc-input" type="number" id="py-a" value="3" step="any" ${m==='a'?'disabled class="calc-input bg-gray-100"':''}/></div>
+        <div><label class="calc-label">${m==='b'?'Kathete b (gesamt = ?)':'Kathete b'}</label>
+          <input class="calc-input" type="number" id="py-b" value="4" step="any" ${m==='b'?'disabled class="calc-input bg-gray-100"':''}/></div>
+        <div><label class="calc-label ${m==='c'?'text-gray-400':''}">Hypotenuse c</label>
+          ${m==='c'?'<div class="calc-input bg-primary-50 border-primary-300 font-bold text-primary-700">?</div>':'<input class="calc-input" type="number" id="py-c-input" value="5" step="any"/>'}
+        </div>`;
+      document.getElementById('py-result')?.classList.add('hidden');
+    });
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

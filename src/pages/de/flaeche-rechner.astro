@@ -1,0 +1,151 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Flächenrechner 2026","url":"https://rechnerbox.eu/de/flaeche-rechner","applicationCategory":"UtilitiesApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie berechne ich die Fläche eines Rechtecks?","acceptedAnswer":{"@type":"Answer","text":"Fläche Rechteck = Länge × Breite. Beispiel: 5m × 3m = 15 m²."}},
+    {"@type":"Question","name":"Wie berechne ich die Fläche eines Kreises?","acceptedAnswer":{"@type":"Answer","text":"Fläche Kreis = π × r². Bei Durchmesser d: A = π × (d/2)². Beispiel: Durchmesser 10m → A = π × 25 = 78,54 m²."}},
+    {"@type":"Question","name":"Wie berechne ich die Fläche eines Dreiecks?","acceptedAnswer":{"@type":"Answer","text":"Fläche Dreieck = (Grundlinie × Höhe) / 2. Bei bekannten Seiten: Heronsche Formel."}},
+    {"@type":"Question","name":"Was ist der Unterschied zwischen Fläche und Umfang?","acceptedAnswer":{"@type":"Answer","text":"Die Fläche ist der Flächeninhalt (in m², cm²). Der Umfang ist die Länge der Außenkante (in m, cm). Ein Quadrat mit 5m Seitenlänge hat Fläche = 25 m² und Umfang = 20 m."}}
+  ]}
+]};
+const shapes = [
+  {id:'rechteck',label:'Rechteck'},
+  {id:'quadrat',label:'Quadrat'},
+  {id:'dreieck',label:'Dreieck'},
+  {id:'kreis',label:'Kreis'},
+  {id:'trapez',label:'Trapez'},
+  {id:'parallelogramm',label:'Parallelogramm'},
+  {id:'raute',label:'Raute'},
+  {id:'ring',label:'Kreisring'},
+];
+---
+<BaseLayout
+  title="Flächenrechner 2026 – Fläche berechnen: Kreis, Rechteck, Dreieck"
+  description="Fläche und Umfang berechnen für alle Formen: Rechteck, Kreis, Dreieck, Trapez, Parallelogramm. Mit Formeln und Lösungsweg. Kostenloser Flächenrechner."
+  canonical="https://rechnerbox.eu/de/flaeche-rechner"
+  hreflangDE="/de/flaeche-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Flächenrechner
+    </nav>
+    <h1>Flächenrechner 2026 – Fläche & Umfang</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Fläche und Umfang für alle wichtigen geometrischen Formen berechnen – mit Formeln und vollständigem Lösungsweg.
+    </p>
+
+    <div class="calc-box">
+      <div class="mb-4">
+        <label class="calc-label">Form auswählen</label>
+        <select class="calc-select" id="fl-shape" onchange="updateFlForm()">
+          {shapes.map(s => <option value={s.id}>{s.label}</option>)}
+        </select>
+      </div>
+
+      <div id="fl-inputs" class="mb-4"></div>
+
+      <div class="mb-4">
+        <label class="calc-label">Maßeinheit</label>
+        <select class="calc-select" id="fl-unit">
+          <option value="m">Meter (m)</option>
+          <option value="cm">Zentimeter (cm)</option>
+          <option value="mm">Millimeter (mm)</option>
+          <option value="km">Kilometer (km)</option>
+          <option value="in">Inch</option>
+          <option value="ft">Fuß (ft)</option>
+        </select>
+      </div>
+
+      <button class="calc-btn" onclick="calcFL()">Fläche berechnen</button>
+      <div class="calc-result hidden" id="fl-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center mb-3">
+          <div><div class="result-value" id="fl-area">–</div><div class="result-label" id="fl-area-lbl">Fläche</div></div>
+          <div><div class="result-value text-2xl" id="fl-peri">–</div><div class="result-label" id="fl-peri-lbl">Umfang</div></div>
+          <div><div class="result-value text-xl hidden" id="fl-r3">–</div><div class="result-label hidden" id="fl-r3-lbl">–</div></div>
+          <div><div class="result-value text-xl hidden" id="fl-r4">–</div><div class="result-label hidden" id="fl-r4-lbl">–</div></div>
+        </div>
+        <div class="bg-white rounded-xl p-3 text-sm font-mono text-gray-600 text-left leading-relaxed" id="fl-steps"></div>
+      </div>
+    </div>
+
+    <section class="mt-8">
+      <h2>Flächenformeln – Übersicht</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
+        {[
+          {name:"Rechteck",icon:"▭",a:"A = l × b",u:"U = 2(l + b)"},
+          {name:"Quadrat",icon:"⬜",a:"A = a²",u:"U = 4a"},
+          {name:"Dreieck",icon:"△",a:"A = (g × h) / 2",u:"U = a + b + c"},
+          {name:"Kreis",icon:"⬤",a:"A = π × r²",u:"U = 2π × r"},
+          {name:"Trapez",icon:"⏢",a:"A = (a + c) / 2 × h",u:"U = a+b+c+d"},
+          {name:"Parallelogramm",icon:"▱",a:"A = g × h",u:"U = 2(a + b)"},
+        ].map(s=>(
+          <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+            <div class="font-bold text-gray-800 mb-2 text-lg">{s.icon} {s.name}</div>
+            <div class="font-mono text-xs text-primary-700 mb-1">{s.a}</div>
+            <div class="font-mono text-xs text-gray-500">{s.u}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Fläche berechnen</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wie viele Quadratmeter hat ein Raum von 4m × 5m?",a:"4m × 5m = 20 m². Das entspricht einer typischen Wohnzimmergröße. Für Wandfarbe, Fußboden oder Fliesen teilt man oft die Gesamtfläche durch den Verbrauch pro m²."},
+          {q:"Wie berechne ich die Wohnfläche einer Wohnung?",a:"Alle Räume einzeln berechnen und addieren. Schrägen werden zur Hälfte angerechnet (unter 1m Höhe gar nicht, 1-2m zu 50%, über 2m voll). Kellerräume und Terrassen gelten nicht als Wohnfläche."},
+          {q:"Was ist der Unterschied zwischen Fläche und Grundfläche?",a:"Grundfläche ist die Fläche des Bodens (2D). Wenn von Gebäuden die Rede ist, meint man oft die Grundfläche der Außenwände. Fläche ist der allgemeine Begriff für jede zweidimensionale Ausdehnung."},
+          {q:"Wie rechne ich m² in cm² um?",a:"1 m² = 10.000 cm² (= 100cm × 100cm). 1 cm² = 0,0001 m². Beispiel: 2,5 m² = 25.000 cm²."},
+        ].map(f=>(<div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/pythagoras-rechner',label:'Pythagoras'},{href:'/de/dreisatz-rechner',label:'Dreisatz'},{href:'/de/u-wert-rechner',label:'U-Wert Rechner'},{href:'/de/hoai-rechner',label:'HOAI Rechner'},{href:'/de/prozent-rechner',label:'Prozentrechner'},{href:'/de/umrechnung-cm-inch',label:'cm ↔ Inch'}].map(r=>(
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    const PI = Math.PI;
+    function fmtN(n:number,d=4){return n.toFixed(d).replace(/\.?0+$/,'').replace('.',',');}
+    function getU(){return (document.getElementById('fl-unit') as HTMLSelectElement).value;}
+    const SHAPES:{[k:string]:{inputs:{id:string,label:string,default:number}[],calc:(v:number[])=>{area:number,peri:number,extra?:{v:number,l:string}[],steps:string}}}={
+      rechteck:{inputs:[{id:'l',label:'Länge',default:5},{id:'b',label:'Breite',default:3}],calc:([l,b])=>({area:l*b,peri:2*(l+b),steps:`A = l × b = ${l} × ${b} = ${l*b}\nU = 2×(l+b) = 2×(${l}+${b}) = ${2*(l+b)}`})},
+      quadrat:{inputs:[{id:'a',label:'Seitenlänge a',default:5}],calc:([a])=>({area:a*a,peri:4*a,steps:`A = a² = ${a}² = ${a*a}\nU = 4×a = 4×${a} = ${4*a}`})},
+      dreieck:{inputs:[{id:'g',label:'Grundlinie g',default:6},{id:'h',label:'Höhe h',default:4},{id:'s1',label:'Seite b',default:5},{id:'s2',label:'Seite c',default:5}],calc:([g,h,s1,s2])=>({area:g*h/2,peri:g+s1+s2,steps:`A = (g × h) / 2 = (${g} × ${h}) / 2 = ${g*h/2}\nU = g+b+c = ${g}+${s1}+${s2} = ${g+s1+s2}`})},
+      kreis:{inputs:[{id:'r',label:'Radius r',default:5}],calc:([r])=>({area:PI*r*r,peri:2*PI*r,extra:[{v:2*r,l:'Durchmesser'},{v:PI*r*r,l:'Fläche (m²)'}],steps:`A = π × r² = π × ${r}² = ${fmtN(PI*r*r)}\nU = 2 × π × r = 2 × π × ${r} = ${fmtN(2*PI*r)}\nDurchmesser d = 2r = ${2*r}`})},
+      trapez:{inputs:[{id:'a',label:'Seite a (oben)',default:3},{id:'c',label:'Seite c (unten)',default:5},{id:'h',label:'Höhe h',default:4},{id:'b',label:'Schenkel b',default:4.5},{id:'d',label:'Schenkel d',default:4.5}],calc:([a,c,h,b,d])=>({area:(a+c)/2*h,peri:a+b+c+d,steps:`A = (a+c)/2 × h = (${a}+${c})/2 × ${h} = ${fmtN((a+c)/2*h)}\nU = a+b+c+d = ${a+b+c+d}`})},
+      parallelogramm:{inputs:[{id:'g',label:'Grundseite g',default:6},{id:'h',label:'Höhe h',default:4},{id:'s',label:'Seite b',default:5}],calc:([g,h,s])=>({area:g*h,peri:2*(g+s),steps:`A = g × h = ${g} × ${h} = ${g*h}\nU = 2×(g+b) = 2×(${g}+${s}) = ${2*(g+s)}`})},
+      raute:{inputs:[{id:'d1',label:'Diagonale d1',default:8},{id:'d2',label:'Diagonale d2',default:6}],calc:([d1,d2])=>{const a=Math.sqrt((d1/2)**2+(d2/2)**2);return {area:d1*d2/2,peri:4*a,steps:`A = (d1 × d2) / 2 = (${d1} × ${d2}) / 2 = ${d1*d2/2}\na = √((d1/2)²+(d2/2)²) = ${fmtN(a)}\nU = 4a = ${fmtN(4*a)}`};}},
+      ring:{inputs:[{id:'R',label:'Außenradius R',default:5},{id:'r',label:'Innenradius r',default:3}],calc:([R,r])=>({area:PI*(R*R-r*r),peri:2*PI*R+2*PI*r,steps:`A = π×(R²-r²) = π×(${R}²-${r}²) = ${fmtN(PI*(R*R-r*r))}\nÄußerer Umfang + Innerer Umfang = ${fmtN(2*PI*R+2*PI*r)}`})},
+    };
+    function updateFlForm(){
+      const shape=(document.getElementById('fl-shape') as HTMLSelectElement).value;
+      const cfg=SHAPES[shape];
+      const u=getU();
+      document.getElementById('fl-inputs')!.innerHTML=cfg.inputs.map(i=>`<div class="mb-3"><label class="calc-label">${i.label} (${u})</label><input class="calc-input" type="number" id="fl-${i.id}" value="${i.default}" step="any" min="0"/></div>`).join('');
+      document.getElementById('fl-result')?.classList.add('hidden');
+    }
+    (window as any).calcFL=function(){
+      const shape=(document.getElementById('fl-shape') as HTMLSelectElement).value;
+      const u=getU();
+      const cfg=SHAPES[shape];
+      const vals=cfg.inputs.map(i=>parseFloat((document.getElementById('fl-'+i.id) as HTMLInputElement)?.value||'0')||0);
+      const {area,peri,steps}=cfg.calc(vals);
+      const r=document.getElementById('fl-result')!;r.classList.remove('hidden');
+      document.getElementById('fl-area')!.textContent=fmtN(area)+' '+u+'²';
+      document.getElementById('fl-peri')!.textContent=fmtN(peri)+' '+u;
+      document.getElementById('fl-steps')!.textContent=steps;
+    };
+    updateFlForm();
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

@@ -1,0 +1,85 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+---
+<BaseLayout title="HOAI Rechner 2026 – Architektenhonorar berechnen" description="Architekten- und Ingenieurhonorar nach HOAI 2021 schnell berechnen. Kostenloser HOAI-Rechner für Gebäude, Freianlagen und Tragwerksplanung 2026." canonical="https://rechnerbox.eu/de/hoai-rechner" hreflangDE="/de/hoai-rechner">
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › HOAI Rechner</nav>
+    <h1>HOAI Rechner 2026 – Architektenhonorar</h1>
+    <p class="text-lg text-gray-600 mb-6">Berechnen Sie das Mindest- und Maximalhonorar für Architekten und Ingenieure nach HOAI 2021 (aktuell für 2026).</p>
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div><label class="calc-label">Anrechenbare Kosten (€)</label><input class="calc-input" type="number" id="h-kosten" value="300000" step="1000"/></div>
+        <div><label class="calc-label">Honorarzone</label>
+          <select class="calc-select" id="h-zone">
+            <option value="1">Zone I (einfach)</option>
+            <option value="2">Zone II (durchschnittlich)</option>
+            <option value="3" selected>Zone III (mittel)</option>
+            <option value="4">Zone IV (überdurchschnittlich)</option>
+            <option value="5">Zone V (hoch)</option>
+          </select>
+        </div>
+        <div><label class="calc-label">Leistungsphase</label>
+          <select class="calc-select" id="h-lph">
+            <option value="0.02">LP 1 – Grundlagenermittlung (2%)</option>
+            <option value="0.07">LP 2 – Vorplanung (7%)</option>
+            <option value="0.15">LP 3 – Entwurfsplanung (15%)</option>
+            <option value="0.03">LP 4 – Genehmigungsplanung (3%)</option>
+            <option value="0.25" selected>LP 5 – Ausführungsplanung (25%)</option>
+            <option value="0.1">LP 6 – Vorbereitung Vergabe (10%)</option>
+            <option value="0.04">LP 7 – Mitwirkung Vergabe (4%)</option>
+            <option value="0.32">LP 8 – Bauüberwachung (32%)</option>
+            <option value="0.02">LP 9 – Objektbetreuung (2%)</option>
+            <option value="1.0">Vollständig (LP 1-9: 100%)</option>
+          </select>
+        </div>
+        <div><label class="calc-label">MwSt.</label>
+          <select class="calc-select" id="h-mwst"><option value="1.19">19%</option><option value="1.07">7%</option><option value="1">0% (steuerfrei)</option></select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcHOAI()">Honorar berechnen</button>
+      <div class="calc-result hidden" id="h-result">
+        <div class="grid grid-cols-2 gap-4 text-center">
+          <div><div class="result-value" id="h-min">–</div><div class="result-label">Mindesthonorar (netto)</div></div>
+          <div><div class="result-value" id="h-max">–</div><div class="result-label">Maximalhonorar (netto)</div></div>
+        </div>
+        <div class="mt-3 text-center text-sm text-gray-600">inkl. MwSt: <span class="font-semibold" id="h-brutto">–</span></div>
+      </div>
+    </div>
+    <div class="info-box mt-4">⚖️ Seit der HOAI-Reform 2021 sind die Honorare Richtwerte, keine verbindlichen Mindestsätze mehr (EuGH-Urteil). Verhandlung ist möglich.</div>
+    <section class="mt-6"><h2>FAQ</h2><div class="space-y-3">
+      <div class="faq-item"><div class="faq-q">Was sind anrechenbare Kosten bei der HOAI?</div><div class="faq-a">Die anrechenbaren Kosten entsprechen den Kosten der Kostengruppen 300–400 (Bauwerk) nach DIN 276. Grundstückskosten und Ausstattung werden in der Regel nicht angerechnet.</div></div>
+      <div class="faq-item"><div class="faq-q">Was ist die Honorarzone?</div><div class="faq-a">Die Honorarzone I–V richtet sich nach der Schwierigkeit des Objekts. Ein einfaches Wohnhaus liegt in Zone II, ein aufwändiges Sonderbauwerk in Zone IV oder V.</div></div>
+    </div></section>
+  </article>
+  <script>
+    const HOAI:number[][] = [
+      [25000,1484,2137,2267,3260,3467,4994],[50000,2640,3801,4035,5803,6172,8885],
+      [100000,4609,6633,7046,10135,10779,15514],[150000,6361,9155,9723,13990,14876,21403],
+      [200000,7981,11485,12199,17554,18672,26874],[300000,10906,15696,16672,23989,25523,36720],
+      [500000,16226,23351,24804,35692,37973,54658],[750000,22082,31780,33785,48622,51722,74418],
+      [1000000,27388,39416,41929,60309,64205,92364],[2000000,46239,66572,70726,101780,108417,155969],
+    ];
+    function interp(k:number,zone:number):{min:number,max:number}{
+      let lo=HOAI[0],hi=HOAI[HOAI.length-1];
+      for(let i=0;i<HOAI.length-1;i++){if(k>=HOAI[i][0]&&k<=HOAI[i+1][0]){lo=HOAI[i];hi=HOAI[i+1];break;}}
+      const t=(k-lo[0])/(hi[0]-lo[0]||1);const z2=(zone-1)*2;
+      return {min:lo[1+z2]+t*(hi[1+z2]-lo[1+z2]),max:lo[2+z2]+t*(hi[2+z2]-lo[2+z2])};
+    }
+    function fmtEur(n:number){return n.toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:0})+' €';}
+    (window as any).calcHOAI=function(){
+      const k=parseFloat((document.getElementById('h-kosten') as HTMLInputElement).value)||0;
+      const zone=parseInt((document.getElementById('h-zone') as HTMLSelectElement).value);
+      const lph=parseFloat((document.getElementById('h-lph') as HTMLSelectElement).value);
+      const mwst=parseFloat((document.getElementById('h-mwst') as HTMLSelectElement).value);
+      const base=interp(k,zone);const min=base.min*lph,max=base.max*lph;
+      const r=document.getElementById('h-result')!;r.classList.remove('hidden');
+      document.getElementById('h-min')!.textContent=fmtEur(min);
+      document.getElementById('h-max')!.textContent=fmtEur(max);
+      document.getElementById('h-brutto')!.textContent=fmtEur(min*mwst)+' – '+fmtEur(max*mwst);
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

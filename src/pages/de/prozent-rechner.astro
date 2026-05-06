@@ -1,0 +1,133 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Prozentrechner","url":"https://rechnerbox.eu/de/prozent-rechner","applicationCategory":"EducationalApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie berechne ich Prozent von einer Zahl?","acceptedAnswer":{"@type":"Answer","text":"Formel: Prozentwert = Grundwert × Prozentsatz / 100. Beispiel: 15% von 200 = 200 × 15 / 100 = 30."}},
+    {"@type":"Question","name":"Wie berechne ich den Prozentsatz?","acceptedAnswer":{"@type":"Answer","text":"Prozentsatz = (Prozentwert / Grundwert) × 100. Beispiel: Was Prozent sind 30 von 200? → (30/200)×100 = 15%."}},
+    {"@type":"Question","name":"Was bedeutet prozentualer Unterschied?","acceptedAnswer":{"@type":"Answer","text":"Die Veränderung in % = ((neuer Wert - alter Wert) / alter Wert) × 100. Bei 80 zu 100: (20/80)×100 = 25% Anstieg."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Prozentrechner 2026 – Prozente schnell online berechnen"
+  description="Prozentwert, Prozentsatz oder Grundwert berechnen – kostenloser Online-Prozentrechner. Prozentualer Unterschied, Rabatt und MwSt berechnen."
+  canonical="https://rechnerbox.eu/de/prozent-rechner"
+  hreflangDE="/de/prozent-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Prozentrechner
+    </nav>
+    <h1>Prozentrechner 2026</h1>
+    <p class="text-lg text-gray-600 mb-6">Prozentwert, Prozentsatz und Grundwert schnell berechnen. Auch für Rabatt, Mehrwertsteuer und prozentualen Unterschied geeignet.</p>
+
+    <div class="calc-box">
+      <div class="flex flex-wrap gap-2 mb-5" id="mode-tabs">
+        {[
+          {id:'pv', label:'% von Zahl'},
+          {id:'ps', label:'Prozentsatz'},
+          {id:'gw', label:'Grundwert'},
+          {id:'diff', label:'Änderung %'},
+        ].map((t,i) => (
+          <button onclick={`setProzMode('${t.id}')`}
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${i===0?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`}
+            id={`tab-${t.id}`}>{t.label}</button>
+        ))}
+      </div>
+
+      <div id="mode-pv">
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div><label class="calc-label">Prozentsatz (%)</label><input class="calc-input" type="number" id="pv-pct" value="15" /></div>
+          <div><label class="calc-label">Grundwert</label><input class="calc-input" type="number" id="pv-base" value="200" /></div>
+        </div>
+        <button class="calc-btn" onclick="calcProz()">Berechnen</button>
+        <div class="calc-result hidden" id="pv-result"><div class="result-value" id="pv-res">–</div><div class="result-label" id="pv-lbl">Ergebnis</div></div>
+      </div>
+
+      <div id="mode-ps" class="hidden">
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div><label class="calc-label">Prozentwert</label><input class="calc-input" type="number" id="ps-val" value="30" /></div>
+          <div><label class="calc-label">Grundwert</label><input class="calc-input" type="number" id="ps-base" value="200" /></div>
+        </div>
+        <button class="calc-btn" onclick="calcProz()">Berechnen</button>
+        <div class="calc-result hidden" id="ps-result"><div class="result-value" id="ps-res">–</div><div class="result-label">Prozentsatz</div></div>
+      </div>
+
+      <div id="mode-gw" class="hidden">
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div><label class="calc-label">Prozentwert</label><input class="calc-input" type="number" id="gw-val" value="30" /></div>
+          <div><label class="calc-label">Prozentsatz (%)</label><input class="calc-input" type="number" id="gw-pct" value="15" /></div>
+        </div>
+        <button class="calc-btn" onclick="calcProz()">Berechnen</button>
+        <div class="calc-result hidden" id="gw-result"><div class="result-value" id="gw-res">–</div><div class="result-label">Grundwert</div></div>
+      </div>
+
+      <div id="mode-diff" class="hidden">
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div><label class="calc-label">Alter Wert</label><input class="calc-input" type="number" id="diff-old" value="80" /></div>
+          <div><label class="calc-label">Neuer Wert</label><input class="calc-input" type="number" id="diff-new" value="100" /></div>
+        </div>
+        <button class="calc-btn" onclick="calcProz()">Berechnen</button>
+        <div class="calc-result hidden" id="diff-result"><div class="result-value" id="diff-res">–</div><div class="result-label" id="diff-lbl">Veränderung</div></div>
+      </div>
+    </div>
+
+    <section class="mt-8">
+      <h2>Prozent berechnen – Formeln & Beispiele</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
+        <div class="bg-gray-50 rounded-xl p-4 border"><div class="font-semibold text-gray-800 mb-1">Prozentwert</div><code class="text-xs bg-white px-2 py-1 rounded">W = G × p / 100</code><p class="text-xs text-gray-500 mt-1">Beispiel: 20% von 150 = 30</p></div>
+        <div class="bg-gray-50 rounded-xl p-4 border"><div class="font-semibold text-gray-800 mb-1">Prozentsatz</div><code class="text-xs bg-white px-2 py-1 rounded">p = W / G × 100</code><p class="text-xs text-gray-500 mt-1">Beispiel: 30 von 200 = 15%</p></div>
+        <div class="bg-gray-50 rounded-xl p-4 border"><div class="font-semibold text-gray-800 mb-1">Grundwert</div><code class="text-xs bg-white px-2 py-1 rounded">G = W / p × 100</code><p class="text-xs text-gray-500 mt-1">Beispiel: W=30, p=15% → G=200</p></div>
+      </div>
+    </section>
+    <section class="mt-6">
+      <h2>FAQ – Prozentrechnung</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wie rechne ich 19% MwSt heraus?", a:"Brutto durch 1,19 = Netto. Beispiel: 119 € / 1,19 = 100 € netto, MwSt = 19 €."},
+          {q:"Was ist der prozentuale Unterschied zwischen zwei Zahlen?", a:"((neuer Wert - alter Wert) / alter Wert) × 100. Bei +25% Anstieg bedeutet das: alter Wert × 1,25 = neuer Wert."},
+          {q:"Wie berechne ich Rabatt in Prozent?", a:"Rabatt% = (Preisreduktion / Originalpreis) × 100. Beispiel: 20 € Rabatt auf 80 € = 25% Rabatt."},
+        ].map(f => (<div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/mwst-rechner',label:'MwSt Rechner'},{href:'/de/dreisatz-rechner',label:'Dreisatz'},{href:'/de/paypal-gebuehren-rechner',label:'PayPal Gebühren'}].map(r=>(
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    let curMode = 'pv';
+    const modes = ['pv','ps','gw','diff'];
+    (window as any).setProzMode = function(m:string){
+      curMode=m;
+      modes.forEach(x=>{
+        const el=document.getElementById('mode-'+x);
+        const tab=document.getElementById('tab-'+x);
+        if(!el||!tab)return;
+        el.classList.toggle('hidden',x!==m);
+        tab.className=`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${x===m?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`;
+      });
+    };
+    function n(id:string):number{ return parseFloat((document.getElementById(id) as HTMLInputElement)?.value||'0'); }
+    function show(resId:string, val:string){
+      const el=document.getElementById(resId);
+      if(el){ el.classList.remove('hidden'); const v=el.querySelector('.result-value'); if(v)v.textContent=val; }
+    }
+    (window as any).calcProz = function(){
+      if(curMode==='pv'){ const r=n('pv-base')*n('pv-pct')/100; show('pv-result', r.toFixed(2).replace('.',',')); document.getElementById('pv-lbl')!.textContent=`${n('pv-pct')}% von ${n('pv-base')}`; }
+      if(curMode==='ps'){ const r=n('ps-val')/n('ps-base')*100; show('ps-result', r.toFixed(2).replace('.',',')+' %'); }
+      if(curMode==='gw'){ const r=n('gw-val')/n('gw-pct')*100; show('gw-result', r.toFixed(2).replace('.',',')); }
+      if(curMode==='diff'){ const r=(n('diff-new')-n('diff-old'))/n('diff-old')*100; const sign=r>=0?'+':''; show('diff-result', sign+r.toFixed(2).replace('.',',')+' %'); document.getElementById('diff-lbl')!.textContent=r>=0?'Anstieg':'Rückgang'; }
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+---
+<BaseLayout title="Bürgergeld Rechner 2026 – Anspruch berechnen" description="Bürgergeld 2026 berechnen: Regelsatz, Kosten der Unterkunft und Mehrbedarf. Aktuell für 2026 mit neuen Regelsätzen. Kostenloser Bürgergeld-Rechner." canonical="https://rechnerbox.eu/de/buergergeld-rechner" hreflangDE="/de/buergergeld-rechner">
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Bürgergeld Rechner</nav>
+    <h1>Bürgergeld Rechner 2026</h1>
+    <p class="text-lg text-gray-600 mb-6">Berechnen Sie Ihren Bürgergeld-Anspruch für 2026 – inkl. aktueller Regelsätze, Kosten der Unterkunft (KdU) und Mehrbedarf.</p>
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div><label class="calc-label">Haushaltsgröße</label>
+          <select class="calc-select" id="bg-type">
+            <option value="single">Alleinstehend</option>
+            <option value="partner">Paar (2 Personen)</option>
+            <option value="single_kind1">Alleinerziehend + 1 Kind</option>
+            <option value="single_kind2">Alleinerziehend + 2 Kinder</option>
+            <option value="familie">Familie (2 Erwachsene + 1-2 Kinder)</option>
+          </select>
+        </div>
+        <div><label class="calc-label">Warmmiete (€/Monat)</label><input class="calc-input" type="number" id="bg-miete" value="600" min="0"/></div>
+        <div><label class="calc-label">Eigenes Einkommen (€/Monat)</label><input class="calc-input" type="number" id="bg-eink" value="0" min="0"/></div>
+        <div><label class="calc-label">Kinderzuschlag?</label>
+          <select class="calc-select" id="bg-kiz"><option value="0">Nein</option><option value="292">Ja (+292€/Kind)</option></select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcBG()">Bürgergeld berechnen</button>
+      <div class="calc-result hidden" id="bg-result">
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div><div class="result-value" id="bg-regel">–</div><div class="result-label">Regelsatz</div></div>
+          <div><div class="result-value" id="bg-kdu">–</div><div class="result-label">Unterkunft</div></div>
+          <div><div class="result-value text-2xl font-bold text-primary-800" id="bg-total">–</div><div class="result-label">Gesamt / Monat</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="info-box mt-4">📌 <strong>Regelsätze 2026:</strong> Alleinstehend 563 €, Paare je 506 €, Kinder 0-5: 357 €, 6-13: 390 €, 14-17: 471 €, ab 18: 451 €.</div>
+    <section class="mt-6"><h2>FAQ</h2><div class="space-y-3">
+      <div class="faq-item"><div class="faq-q">Wie hoch ist das Bürgergeld 2026?</div><div class="faq-a">Der Regelsatz für Alleinstehende beträgt 2026 monatlich 563 €. Dazu kommen die tatsächlichen Kosten der Unterkunft (Miete + Heizkosten) in angemessener Höhe.</div></div>
+      <div class="faq-item"><div class="faq-q">Was darf ich hinzuverdienen beim Bürgergeld?</div><div class="faq-a">Bei Erwerbseinkommen gilt ein Freibetrag von 100 € monatlich. Darüber hinaus werden 20% des Einkommens zwischen 100 € und 1.000 € angerechnet.</div></div>
+    </div></section>
+  </article>
+  <script>
+    (window as any).calcBG=function(){
+      const typ=(document.getElementById('bg-type') as HTMLSelectElement).value;
+      const miete=parseFloat((document.getElementById('bg-miete') as HTMLInputElement).value)||0;
+      const eink=parseFloat((document.getElementById('bg-eink') as HTMLInputElement).value)||0;
+      let regel=0;
+      if(typ==='single')regel=563;
+      else if(typ==='partner')regel=506*2;
+      else if(typ==='single_kind1')regel=563+390;
+      else if(typ==='single_kind2')regel=563+390*2;
+      else if(typ==='familie')regel=506*2+390;
+      let anrEink=eink>100?100+(eink-100)*0.2:eink;
+      const nettoBG=Math.max(0,regel+miete-anrEink);
+      const r=document.getElementById('bg-result')!;r.classList.remove('hidden');
+      document.getElementById('bg-regel')!.textContent=regel.toLocaleString('de-DE')+' €';
+      document.getElementById('bg-kdu')!.textContent=miete.toLocaleString('de-DE')+' €';
+      document.getElementById('bg-total')!.textContent=nettoBG.toLocaleString('de-DE')+' €';
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

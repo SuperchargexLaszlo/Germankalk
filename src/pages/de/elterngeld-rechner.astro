@@ -1,0 +1,268 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Elterngeld Rechner 2026","url":"https://rechnerbox.eu/de/elterngeld-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie hoch ist das Elterngeld 2026?","acceptedAnswer":{"@type":"Answer","text":"Das Basiselterngeld beträgt 65% bis 67% des Nettoeinkommens vor der Geburt, mindestens 300 € und maximal 1.800 € pro Monat. Bei Geringverdienern kann der Satz auf bis zu 100% steigen."}},
+    {"@type":"Question","name":"Wie lange wird Elterngeld gezahlt?","acceptedAnswer":{"@type":"Answer","text":"Basiselterngeld wird für bis zu 14 Monate gezahlt (12 Monate + 2 Partnermonate). ElterngeldPlus verdoppelt die Bezugsdauer, halbiert aber den monatlichen Betrag. Kombinationen sind möglich."}},
+    {"@type":"Question","name":"Kann ich während des Elterngeldbezugs arbeiten?","acceptedAnswer":{"@type":"Answer","text":"Ja, bis zu 32 Stunden pro Woche (seit 2024 gilt diese Grenze für beide Elternteile). Das Einkommen wird auf das Elterngeld angerechnet und mindert den Auszahlungsbetrag entsprechend."}},
+    {"@type":"Question","name":"Was ist der Unterschied zwischen Elterngeld und ElterngeldPlus?","acceptedAnswer":{"@type":"Answer","text":"Basiselterngeld: voller Betrag (max. 1.800 €) für bis zu 14 Monate. ElterngeldPlus: halber Betrag (max. 900 €) für bis zu 28 Monate. Vorteil von Plus: länger Anspruch, besser kombinierbar mit Teilzeitarbeit."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Elterngeld Rechner 2026 – Elterngeld berechnen"
+  description="Elterngeld 2026 berechnen: Basiselterngeld, ElterngeldPlus und Partnerschaftsbonus. Mit aktuellem Nettoeinkommen, Geschwisterbonus und Mindestbetrag. Kostenlos."
+  canonical="https://rechnerbox.eu/de/elterngeld-rechner"
+  hreflangDE="/de/elterngeld-rechner"
+  image="/og/og-elterngeld.svg"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Elterngeld Rechner
+    </nav>
+    <h1>Elterngeld Rechner 2026</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Elterngeld für 2026 berechnen – Basiselterngeld und ElterngeldPlus. Mit Geschwisterbonus, Mehrlingsbonus und Partnerschaftsbonus.
+    </p>
+
+    <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-purple-800 mb-1">💡 Elterngeld 2026 auf einen Blick</p>
+      <p class="text-sm text-purple-700">
+        <strong>65–67%</strong> des Nettoeinkommens vor Geburt ·
+        <strong>mind. 300 €</strong> · <strong>max. 1.800 €/Monat</strong> ·
+        bis zu <strong>14 Monate</strong> Basiselterngeld
+      </p>
+    </div>
+
+    <div class="calc-box">
+      <div class="flex flex-wrap gap-2 mb-5">
+        {[{id:'basis',l:'Basiselterngeld'},{id:'plus',l:'ElterngeldPlus'},{id:'dauer',l:'Bezugsdauer'}].map((t,i) => (
+          <button onclick={`setEGMode('${t.id}')`} id={`egtab-${t.id}`}
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${i===0?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`}>{t.l}</button>
+        ))}
+      </div>
+
+      <!-- Basis & Plus teilen sich viele Felder -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Nettoeinkommen vor Geburt (€/Monat)</label>
+          <input class="calc-input" type="number" id="eg-netto" value="2800" step="50" />
+          <p class="text-xs text-gray-400 mt-1">→ <a href="/de/brutto-netto-rechner" class="text-primary-600 hover:underline">Netto noch nicht bekannt? Rechner →</a></p>
+        </div>
+        <div>
+          <label class="calc-label">Einkommen während Elternzeit (€/Monat)</label>
+          <input class="calc-input" type="number" id="eg-waehrend" value="0" step="50" />
+          <p class="text-xs text-gray-400 mt-1">0 = kein Einkommen während Bezug</p>
+        </div>
+        <div>
+          <label class="calc-label">Geschwisterbonus?</label>
+          <select class="calc-select" id="eg-geschwister">
+            <option value="0">Nein (erstes/einziges Kind)</option>
+            <option value="0.1">Ja – 1 Kind unter 3 Jahren (+10%)</option>
+            <option value="0.1">Ja – 2+ Kinder unter 6 Jahren (+10%)</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Mehrlinge?</label>
+          <select class="calc-select" id="eg-mehrlinge">
+            <option value="0">Nein (Einzelkind)</option>
+            <option value="300">Zwillinge (+300 €/Monat)</option>
+            <option value="600">Drillinge (+600 €/Monat)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Dauer-Modus zusätzlich -->
+      <div id="eg-dauer-inputs" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Geplante Elternzeit (Monate)</label>
+          <select class="calc-select" id="eg-monate">
+            <option value="2">2 Monate (Partnermonate)</option>
+            <option value="4">4 Monate</option>
+            <option value="6">6 Monate</option>
+            <option value="8">8 Monate</option>
+            <option value="10">10 Monate</option>
+            <option value="12" selected>12 Monate (Standard Hauptverdiener)</option>
+            <option value="14">14 Monate (12+2 Partnermonate)</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Variante</label>
+          <select class="calc-select" id="eg-variante">
+            <option value="basis">Nur Basiselterngeld</option>
+            <option value="plus">Nur ElterngeldPlus</option>
+            <option value="mix">Mix: 6 Basis + Rest als Plus</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calcEG()">Elterngeld berechnen</button>
+
+      <div class="calc-result hidden" id="eg-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center mb-3">
+          <div><div class="result-value" id="eg-betrag">–</div><div class="result-label" id="eg-betrag-lbl">Elterngeld/Monat</div></div>
+          <div><div class="result-value text-2xl" id="eg-netto-out">–</div><div class="result-label">Nettoersatzrate</div></div>
+          <div><div class="result-value text-xl" id="eg-gesamt">–</div><div class="result-label">Gesamtanspruch</div></div>
+          <div><div class="result-value text-xl" id="eg-monate-out">–</div><div class="result-label">Bezugsmonate</div></div>
+        </div>
+        <div class="bg-white rounded-xl p-3 text-sm text-gray-600 text-left leading-relaxed" id="eg-hinweis"></div>
+      </div>
+    </div>
+
+    <div class="info-box mt-4">
+      📌 <strong>Wichtige Änderung 2024:</strong> Die Arbeitszeit-Grenze wurde auf 32h/Woche für beide Elternteile vereinheitlicht. Der Partnerschaftsbonus (4 gleichzeitige Plus-Monate) bleibt bestehen. Einkommensgrenze: 200.000 € zu verst. Jahreseinkommen (Paar) / 150.000 € (Alleinerziehende).
+    </div>
+
+    <section class="mt-8">
+      <h2>Elterngeld-Varianten im Vergleich</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border">Variante</th>
+            <th class="text-center px-3 py-2 border">Betrag</th>
+            <th class="text-center px-3 py-2 border">Dauer</th>
+            <th class="text-center px-3 py-2 border">Geeignet für</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              ["Basiselterngeld","65–67% Netto, max. 1.800 €","bis 14 Monate","Vollzeit-Elternzeit, erster Elternteil"],
+              ["ElterngeldPlus","50% Basiselterngeld, max. 900 €","bis 28 Monate","Teilzeitarbeit parallel, längere Bezugsdauer"],
+              ["Partnerschaftsbonus","ElterngeldPlus + 4 Bonus-Monate","+4 Monate pro Elternteil","Beide arbeiten 24–32h gleichzeitig"],
+              ["Geschwisterbonus","+10% auf Gesamtelterngeld","gleich wie Basisvariante","Jüngere Geschwister unter 3 / 6 Jahren"],
+              ["Mehrlingszuschlag","+300 € je weiterem Kind","gleich wie Basisvariante","Zwillinge, Drillinge etc."],
+            ].map(r => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-medium text-gray-800">{r[0]}</td>
+                <td class="text-center px-3 py-2 border text-primary-700 font-medium">{r[1]}</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{r[2]}</td>
+                <td class="px-3 py-2 border text-gray-500 text-xs">{r[3]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8">
+      <h2>Elterngeld-Tabelle 2026 (Basiselterngeld, ohne Boni)</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border">Netto vor Geburt</th>
+            <th class="text-center px-3 py-2 border">Elterngeld/Monat</th>
+            <th class="text-center px-3 py-2 border">Ersatzrate</th>
+            <th class="text-center px-3 py-2 border">ElterngeldPlus</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              [1000,670,67,335],[1500,1005,67,503],[2000,1340,67,670],
+              [2500,1625,65,813],[3000,1950,65,975],[3500,2000,57,1000],
+              [4000,2000,50,1000],[5000,2000,40,1000],
+            ].map(r => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-medium text-gray-800">{(r[0] as number).toLocaleString('de-DE')} €</td>
+                <td class="text-center px-3 py-2 border text-green-700 font-bold">{(r[1] as number).toLocaleString('de-DE')} €</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{r[2]}%</td>
+                <td class="text-center px-3 py-2 border text-purple-600">{(r[3] as number).toLocaleString('de-DE')} €</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Elterngeld 2026</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Ab wann muss ich Elterngeld beantragen?",a:"Elterngeld muss rückwirkend für maximal 3 Monate beantragt werden. Am besten sofort nach der Geburt beim zuständigen Elterngeldstelle beantragen, da die Bearbeitung mehrere Wochen dauern kann. Zuständig ist die Elterngeldstelle des Wohnsitz-Bundeslandes."},
+          {q:"Ist Elterngeld steuerpflichtig?",a:"Elterngeld selbst ist steuerfrei, unterliegt aber dem Progressionsvorbehalt. Das bedeutet: Elterngeld erhöht den Steuersatz für andere Einkünfte (z.B. Gehalt in den Monaten ohne Elterngeld). Bei der Steuererklärung kann es daher zu Nachzahlungen kommen."},
+          {q:"Kann ich Elterngeld und Krankengeld gleichzeitig beziehen?",a:"Nein. Elterngeld und Mutterschaftsgeld / Krankengeld werden gegeneinander verrechnet. Während des Bezugs von Mutterschaftsgeld ruht der Elterngeldanspruch bis auf den Mindestbetrag von 300 €."},
+          {q:"Wie wirkt sich Teilzeitarbeit auf das Elterngeld aus?",a:"Einkommen während des Elterngeldbezugs wird angerechnet. Das angerechnete Einkommen mindert die Basis für die Elterngeldberechnung. Bis 32h/Woche ist Arbeit erlaubt. ElterngeldPlus ist besonders vorteilhaft bei Teilzeitarbeit."},
+        ].map(f => (
+          <div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>
+        ))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/brutto-netto-rechner',label:'Brutto-Netto'},{href:'/de/krankengeld-rechner',label:'Krankengeld'},{href:'/de/buergergeld-rechner',label:'Bürgergeld'},{href:'/de/ssw-rechner',label:'SSW Rechner'},{href:'/de/stundenlohn-rechner',label:'Stundenlohn'},{href:'/de/arbeitszeit-rechner',label:'Arbeitszeit'}].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    let egMode = 'basis';
+    const egModes = ['basis','plus','dauer'];
+    function fmtE(n: number) { return n.toLocaleString('de-DE', {maximumFractionDigits: 0}) + ' €'; }
+    (window as any).setEGMode = function(m: string) {
+      egMode = m;
+      egModes.forEach(x => {
+        const t = document.getElementById('egtab-' + x);
+        if (t) t.className = `px-3 py-1.5 rounded-lg text-sm font-medium border transition ${x===m?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`;
+      });
+      const d = document.getElementById('eg-dauer-inputs');
+      if (d) d.classList.toggle('hidden', m !== 'dauer');
+      document.getElementById('eg-result')?.classList.add('hidden');
+    };
+    function calcBasisEG(netto: number, waehrend: number, gbonus: number, mbonus: number): number {
+      const diff = Math.max(0, netto - waehrend);
+      // Ersatzrate: steigt bei Geringverdienern
+      let rate = 0.65;
+      if (diff <= 1000) rate = 0.67 + Math.max(0, (1000 - diff) / 1000) * 0.33; // max ~100%
+      rate = Math.min(rate, 1.0);
+      let eg = diff * rate;
+      // Geschwisterbonus
+      eg = eg * (1 + gbonus);
+      // Mindest / Maximum
+      eg = Math.max(300, Math.min(1800, eg));
+      // Mehrlingszuschlag (additiv)
+      eg += mbonus;
+      return Math.round(eg);
+    }
+    (window as any).calcEG = function() {
+      const netto = parseFloat((document.getElementById('eg-netto') as HTMLInputElement).value) || 0;
+      const waehrend = parseFloat((document.getElementById('eg-waehrend') as HTMLInputElement).value) || 0;
+      const gbonus = parseFloat((document.getElementById('eg-geschwister') as HTMLSelectElement).value) || 0;
+      const mbonus = parseFloat((document.getElementById('eg-mehrlinge') as HTMLSelectElement).value) || 0;
+      const basisEG = calcBasisEG(netto, waehrend, gbonus, mbonus);
+      const plusEG = Math.min(900, Math.round(basisEG / 2));
+      const rate = netto > 0 ? Math.round(basisEG / netto * 100) : 0;
+      const r = document.getElementById('eg-result')!; r.classList.remove('hidden');
+      let betrag: number, monate: number, gesamt: number, lbl: string, hinweis: string;
+      if (egMode === 'basis') {
+        betrag = basisEG; monate = 14; gesamt = basisEG * 12;
+        lbl = 'Basiselterngeld/Monat';
+        hinweis = `Basiselterngeld: ${fmtE(basisEG)}/Monat für max. 12 Monate (+ 2 Partnermonate = 14 Monate total). Jahresgesamtwert (12 Monate Hauptverdiener): ${fmtE(gesamt)}.`;
+      } else if (egMode === 'plus') {
+        betrag = plusEG; monate = 28; gesamt = plusEG * 24;
+        lbl = 'ElterngeldPlus/Monat';
+        hinweis = `ElterngeldPlus: ${fmtE(plusEG)}/Monat für max. 24 Monate (+ 8 Partnermonate). Vorteil bei Teilzeit: Mehr Monate, gut kombinierbar mit bis zu 32h/Woche Arbeit.`;
+      } else {
+        const mo = parseInt((document.getElementById('eg-monate') as HTMLSelectElement).value);
+        const variante = (document.getElementById('eg-variante') as HTMLSelectElement).value;
+        let g = 0;
+        if (variante === 'basis') { betrag = basisEG; g = basisEG * mo; }
+        else if (variante === 'plus') { betrag = plusEG; g = plusEG * mo * 2; monate = mo * 2; }
+        else { const bMo = Math.min(6, mo); const pMo = Math.max(0, mo - bMo); betrag = basisEG; g = basisEG * bMo + plusEG * pMo * 2; }
+        monate = mo; gesamt = g;
+        lbl = 'Ø Elterngeld/Monat';
+        hinweis = `Gewählte Bezugsdauer: ${mo} Monate. Gesamtauszahlung über gesamten Zeitraum: ${fmtE(gesamt)}.`;
+      }
+      document.getElementById('eg-betrag')!.textContent = fmtE(betrag);
+      document.getElementById('eg-betrag-lbl')!.textContent = lbl;
+      document.getElementById('eg-netto-out')!.textContent = rate + '%';
+      document.getElementById('eg-gesamt')!.textContent = fmtE(gesamt);
+      document.getElementById('eg-monate-out')!.textContent = (monate || 14) + ' Mon.';
+      document.getElementById('eg-hinweis')!.textContent = hinweis;
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

@@ -1,0 +1,201 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"TV-L Rechner 2026","url":"https://rechnerbox.eu/de/tv-l-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Was ist der Unterschied zwischen TV-L und TVöD?","acceptedAnswer":{"@type":"Answer","text":"TV-L gilt für Beschäftigte der Bundesländer (außer Hessen), TVöD für Bund und Kommunen. TV-L Gehälter liegen in mittleren Entgeltgruppen oft etwas unter TVöD Bund."}},
+    {"@type":"Question","name":"Wie hoch ist das TV-L Gehalt 2026?","acceptedAnswer":{"@type":"Answer","text":"Im TV-L 2026 reichen die Gehälter von ca. 2.219 € (EG 1, Stufe 1) bis ca. 8.397 € (EG 15, Stufe 5) brutto. Die Werte gelten nach der Anpassung von 2024/2025."}},
+    {"@type":"Question","name":"Gilt TV-L in allen Bundesländern?","acceptedAnswer":{"@type":"Answer","text":"Der TV-L gilt in 15 Bundesländern. Hessen hat einen eigenen Tarifvertrag (TV-H). Bayern und Baden-Württemberg haben eigene Sonderregelungen für einige Bereiche."}},
+    {"@type":"Question","name":"Wann wechsle ich von Stufe 1 in Stufe 2 TV-L?","acceptedAnswer":{"@type":"Answer","text":"Im TV-L beginnt man ebenfalls in Stufe 1 und wechselt nach einem Jahr in Stufe 2. Bei nachgewiesener einschlägiger Berufserfahrung kann der Arbeitgeber eine höhere Stufe gewähren."}}
+  ]}
+]};
+const TVL: Record<string, number[]> = {
+  "EG 1": [2219,2369,2453,2539,2579,2617],
+  "EG 2": [2464,2631,2733,2830,2901,2970],
+  "EG 3": [2652,2846,2949,3050,3096,3143],
+  "EG 4": [2772,2970,3109,3244,3316,3388],
+  "EG 5": [2926,3150,3345,3474,3622,3697],
+  "EG 6": [3032,3287,3487,3658,3834,3915],
+  "EG 7": [3149,3411,3622,3820,3934,4018],
+  "EG 8": [3293,3560,3784,3953,4088,4177],
+  "EG 9a": [3394,3666,3888,4099,4310,4408],
+  "EG 9b": [3509,3790,4035,4263,4512,4623],
+  "EG 10": [3968,4291,4570,4851,5108,5234],
+  "EG 11": [4350,4699,5011,5308,5644,5786],
+  "EG 12": [4899,5293,5643,5992,6430,6591],
+  "EG 13": [5503,5929,6328,6727,7115,0],
+  "EG 14": [5952,6408,6875,7288,7706,0],
+  "EG 15": [6593,7085,7608,8113,8397,0],
+};
+const egs = Object.keys(TVL);
+---
+<BaseLayout
+  title="TV-L Rechner 2026 – Gehalt Tarifvertrag Länder berechnen"
+  description="TV-L Gehalt 2026 berechnen: Entgeltgruppe, Erfahrungsstufe und Bundesland. Aktuelle TV-L Entgelttabelle 2026 für alle Bundesländer. Kostenlos."
+  canonical="https://rechnerbox.eu/de/tv-l-rechner"
+  hreflangDE="/de/tv-l-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › TV-L Rechner
+    </nav>
+    <h1>TV-L Rechner 2026 – Gehalt Tarifvertrag Länder</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      TV-L Bruttogehalt 2026 nach Entgeltgruppe und Erfahrungsstufe berechnen – für Beschäftigte der Bundesländer. Aktuelle Entgelttabelle nach der Anpassung 2025.
+    </p>
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Entgeltgruppe</label>
+          <select class="calc-select" id="tvl-eg">
+            {egs.map(eg => <option value={eg}>{eg}</option>)}
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Erfahrungsstufe</label>
+          <select class="calc-select" id="tvl-stufe">
+            <option value="0">Stufe 1</option>
+            <option value="1">Stufe 2</option>
+            <option value="2">Stufe 3</option>
+            <option value="3">Stufe 4</option>
+            <option value="4">Stufe 5</option>
+            <option value="5">Stufe 6</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Beschäftigungsumfang</label>
+          <select class="calc-select" id="tvl-vz">
+            <option value="1">Vollzeit (100%)</option>
+            <option value="0.9">Teilzeit 90%</option>
+            <option value="0.75">Teilzeit 75%</option>
+            <option value="0.5">Teilzeit 50%</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcTVL()">Gehalt berechnen</button>
+      <div class="calc-result hidden" id="tvl-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div><div class="result-value" id="tvl-brutto">–</div><div class="result-label">Brutto / Monat</div></div>
+          <div><div class="result-value text-2xl" id="tvl-netto">–</div><div class="result-label">Netto* ca.</div></div>
+          <div><div class="result-value text-xl" id="tvl-year">–</div><div class="result-label">Brutto / Jahr</div></div>
+          <div><div class="result-value text-xl" id="tvl-jaz">–</div><div class="result-label">+Jahressonderzahl.</div></div>
+        </div>
+        <p class="text-xs text-gray-400 mt-2">* Schätzung: Steuerklasse I, GKV, keine Kirchensteuer</p>
+      </div>
+    </div>
+    <div class="info-box mt-4">
+      📌 <strong>TV-L 2026:</strong> Die Tabellenwerte gelten nach dem Tarifabschluss 2024 (+5,5% ab März 2024, mind. 340 €). EG 15 ohne Stufe 6. Jahressonderzahlung: 51,78–77,43% eines Monatsgehalts je nach EG und Bundesland.
+    </div>
+    <section class="mt-8">
+      <h2>TV-L Entgelttabelle 2026 (Auszug)</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead>
+            <tr class="bg-gray-100 text-gray-700">
+              <th class="text-left px-3 py-2 border">EG</th>
+              <th class="text-center px-3 py-2 border">S 1</th>
+              <th class="text-center px-3 py-2 border">S 2</th>
+              <th class="text-center px-3 py-2 border">S 3</th>
+              <th class="text-center px-3 py-2 border">S 4</th>
+              <th class="text-center px-3 py-2 border">S 5</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {Object.entries(TVL).filter(([eg]) => ["EG 5","EG 9a","EG 10","EG 11","EG 12","EG 13"].includes(eg)).map(([eg, stufen]) => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-semibold text-gray-800">{eg}</td>
+                {stufen.slice(0,5).map(s => <td class="text-center px-3 py-2 border text-gray-600">{s > 0 ? s.toLocaleString('de-DE') + ' €' : '–'}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="mt-8">
+      <h2>TV-L vs. TVöD – Gehaltsvergleich 2026</h2>
+      <p>TV-L Gehälter liegen in den mittleren und unteren Entgeltgruppen meist sehr nah am TVöD Bund. Ab EG 12 aufwärts können Unterschiede auftreten. Als Lehrer (A-Besoldung) oder Beamter gilt ein separates Besoldungsrecht.</p>
+      <div class="overflow-x-auto mt-3">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100"><th class="text-left px-3 py-2 border">EG</th><th class="text-center px-3 py-2 border">TVöD Bund S3</th><th class="text-center px-3 py-2 border">TV-L S3</th><th class="text-center px-3 py-2 border">Differenz</th></tr></thead>
+          <tbody>
+            {[["EG 9b",4098,4035,-63],["EG 10",4643,4570,-73],["EG 11",5090,5011,-79],["EG 12",5733,5643,-90],["EG 13",6430,6328,-102]].map(r => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-medium text-gray-800">{r[0]}</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{(r[1] as number).toLocaleString('de-DE')} €</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{(r[2] as number).toLocaleString('de-DE')} €</td>
+                <td class="text-center px-3 py-2 border text-red-600">{r[3]} €</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="mt-8"><h2>FAQ – TV-L 2026</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Was ist der Unterschied zwischen TV-L und TVöD?",a:"TV-L gilt für Beschäftigte der Bundesländer (außer Hessen), TVöD für Bund und Kommunen. Die Entgelttabellen sind ähnlich, aber TV-L liegt in höheren EG oft leicht darunter. Beide Tarifsysteme sind vergleichbar strukturiert."},
+          {q:"In welcher Stufe fange ich an?",a:"Berufsanfänger starten in Stufe 1. Bei nachgewiesener einschlägiger Berufserfahrung von mehr als einem Jahr kann der Arbeitgeber höhere Stufen anerkennen, was die Eingruppierung erheblich verbessert."},
+          {q:"Gilt TV-L auch für Lehrkräfte?",a:"Lehrkräfte an öffentlichen Schulen sind in der Regel verbeamtet und fallen unter das Beamtenbesoldungsgesetz. Angestellte Lehrkräfte erhalten TV-L nach den Entgeltordnungen L (EG L)."},
+          {q:"Wie hoch ist die TV-L Jahressonderzahlung?",a:"Im TV-L erhalten EG 1–8 eine Jahressonderzahlung von 90% eines Monatsgehalts, EG 9–12 ca. 80% und EG 13–15 ca. 60%. Auszahlung erfolgt im November."},
+        ].map(f => (
+          <div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>
+        ))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/tvoed-rechner',label:'TVöD Rechner'},{href:'/de/brutto-netto-rechner',label:'Brutto-Netto'},{href:'/de/krankengeld-rechner',label:'Krankengeld'},{href:'/de/arbeitszeit-rechner',label:'Arbeitszeitrechner'},{href:'/de/minijob-rechner',label:'Minijob Rechner'},{href:'/de/urlaubsgeld-rechner',label:'Urlaubsgeld'}].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    const TVL_DATA: Record<string, number[]> = {
+      "EG 1":[2219,2369,2453,2539,2579,2617],"EG 2":[2464,2631,2733,2830,2901,2970],
+      "EG 3":[2652,2846,2949,3050,3096,3143],"EG 4":[2772,2970,3109,3244,3316,3388],
+      "EG 5":[2926,3150,3345,3474,3622,3697],"EG 6":[3032,3287,3487,3658,3834,3915],
+      "EG 7":[3149,3411,3622,3820,3934,4018],"EG 8":[3293,3560,3784,3953,4088,4177],
+      "EG 9a":[3394,3666,3888,4099,4310,4408],"EG 9b":[3509,3790,4035,4263,4512,4623],
+      "EG 10":[3968,4291,4570,4851,5108,5234],"EG 11":[4350,4699,5011,5308,5644,5786],
+      "EG 12":[4899,5293,5643,5992,6430,6591],"EG 13":[5503,5929,6328,6727,7115,0],
+      "EG 14":[5952,6408,6875,7288,7706,0],"EG 15":[6593,7085,7608,8113,8397,0],
+    };
+    function estimateNetto(brutto: number): number {
+      const j = brutto * 12;
+      let lst = 0;
+      if (j > 12084) {
+        if (j <= 17005) lst = ((j-12084)/10000*979.18+1400)*((j-12084)/10000);
+        else if (j <= 66761) lst = ((j-17005)/10000*192.59+2397)*((j-17005)/10000)+1025.38;
+        else lst = 0.42*j-10602;
+      }
+      const sv = brutto*(0.073+0.01775+0.093+0.013);
+      return brutto - lst/12 - sv;
+    }
+    function fmt(n: number) { return n.toLocaleString('de-DE',{maximumFractionDigits:0})+' €'; }
+    (window as any).calcTVL = function() {
+      const eg = (document.getElementById('tvl-eg') as HTMLSelectElement).value;
+      const stufe = parseInt((document.getElementById('tvl-stufe') as HTMLSelectElement).value);
+      const vz = parseFloat((document.getElementById('tvl-vz') as HTMLSelectElement).value);
+      const stufen = TVL_DATA[eg];
+      if (!stufen) return;
+      const raw = stufen[stufe];
+      if (!raw) { alert('Stufe 6 nicht verfügbar für diese EG'); return; }
+      const brutto = raw * vz;
+      const netto = estimateNetto(brutto);
+      const jaz = brutto * (parseInt(eg.replace('EG ','')) <= 8 ? 0.9 : parseInt(eg.replace('EG ','')) <= 12 ? 0.8 : 0.6);
+      const r = document.getElementById('tvl-result')!; r.classList.remove('hidden');
+      document.getElementById('tvl-brutto')!.textContent = fmt(brutto);
+      document.getElementById('tvl-netto')!.textContent = fmt(netto);
+      document.getElementById('tvl-year')!.textContent = fmt(brutto*12);
+      document.getElementById('tvl-jaz')!.textContent = fmt(jaz);
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

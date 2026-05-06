@@ -1,0 +1,149 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {"@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Pace Rechner","url":"https://rechnerbox.eu/de/pace-rechner","applicationCategory":"SportsApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Was ist Pace beim Laufen?","acceptedAnswer":{"@type":"Answer","text":"Pace ist die Zeit, die Sie für einen Kilometer benötigen (min/km). Ein Pace von 5:00 bedeutet 5 Minuten pro Kilometer, was einer Geschwindigkeit von 12 km/h entspricht."}},
+    {"@type":"Question","name":"Wie schnell muss ich laufen für einen Halbmarathon in 2 Stunden?","acceptedAnswer":{"@type":"Answer","text":"Für einen Halbmarathon (21,0975 km) in 2 Stunden benötigen Sie einen Pace von ca. 5:41 min/km bzw. eine Geschwindigkeit von ca. 10,55 km/h."}},
+    {"@type":"Question","name":"Wie berechne ich meine Finishzeit beim Marathon?","acceptedAnswer":{"@type":"Answer","text":"Finishzeit = Pace (min/km) × Distanz (km). Beim Marathon: Pace 5:00 × 42,195 = 210,975 Minuten = 3 Stunden 30 Minuten 58 Sekunden."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Pace Rechner 2026 – Lauftempo, Pace & Finishzeit berechnen"
+  description="Pace, Geschwindigkeit und Finishzeit für Läufer berechnen. Marathon, Halbmarathon, 10km – alle Distanzen. Kostenloser Pace-Rechner 2026."
+  canonical="https://rechnerbox.eu/de/pace-rechner"
+  hreflangDE="/de/pace-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Pace Rechner
+    </nav>
+    <h1>Pace Rechner 2026 – Lauftempo berechnen</h1>
+    <p class="text-lg text-gray-600 mb-6">Berechnen Sie Ihren Pace (min/km), Ihre Geschwindigkeit (km/h) und die voraussichtliche Finishzeit für jede Laufdistanz.</p>
+
+    <div class="calc-box">
+      <div class="flex flex-wrap gap-2 mb-5">
+        {[{id:'pace',l:'Pace → Zeit'},{id:'speed',l:'km/h → Pace'},{id:'finish',l:'Finishzeit'}].map((t,i)=>(
+          <button onclick={`setPaceMode('${t.id}')`} id={`ptab-${t.id}`}
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${i===0?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`}>{t.l}</button>
+        ))}
+      </div>
+
+      <!-- Mode: Pace to Zeit -->
+      <div id="mode-pace">
+        <div class="grid grid-cols-3 gap-3 mb-3">
+          <div><label class="calc-label">Pace (min)</label><input class="calc-input" type="number" id="p-min" value="5" min="0" /></div>
+          <div><label class="calc-label">Pace (sek)</label><input class="calc-input" type="number" id="p-sec" value="30" min="0" max="59" /></div>
+          <div><label class="calc-label">Distanz (km)</label><input class="calc-input" type="number" id="p-dist" value="10" step="0.001" /></div>
+        </div>
+        <button class="calc-btn" onclick="calcPace()">Berechnen</button>
+        <div class="calc-result hidden" id="pace-result">
+          <div class="grid grid-cols-2 gap-4">
+            <div><div class="result-value" id="p-time">–</div><div class="result-label">Finishzeit</div></div>
+            <div><div class="result-value" id="p-kmh">–</div><div class="result-label">Geschwindigkeit</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode: Speed to Pace -->
+      <div id="mode-speed" class="hidden">
+        <div class="grid grid-cols-2 gap-3 mb-3">
+          <div><label class="calc-label">Geschwindigkeit (km/h)</label><input class="calc-input" type="number" id="s-kmh" value="10" step="0.1" /></div>
+          <div><label class="calc-label">Distanz (km)</label><input class="calc-input" type="number" id="s-dist" value="10" step="0.001" /></div>
+        </div>
+        <button class="calc-btn" onclick="calcPace()">Berechnen</button>
+        <div class="calc-result hidden" id="speed-result">
+          <div class="grid grid-cols-2 gap-4">
+            <div><div class="result-value" id="s-pace">–</div><div class="result-label">Pace (min/km)</div></div>
+            <div><div class="result-value" id="s-time">–</div><div class="result-label">Finishzeit</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode: Finish time input -->
+      <div id="mode-finish" class="hidden">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+          <div><label class="calc-label">Stunden</label><input class="calc-input" type="number" id="f-h" value="0" min="0" /></div>
+          <div><label class="calc-label">Minuten</label><input class="calc-input" type="number" id="f-m" value="50" min="0" max="59" /></div>
+          <div><label class="calc-label">Sekunden</label><input class="calc-input" type="number" id="f-s" value="0" min="0" max="59" /></div>
+          <div><label class="calc-label">Distanz (km)</label><input class="calc-input" type="number" id="f-dist" value="10" step="0.001" /></div>
+        </div>
+        <button class="calc-btn" onclick="calcPace()">Berechnen</button>
+        <div class="calc-result hidden" id="finish-result">
+          <div class="grid grid-cols-2 gap-4">
+            <div><div class="result-value" id="f-pace">–</div><div class="result-label">Pace (min/km)</div></div>
+            <div><div class="result-value" id="f-kmh">–</div><div class="result-label">km/h</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Referenz-Tabelle -->
+    <div class="overflow-x-auto my-6">
+      <table class="w-full text-sm border-collapse"><thead><tr class="bg-gray-100 text-gray-700">
+        <th class="text-left px-3 py-2 border border-gray-200">Distanz</th>
+        <th class="px-3 py-2 border border-gray-200">5:00 min/km</th>
+        <th class="px-3 py-2 border border-gray-200">5:30 min/km</th>
+        <th class="px-3 py-2 border border-gray-200">6:00 min/km</th>
+      </tr></thead>
+      <tbody class="divide-y divide-gray-200">
+        {[['5 km','0:25:00','0:27:30','0:30:00'],['10 km','0:50:00','0:55:00','1:00:00'],['Halbmarathon','1:45:58','1:56:03','2:06:08'],['Marathon','3:31:55','3:52:06','4:12:17']].map(r=>(
+          <tr class="hover:bg-gray-50">{r.map((c,i)=><td class={`px-3 py-2 border border-gray-200 ${i===0?'font-medium text-gray-800':'text-center text-gray-600'}`}>{c}</td>)}</tr>
+        ))}
+      </tbody>
+    </table></div>
+
+    <section class="mt-6"><h2>FAQ – Pace & Lauftempo</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Was ist ein guter Pace für Anfänger?",a:"Ein angenehmer Lauf-Pace für Anfänger liegt typischerweise zwischen 7:00 und 9:00 min/km. Das entspricht einer Geschwindigkeit von etwa 7–9 km/h."},
+          {q:"Wie schnell muss ich laufen für einen Marathon unter 4 Stunden?",a:"Für einen Marathon in 4 Stunden brauchen Sie einen Durchschnitts-Pace von 5:41 min/km (10,55 km/h)."},
+          {q:"Was ist der Unterschied zwischen Pace und Geschwindigkeit?",a:"Pace ist die Zeit pro Kilometer (z.B. 5:00 min/km). Geschwindigkeit ist die zurückgelegte Strecke pro Stunde (z.B. 12 km/h). Pace = 60 / Geschwindigkeit."},
+        ].map(f=>(<div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>))}
+      </div>
+    </section>
+  </article>
+
+  <script>
+    let paceMode = 'pace';
+    const paceModes = ['pace','speed','finish'];
+    function secsToTime(s:number){const h=Math.floor(s/3600);const m=Math.floor((s%3600)/60);const sec=Math.round(s%60);return (h?h+':':'')+(h?String(m).padStart(2,'0'):m)+':'+String(sec).padStart(2,'0');}
+    function n(id:string):number{return parseFloat((document.getElementById(id) as HTMLInputElement)?.value||'0');}
+    function show(id:string,vals:Record<string,string>){const el=document.getElementById(id);if(!el)return;el.classList.remove('hidden');Object.entries(vals).forEach(([k,v])=>{const c=document.getElementById(k);if(c)c.textContent=v;});}
+    (window as any).setPaceMode=function(m:string){
+      paceMode=m;
+      paceModes.forEach(x=>{
+        const el=document.getElementById('mode-'+x);const tab=document.getElementById('ptab-'+x);
+        if(!el||!tab)return;
+        el.classList.toggle('hidden',x!==m);
+        tab.className=`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${x===m?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`;
+      });
+    };
+    (window as any).calcPace=function(){
+      if(paceMode==='pace'){
+        const totalSec=(n('p-min')*60+n('p-sec'))*n('p-dist');
+        const kmh=3600/(n('p-min')*60+n('p-sec'));
+        show('pace-result',{'p-time':secsToTime(totalSec),'p-kmh':kmh.toFixed(2).replace('.',',')+' km/h'});
+      }
+      if(paceMode==='speed'){
+        const paceSecPerKm=3600/n('s-kmh');
+        const m=Math.floor(paceSecPerKm/60);const s=Math.round(paceSecPerKm%60);
+        const finish=paceSecPerKm*n('s-dist');
+        show('speed-result',{'s-pace':m+':'+String(s).padStart(2,'0')+' min/km','s-time':secsToTime(finish)});
+      }
+      if(paceMode==='finish'){
+        const total=n('f-h')*3600+n('f-m')*60+n('f-s');
+        const pSec=total/n('f-dist');
+        const pm=Math.floor(pSec/60);const ps=Math.round(pSec%60);
+        const kmh=3600/pSec;
+        show('finish-result',{'f-pace':pm+':'+String(ps).padStart(2,'0')+' min/km','f-kmh':kmh.toFixed(2).replace('.',',')+' km/h'});
+      }
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

@@ -1,0 +1,208 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"U-Wert Rechner 2026","url":"https://rechnerbox.eu/de/u-wert-rechner","applicationCategory":"UtilitiesApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Was ist der U-Wert?","acceptedAnswer":{"@type":"Answer","text":"Der U-Wert (Wärmedurchgangskoeffizient) gibt an, wie viel Wärme pro Sekunde durch 1 m² eines Bauteils fließt, wenn der Temperaturunterschied 1 Kelvin beträgt. Einheit: W/(m²K). Niedrigere Werte = bessere Dämmung."}},
+    {"@type":"Question","name":"Welcher U-Wert ist für Außenwände 2026 gefordert?","acceptedAnswer":{"@type":"Answer","text":"Nach GEG (Gebäudeenergiegesetz) 2024 gilt für Außenwände bei Neubau ein U-Wert von maximal 0,28 W/(m²K). Für Dach/Decke maximal 0,20 W/(m²K), für Fenster maximal 1,3 W/(m²K)."}},
+    {"@type":"Question","name":"Wie verbessere ich den U-Wert einer Wand?",a:"Den U-Wert verbessern Sie durch Hinzufügen von Dämmschichten (z.B. EPS, Mineralwolle). Eine 10cm Dämmschicht (λ=0,035 W/(m·K)) hat einen R-Wert von 2,86 m²K/W und verbessert den U-Wert erheblich."}}
+  ]}
+]};
+
+const MATERIALS = [
+  {name:'Beton (2400 kg/m³)', lambda: 2.10},
+  {name:'Stahlbeton', lambda: 2.30},
+  {name:'Kalksandstein (2000 kg/m³)', lambda: 1.20},
+  {name:'Mauerziegel (1200 kg/m³)', lambda: 0.50},
+  {name:'Hohlblockziegel', lambda: 0.36},
+  {name:'Porenbeton (PP2)', lambda: 0.09},
+  {name:'Poroton T14', lambda: 0.14},
+  {name:'Holz (Fichte/Kiefer)', lambda: 0.13},
+  {name:'EPS Hartschaum (WLG 035)', lambda: 0.035},
+  {name:'Mineralwolle (WLG 035)', lambda: 0.035},
+  {name:'Mineralwolle (WLG 040)', lambda: 0.040},
+  {name:'PIR-Hartschaum', lambda: 0.025},
+  {name:'Holzfaser-Dämmplatte', lambda: 0.048},
+  {name:'Zelluloseflocken', lambda: 0.040},
+  {name:'Kalk-Zementputz', lambda: 0.87},
+  {name:'Gipsputz', lambda: 0.35},
+  {name:'Luftschicht (stehend, 5cm)', lambda: 0.180},
+];
+---
+<BaseLayout
+  title="U-Wert Rechner 2026 – Wärmedurchgangskoeffizient berechnen"
+  description="U-Wert von Wänden, Dächern und Böden online berechnen. GEG 2024 Grenzwerte, Schichtaufbau eingeben. Kostenloser U-Wert-Rechner für Neubau und Sanierung."
+  canonical="https://rechnerbox.eu/de/u-wert-rechner"
+  hreflangDE="/de/u-wert-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › U-Wert Rechner
+    </nav>
+    <h1>U-Wert Rechner 2026 – Wärmedurchgangskoeffizient</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      U-Wert von Bauteilen nach GEG 2024 berechnen – Schicht für Schicht. Mit Materialdatenbank, R-Wert-Berechnung und Grenzwert-Prüfung.
+    </p>
+
+    <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-green-800 mb-2">📋 GEG 2024 U-Wert Grenzwerte (Neubau)</p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-green-700">
+        {[["Außenwand","≤ 0,28"],["Dach","≤ 0,20"],["Kellerdecke","≤ 0,30"],["Fenster","≤ 1,30"]].map(([l,v])=>(
+          <div class="bg-white rounded-lg p-2 text-center border border-green-100">
+            <div class="font-medium">{l}</div><div class="font-bold text-green-800">{v} W/(m²K)</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="calc-box">
+      <div class="mb-4">
+        <label class="calc-label">Bauteil-Typ (Randbedingungen)</label>
+        <select class="calc-select" id="uw-type">
+          <option value="0.13;0.04">Außenwand (Rsi 0,13 + Rse 0,04)</option>
+          <option value="0.10;0.04">Dach (Rsi 0,10 + Rse 0,04)</option>
+          <option value="0.17;0.04">Bodenkontakt (Rsi 0,17 + Rse 0,04)</option>
+          <option value="0.13;0.13">Innenwand (Rsi 0,13 + Rsi 0,13)</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="calc-label">Schichten (von innen nach außen)</label>
+        <div id="uw-layers" class="space-y-2">
+          <div class="uw-layer flex gap-2 items-center">
+            <select class="calc-select flex-1 text-sm" onchange="updateLambda(this)">
+              {MATERIALS.map(m => <option value={m.lambda.toString()}>{m.name} (λ={m.lambda})</option>)}
+            </select>
+            <div class="flex gap-1 items-center">
+              <input class="calc-input w-20 text-sm" type="number" placeholder="mm" value="240" min="1" step="1" title="Dicke in mm"/>
+              <span class="text-xs text-gray-400">mm</span>
+            </div>
+            <span class="text-xs text-gray-400 w-20 layer-r">R: –</span>
+            <button onclick="this.closest('.uw-layer').remove();calcUW()" class="text-red-400 hover:text-red-600 px-1">✕</button>
+          </div>
+          <div class="uw-layer flex gap-2 items-center">
+            <select class="calc-select flex-1 text-sm" onchange="updateLambda(this)">
+              {MATERIALS.map(m => <option value={m.lambda.toString()} selected={m.lambda===0.035}>{m.name} (λ={m.lambda})</option>)}
+            </select>
+            <div class="flex gap-1 items-center">
+              <input class="calc-input w-20 text-sm" type="number" placeholder="mm" value="100" min="1" step="1"/>
+              <span class="text-xs text-gray-400">mm</span>
+            </div>
+            <span class="text-xs text-gray-400 w-20 layer-r">R: –</span>
+            <button onclick="this.closest('.uw-layer').remove();calcUW()" class="text-red-400 hover:text-red-600 px-1">✕</button>
+          </div>
+        </div>
+        <button onclick="addLayer()" class="mt-2 text-sm text-primary-600 hover:text-primary-800 font-medium">+ Schicht hinzufügen</button>
+      </div>
+
+      <button class="calc-btn" onclick="calcUW()">U-Wert berechnen</button>
+
+      <div class="calc-result hidden" id="uw-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center mb-3">
+          <div><div class="result-value text-3xl" id="uw-val">–</div><div class="result-label">U-Wert W/(m²K)</div></div>
+          <div><div class="result-value text-2xl" id="uw-rges">–</div><div class="result-label">R-Wert gesamt (m²K/W)</div></div>
+          <div><div class="result-value text-xl" id="uw-bewert">–</div><div class="result-label">Bewertung</div></div>
+          <div><div class="result-value text-xl" id="uw-limite">–</div><div class="result-label">GEG Grenzwert</div></div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs border-collapse" id="uw-detail"></table>
+        </div>
+      </div>
+    </div>
+
+    <section class="mt-8">
+      <h2>U-Wert typischer Bauteile (Richtwerte)</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100"><th class="text-left px-3 py-2 border">Bauteil</th><th class="text-center px-3 py-2 border">U-Wert</th><th class="text-center px-3 py-2 border">Bewertung</th></tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[["Einfachverglasung (alt)","5,7","⛔ Sehr schlecht"],["Zweifach-WV (alt, 80er)","2,5","🔴 Schlecht"],["Zweifach-WV (modern)","1,1","⚠️ Ausreichend"],["Dreifach-WV (Neubau)","0,6","✅ Gut"],["Massivwand 36cm Ziegel (alt)","1,0","🔴 Schlecht"],["Gedämmte Außenwand KfW","0,18","✅ Sehr gut"],["Flachdach ungedämmt","2,0","⛔ Schlecht"],["Flachdach nach GEG","0,20","✅ Anforderung"]].map(r=>(
+              <tr class="hover:bg-gray-50"><td class="px-3 py-2 border font-medium">{r[0]}</td><td class="text-center px-3 py-2 border font-bold text-primary-700">{r[1]} W/(m²K)</td><td class="text-center px-3 py-2 border">{r[2]}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – U-Wert</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Was ist der Unterschied zwischen U-Wert und R-Wert?",a:"Der R-Wert (Wärmedurchlasswiderstand) ist der Kehrwert des U-Werts: R = 1/U. Ein hoher R-Wert bedeutet gute Dämmung. R-Werte einzelner Schichten können addiert werden."},
+          {q:"Wie viel Dämmung spare ich mit besserem U-Wert?",a:"Faustformel: Heizkostenersparnis ≈ (U_alt - U_neu) / U_alt × aktuelle Heizkosten. Eine Sanierung von U=1,0 auf U=0,2 spart ca. 80% der Transmissionswärmeverluste durch dieses Bauteil."},
+          {q:"Was ist λ (Lambda) bei Dämmstoffen?",a:"Lambda (λ) ist die Wärmeleitfähigkeit in W/(m·K). Niedrigere λ-Werte = bessere Dämmung. EPS 035 hat λ=0,035 W/(m·K). Damit: Für R=1 m²K/W → d = R × λ = 1 × 0,035 = 3,5cm Dicke."},
+        ].map(f=>(<div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/hoai-rechner',label:'HOAI Rechner'},{href:'/de/flaeche-rechner',label:'Flächenrechner'},{href:'/de/pythagoras-rechner',label:'Pythagoras'},{href:'/de/industrieminuten-rechner',label:'Industrieminuten'},{href:'/de/celsius-fahrenheit',label:'Temperatur'},{href:'/de/dreisatz-rechner',label:'Dreisatz'}].map(r=>(
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    const MATS:{name:string,lambda:number}[] = [
+      {name:'Beton',lambda:2.10},{name:'Stahlbeton',lambda:2.30},{name:'Kalksandstein',lambda:1.20},
+      {name:'Mauerziegel',lambda:0.50},{name:'Hohlblockziegel',lambda:0.36},{name:'Porenbeton PP2',lambda:0.09},
+      {name:'Poroton T14',lambda:0.14},{name:'Holz',lambda:0.13},
+      {name:'EPS WLG035',lambda:0.035},{name:'Mineralwolle WLG035',lambda:0.035},
+      {name:'Mineralwolle WLG040',lambda:0.040},{name:'PIR',lambda:0.025},
+      {name:'Holzfaser',lambda:0.048},{name:'Zellulose',lambda:0.040},
+      {name:'KZ-Putz',lambda:0.87},{name:'Gipsputz',lambda:0.35},{name:'Luft 5cm',lambda:0.18},
+    ];
+    function fmtN(n:number,d=3){return n.toFixed(d).replace('.',',');}
+    function updateLambda(sel:HTMLSelectElement){
+      const row=sel.closest('.uw-layer');if(!row)return;
+      const rEl=row.querySelector<HTMLElement>('.layer-r');
+      const d=parseFloat(row.querySelector('input')?.value||'0')/1000;
+      const l=parseFloat(sel.value)||0;
+      if(rEl)rEl.textContent='R: '+fmtN(d>0&&l>0?d/l:0);
+    }
+    function addLayer(){
+      const tmpl=document.querySelector<HTMLElement>('.uw-layer')!.cloneNode(true) as HTMLElement;
+      tmpl.querySelector<HTMLInputElement>('input')!.value='80';
+      const sel=tmpl.querySelector<HTMLSelectElement>('select')!;
+      sel.addEventListener('change',()=>updateLambda(sel));
+      document.getElementById('uw-layers')!.appendChild(tmpl);
+    }
+    document.querySelectorAll<HTMLSelectElement>('.uw-layer select').forEach(s=>s.addEventListener('change',()=>updateLambda(s)));
+    const GEG:{[k:string]:number}={'0.13;0.04':0.28,'0.10;0.04':0.20,'0.17;0.04':0.30,'0.13;0.13':0.99};
+    (window as any).calcUW=function(){
+      const type=(document.getElementById('uw-type') as HTMLSelectElement).value;
+      const [rsi,rse]=type.split(';').map(Number);
+      let rGes=rsi+rse; const rows:string[]=[];
+      rows.push(`<thead><tr class="bg-gray-100"><th class="text-left px-2 py-1 border">Schicht</th><th class="text-center px-2 py-1 border">Dicke</th><th class="text-center px-2 py-1 border">λ W/(mK)</th><th class="text-center px-2 py-1 border">R m²K/W</th></tr></thead><tbody>`);
+      rows.push(`<tr><td class="px-2 py-1 border text-gray-500">Innenoberfläche Rsi</td><td class="text-center px-2 py-1 border">–</td><td class="text-center px-2 py-1 border">–</td><td class="text-center px-2 py-1 border">${rsi}</td></tr>`);
+      document.querySelectorAll<HTMLElement>('.uw-layer').forEach(row=>{
+        const sel=row.querySelector<HTMLSelectElement>('select')!;
+        const d_mm=parseFloat(row.querySelector('input')?.value||'0');
+        const l=parseFloat(sel.value)||0;
+        const d=d_mm/1000; const r=d/l;
+        rGes+=r;
+        const name=sel.options[sel.selectedIndex].text.split('(')[0].trim();
+        rows.push(`<tr class="hover:bg-gray-50"><td class="px-2 py-1 border font-medium">${name}</td><td class="text-center px-2 py-1 border">${d_mm} mm</td><td class="text-center px-2 py-1 border">${l}</td><td class="text-center px-2 py-1 border">${fmtN(r)}</td></tr>`);
+        const rEl=row.querySelector<HTMLElement>('.layer-r');if(rEl)rEl.textContent='R: '+fmtN(r);
+      });
+      rows.push(`<tr><td class="px-2 py-1 border text-gray-500">Außenoberfläche Rse</td><td class="text-center px-2 py-1 border">–</td><td class="text-center px-2 py-1 border">–</td><td class="text-center px-2 py-1 border">${rse}</td></tr>`);
+      rows.push(`<tr class="bg-primary-50 font-bold"><td class="px-2 py-1 border">Gesamt R</td><td colspan="2" class="px-2 py-1 border"></td><td class="text-center px-2 py-1 border">${fmtN(rGes)}</td></tr></tbody>`);
+      const u=1/rGes; const limit=GEG[type]||0.28;
+      const ok=u<=limit; const bewert=u<0.15?'🏆 Passivhaus':u<0.25?'✅ KfW-Standard':u<limit?'✅ GEG erfüllt':u<limit*1.2?'⚠️ Grenzwertig':'❌ GEG nicht erfüllt';
+      const res=document.getElementById('uw-result')!;res.classList.remove('hidden');
+      document.getElementById('uw-val')!.textContent=fmtN(u)+' W/(m²K)';
+      document.getElementById('uw-val')!.style.color=ok?'#16a34a':'#dc2626';
+      document.getElementById('uw-rges')!.textContent=fmtN(rGes);
+      document.getElementById('uw-bewert')!.textContent=bewert;
+      document.getElementById('uw-limite')!.textContent='≤ '+limit;
+      document.getElementById('uw-detail')!.innerHTML=rows.join('');
+    };
+    (window as any).calcUW();
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

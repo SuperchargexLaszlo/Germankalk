@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+<BaseLayout title="404 – Seite nicht gefunden | RechnerBox" description="Diese Seite wurde nicht gefunden. Finden Sie alle Rechner auf der Startseite.">
+  <Header slot="header"/>
+  <div class="max-w-xl mx-auto px-4 py-24 text-center">
+    <div class="text-7xl mb-4">🔢</div>
+    <h1 class="text-4xl font-bold text-gray-800 mb-3">404 – Nicht gefunden</h1>
+    <p class="text-gray-500 mb-6">Diese Seite wurde nicht gefunden. Vielleicht suchen Sie einen unserer Rechner?</p>
+    <a href="/" class="inline-block bg-primary-600 hover:bg-primary-700 text-white font-semibold px-6 py-3 rounded-xl transition">Zur Startseite →</a>
+  </div>
+  <Footer slot="footer"/>
+</BaseLayout>

@@ -1,0 +1,179 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Urlaubsgeld Rechner 2026","url":"https://rechnerbox.eu/de/urlaubsgeld-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Gibt es ein gesetzliches Urlaubsgeld 2026?","acceptedAnswer":{"@type":"Answer","text":"Nein. In Deutschland gibt es kein gesetzliches Recht auf Urlaubsgeld. Urlaubsgeld kann durch Tarifvertrag, Betriebsvereinbarung oder individuelle Arbeitsverträge geregelt sein."}},
+    {"@type":"Question","name":"Wie wird Urlaubsgeld versteuert?","acceptedAnswer":{"@type":"Answer","text":"Urlaubsgeld ist vollständig steuer- und sozialversicherungspflichtig. Es wird zum regulären Monatsgehalt addiert und nach der normalen Lohnsteuerberechnung besteuert. Ein Fünftelungsverfahren ist möglich."}},
+    {"@type":"Question","name":"Wann wird Urlaubsgeld ausgezahlt?","acceptedAnswer":{"@type":"Answer","text":"Urlaubsgeld wird meist im Mai oder Juni vor der Haupturlaubssaison ausgezahlt. Das Auszahlungsdatum ist im Tarifvertrag oder Arbeitsvertrag geregelt."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Urlaubsgeld Rechner 2026 – Urlaubsgeld berechnen & versteuern"
+  description="Urlaubsgeld 2026 berechnen: Brutto- und Nettobetrag, Steuer und Vergleich mit Vorjahr. Gilt für TVöD, TV-L und tarifgebundene Unternehmen. Kostenlos."
+  canonical="https://rechnerbox.eu/de/urlaubsgeld-rechner"
+  hreflangDE="/de/urlaubsgeld-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Urlaubsgeld Rechner
+    </nav>
+    <h1>Urlaubsgeld Rechner 2026</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Berechnen Sie Ihr Urlaubsgeld 2026 inkl. Lohnsteuer und Nettoauszahlung. Für TVöD, TV-L, Metallbranche und individuelle Vereinbarungen.
+    </p>
+
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-yellow-800 mb-1">💡 Wichtig: Kein gesetzliches Urlaubsgeld</p>
+      <p class="text-sm text-yellow-700">Urlaubsgeld ist <strong>freiwillig</strong> und muss im Tarifvertrag, Betriebsvereinbarung oder Arbeitsvertrag geregelt sein. Es ist vollständig steuer- und SV-pflichtig.</p>
+    </div>
+
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Monatliches Bruttogehalt (€)</label>
+          <input class="calc-input" type="number" id="ug-brutto" value="3000" step="50" />
+        </div>
+        <div>
+          <label class="calc-label">Urlaubsgeld-Art</label>
+          <select class="calc-select" id="ug-art">
+            <option value="custom">Eigener Betrag eingeben</option>
+            <option value="tvoed_vu">TVöD/VKA: Urlaubsgeld 0 € (in JAZ)</option>
+            <option value="50pct">50% des Monatsgehalts</option>
+            <option value="100pct">1 volles Monatsgehalt</option>
+            <option value="metal">Metallbranche: 72% Urlaubsgeld</option>
+          </select>
+        </div>
+        <div id="ug-custom-wrap">
+          <label class="calc-label">Urlaubsgeld-Betrag brutto (€)</label>
+          <input class="calc-input" type="number" id="ug-betrag" value="1500" step="50" />
+        </div>
+        <div>
+          <label class="calc-label">Steuerklasse</label>
+          <select class="calc-select" id="ug-stk">
+            <option value="1">Klasse I</option>
+            <option value="3">Klasse III</option>
+            <option value="4">Klasse IV</option>
+            <option value="5">Klasse V</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcUG()">Urlaubsgeld berechnen</button>
+      <div class="calc-result hidden" id="ug-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div><div class="result-value" id="ug-brutto-out">–</div><div class="result-label">Brutto</div></div>
+          <div><div class="result-value text-2xl" id="ug-netto-out">–</div><div class="result-label">Netto ca.</div></div>
+          <div><div class="result-value text-xl" id="ug-steuer-out">–</div><div class="result-label">Lohnsteuer</div></div>
+          <div><div class="result-value text-xl" id="ug-sv-out">–</div><div class="result-label">SV-Abgaben</div></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="mt-8">
+      <h2>Urlaubsgeld nach Branche 2026 – Übersicht</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border">Branche / Tarifvertrag</th>
+            <th class="text-center px-3 py-2 border">Urlaubsgeld</th>
+            <th class="text-center px-3 py-2 border">Bemerkung</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              ["TVöD Bund/VKA","enthalten in JAZ","Jahressonderzahlung Nov."],
+              ["TV-L","51–77% eines Monatsgehalts","nach EG, ausgez. Juli"],
+              ["Metallbranche","72% eines Monatsgehalts","ausgez. Juni/Juli"],
+              ["IG BCE (Chemie)","75% eines Monatsgehalts","ausgez. Mai"],
+              ["Einzelhandel","ca. 550–800 € pauschal","je nach Bundesland"],
+              ["Baugewerbe","SOKA-Bau Regelung","15% des Urlaubsentgelts"],
+              ["Banken (privat)","tariflich: ca. 50–100%","je Haustarif"],
+            ].map(r => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-medium text-gray-800">{r[0]}</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{r[1]}</td>
+                <td class="text-center px-3 py-2 border text-gray-500 text-xs">{r[2]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Urlaubsgeld 2026</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Muss ich Urlaubsgeld zurückzahlen, wenn ich kündige?",a:"Das hängt vom Tarifvertrag oder Arbeitsvertrag ab. Häufig gibt es eine Rückzahlungsklausel, wenn man vor einem bestimmten Datum (z.B. 31. Dezember) kündigt. Rückzahlungsklauseln sind gerichtlich auf Wirksamkeit zu prüfen."},
+          {q:"Was ist der Unterschied zwischen Urlaubsgeld und Urlaubsentgelt?",a:"Urlaubsentgelt ist das während des Urlaubs weiter gezahlte reguläre Gehalt (gesetzlicher Anspruch). Urlaubsgeld ist eine zusätzliche Zahlung über das Urlaubsentgelt hinaus – freiwillig oder tariflich vereinbart."},
+          {q:"Bekomme ich Urlaubsgeld auch bei Teilzeit?",a:"Ja, Teilzeitkräfte haben denselben anteiligen Anspruch auf Urlaubsgeld wie Vollzeitkräfte. Eine unterschiedliche Behandlung ohne sachlichen Grund wäre diskriminierend (Teilzeit-Befristungsgesetz TzBfG § 4)."},
+          {q:"Zählt Urlaubsgeld als Einkommen für ALG?",a:"Ja, Urlaubsgeld wird beim Arbeitslosengeld als einmaliges Einkommen angerechnet und kann den ALG-Anspruch für den entsprechenden Monat verringern."},
+        ].map(f => (
+          <div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>
+        ))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/brutto-netto-rechner',label:'Brutto-Netto'},{href:'/de/tvoed-rechner',label:'TVöD Rechner'},{href:'/de/tv-l-rechner',label:'TV-L Rechner'},{href:'/de/krankengeld-rechner',label:'Krankengeld'},{href:'/de/minijob-rechner',label:'Minijob'},{href:'/de/arbeitszeit-rechner',label:'Arbeitszeit'}].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    function estimateAbzuege(betrag: number, jahresBrutto: number, stk: number): {lst:number, sv:number} {
+      // Sonderzahlung im Monat des Urlaubsgelds → auf Jahresbasis
+      const gesJahresBrutto = jahresBrutto + betrag;
+      let lst = 0;
+      const gfb = 12084;
+      let zvE = Math.max(0, gesJahresBrutto - 1230 - gfb);
+      if (stk===3) zvE = Math.max(0, gesJahresBrutto*2-2460-gfb*2)/2;
+      if (stk===5) zvE = gesJahresBrutto*1.3;
+      if (zvE > 0) {
+        if (zvE <= 17005) { const y=(zvE-gfb)/10000; lst=(979.18*y+1400)*y; }
+        else if (zvE <= 66761) { const z=(zvE-17005)/10000; lst=(192.59*z+2397)*z+1025.38; }
+        else lst = 0.42*zvE-10602.13;
+      }
+      const normalLst_calc = () => {
+        let lnorm = 0; const zvE2=Math.max(0,jahresBrutto-1230-gfb);
+        if(stk===3){const zvE3=Math.max(0,jahresBrutto*2-2460-gfb*2)/2;if(zvE3<=17005){const y=(zvE3-gfb)/10000;lnorm=(979.18*y+1400)*y;}else if(zvE3<=66761){const z=(zvE3-17005)/10000;lnorm=(192.59*z+2397)*z+1025.38;}else lnorm=0.42*zvE3-10602;}
+        else if(zvE2<=17005){const y=(zvE2-gfb)/10000;lnorm=(979.18*y+1400)*y;}else if(zvE2<=66761){const z=(zvE2-17005)/10000;lnorm=(192.59*z+2397)*z+1025.38;}else lnorm=0.42*zvE2-10602;
+        return Math.max(0,lnorm);
+      };
+      const lstAuf = Math.max(0, lst - normalLst_calc());
+      const sv = betrag * (0.073+0.01775+0.093+0.013);
+      return {lst: lstAuf, sv};
+    }
+    function fmt(n: number) { return n.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.')+' €'; }
+    (window as any).calcUG = function() {
+      const brutto = parseFloat((document.getElementById('ug-brutto') as HTMLInputElement).value)||0;
+      const art = (document.getElementById('ug-art') as HTMLSelectElement).value;
+      const stk = parseInt((document.getElementById('ug-stk') as HTMLSelectElement).value);
+      let betrag = parseFloat((document.getElementById('ug-betrag') as HTMLInputElement).value)||0;
+      if (art === '50pct') betrag = brutto * 0.5;
+      else if (art === '100pct') betrag = brutto;
+      else if (art === 'metal') betrag = brutto * 0.72;
+      else if (art === 'tvoed_vu') betrag = 0;
+      if (!betrag) { alert('Kein Urlaubsgeld-Betrag eingegeben oder nicht anwendbar.'); return; }
+      const {lst, sv} = estimateAbzuege(betrag, brutto*12, stk);
+      const netto = betrag - lst - sv;
+      const r = document.getElementById('ug-result')!; r.classList.remove('hidden');
+      document.getElementById('ug-brutto-out')!.textContent = fmt(betrag);
+      document.getElementById('ug-netto-out')!.textContent = fmt(netto);
+      document.getElementById('ug-steuer-out')!.textContent = fmt(lst);
+      document.getElementById('ug-sv-out')!.textContent = fmt(sv);
+    };
+    // Update field visibility based on art selection
+    document.getElementById('ug-art')?.addEventListener('change', function() {
+      const show = (this as HTMLSelectElement).value === 'custom';
+      document.getElementById('ug-custom-wrap')!.style.display = show ? 'block' : 'none';
+    });
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

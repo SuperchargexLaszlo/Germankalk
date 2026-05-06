@@ -1,0 +1,228 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Lohnrechner Schweiz 2026","url":"https://rechnerbox.eu/ch/lohnrechner-schweiz",
+   "applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"CHF"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie viel Netto bleibt von 8000 CHF Bruttolohn in der Schweiz?",
+     "acceptedAnswer":{"@type":"Answer","text":"Bei 8.000 CHF brutto (Kanton Zürich, ledig) bleiben nach AHV/IV/EO (6,35%), ALV (1,1%), Pensionskasse (ca. 7%) und Quellensteuer ca. 5.800–6.200 CHF netto übrig, je nach Kanton und PK-Satz."}},
+    {"@type":"Question","name":"Was ist die AHV in der Schweiz?",
+     "acceptedAnswer":{"@type":"Answer","text":"AHV (Alters- und Hinterlassenenversicherung) ist die Schweizer staatliche Rentenversicherung. Arbeitnehmer zahlen 2026 insgesamt 8,7% (AN+AG), davon trägt der Arbeitnehmer 4,35% selbst."}},
+    {"@type":"Question","name":"Wie funktioniert die Quellensteuer in der Schweiz?",
+     "acceptedAnswer":{"@type":"Answer","text":"Ausländische Arbeitnehmer ohne Niederlassungsbewilligung zahlen Quellensteuer direkt über den Arbeitgeber. Der Satz hängt vom Kanton, Zivilstand und Einkommen ab – typisch 10–25% des Bruttolohns."}},
+    {"@type":"Question","name":"Was ist der Unterschied zwischen AHV und BVG in der Schweiz?",
+     "acceptedAnswer":{"@type":"Answer","text":"AHV ist die 1. Säule (staatliche Rente), BVG/Pensionskasse ist die 2. Säule (berufliche Vorsorge). Zusammen mit der 3. Säule (privates Sparen) bilden sie das Drei-Säulen-System."}}
+  ]}
+]};
+
+// Kantonale Quellensteuersätze 2026 (Schätzwerte, ledige Person)
+const KANTONE = [
+  {kanton:"Zürich (ZH)", satz:12.5}, {kanton:"Bern (BE)", satz:14.2},
+  {kanton:"Luzern (LU)", satz:11.8}, {kanton:"Basel-Stadt (BS)", satz:15.1},
+  {kanton:"St. Gallen (SG)", satz:11.2}, {kanton:"Aargau (AG)", satz:11.5},
+  {kanton:"Zug (ZG)", satz:8.4}, {kanton:"Schwyz (SZ)", satz:8.9},
+  {kanton:"Genf (GE)", satz:16.3}, {kanton:"Waadt (VD)", satz:15.8},
+  {kanton:"Wallis (VS)", satz:13.1}, {kanton:"Tessin (TI)", satz:12.8},
+  {kanton:"Graubünden (GR)", satz:11.9}, {kanton:"Thurgau (TG)", satz:11.4},
+  {kanton:"Solothurn (SO)", satz:13.6}, {kanton:"Freiburg (FR)", satz:14.4},
+];
+---
+<BaseLayout
+  title="Lohnrechner Schweiz 2026 – Nettolohn CHF berechnen"
+  description="Schweizer Nettolohn 2026 berechnen: AHV, IV, EO, ALV, Pensionskasse und Quellensteuer. Für alle Kantone. Kostenloser Lohnrechner Schweiz in CHF."
+  canonical="https://rechnerbox.eu/ch/lohnrechner-schweiz"
+  hreflangCH="/ch/lohnrechner-schweiz"
+  hreflangDE="/de/brutto-netto-rechner"
+  hreflangAT="/at/brutto-netto-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/ch/" class="hover:text-primary-600">Schweiz</a> › Lohnrechner
+    </nav>
+    <h1>Lohnrechner Schweiz 2026 – Nettolohn in CHF</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Schweizer Brutto-Netto-Lohn 2026 berechnen – mit AHV/IV/EO, ALV, Pensionskasse und kantonaler Quellensteuer.
+    </p>
+
+    <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-red-800 mb-2">🇨🇭 Schweizer Sozialversicherung 2026 (AN-Anteil)</p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-red-700">
+        {[["AHV/IV/EO","4,35%"],["ALV","1,10%"],["Pensionskasse","~7%"],["NBU (Unfall)","~1%"]].map(([l,v])=>(
+          <div class="bg-white rounded-lg p-2 border border-red-100 text-center">
+            <div class="font-medium">{l}</div><div class="font-bold text-red-800">{v}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Bruttolohn (CHF/Monat)</label>
+          <input class="calc-input" type="number" id="ch-brutto" value="8000" step="100" />
+        </div>
+        <div>
+          <label class="calc-label">Kanton (Quellensteuer)</label>
+          <select class="calc-select" id="ch-kanton">
+            {KANTONE.map(k => <option value={k.satz.toString()}>{k.kanton} ({k.satz}%)</option>)}
+            <option value="0">Niederlassungsbewilligung C (keine QSt)</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Zivilstand</label>
+          <select class="calc-select" id="ch-ziv">
+            <option value="ledig">Ledig</option>
+            <option value="verheiratet">Verheiratet</option>
+            <option value="eingetragen">Eingetragene Partnerschaft</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Pensionskasse AN-Anteil (%)</label>
+          <input class="calc-input" type="number" id="ch-pk" value="7" min="3" max="15" step="0.5" />
+          <p class="text-xs text-gray-400 mt-0.5">Typisch: 5–12%, je nach PK und Alter</p>
+        </div>
+        <div>
+          <label class="calc-label">NBU-Prämie (Nichtberufsunfall, %)</label>
+          <input class="calc-input" type="number" id="ch-nbu" value="1.0" min="0" max="3" step="0.1" />
+        </div>
+        <div>
+          <label class="calc-label">Kinderzulagen (CHF/Monat)</label>
+          <input class="calc-input" type="number" id="ch-kz" value="0" min="0" step="200" />
+          <p class="text-xs text-gray-400 mt-0.5">Mind. 200 CHF/Kind (kantonal unterschiedlich)</p>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcCHLohn()">Nettolohn berechnen</button>
+      <div class="calc-result hidden" id="ch-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center mb-3">
+          <div><div class="result-value" id="ch-netto">–</div><div class="result-label">Netto / Monat</div></div>
+          <div><div class="result-value text-2xl" id="ch-sv">–</div><div class="result-label">SV-Abzüge</div></div>
+          <div><div class="result-value text-2xl" id="ch-qst">–</div><div class="result-label">Quellensteuer</div></div>
+          <div><div class="result-value text-xl" id="ch-year">–</div><div class="result-label">Netto / Jahr</div></div>
+        </div>
+        <div class="overflow-x-auto" id="ch-detail-wrap">
+          <table class="w-full text-xs border-collapse" id="ch-detail"></table>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box mt-4">
+      💡 <strong>Drei-Säulen-System CH:</strong> 1. Säule = AHV (staatlich) · 2. Säule = BVG/Pensionskasse (beruflich) · 3. Säule = Säule 3a (privat, steuerbegünstigt, max. 7.258 CHF/Jahr 2026)
+    </div>
+
+    <section class="mt-8">
+      <h2>Kantonale Quellensteuersätze 2026 (Schätzwerte, ledig)</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border">Kanton</th>
+            <th class="text-center px-3 py-2 border">Satz (ca.)</th>
+            <th class="text-left px-3 py-2 border">Kanton</th>
+            <th class="text-center px-3 py-2 border">Satz (ca.)</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {KANTONE.reduce((acc,k,i)=>{ if(i%2===0)acc.push([k]); else acc[acc.length-1].push(k); return acc;},[] as typeof KANTONE[]).map(row=>(
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-medium text-gray-800">{row[0].kanton}</td>
+                <td class="text-center px-3 py-2 border text-primary-700 font-semibold">{row[0].satz}%</td>
+                <td class="px-3 py-2 border font-medium text-gray-800">{row[1]?.kanton ?? ''}</td>
+                <td class="text-center px-3 py-2 border text-primary-700 font-semibold">{row[1]?.satz ?? ''}{row[1] ? '%' : ''}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="text-xs text-gray-400 mt-1">Quellensteuertarife sind kantonal und einkommensabhängig. Werte sind Schätzungen für einen ledigen Arbeitnehmer mit mittlerem Einkommen.</p>
+      </div>
+    </section>
+
+    <section class="mt-8">
+      <h2>CH vs. DE vs. AT – Lohnabzüge im Vergleich</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100">
+            <th class="text-left px-3 py-2 border">Abzug</th>
+            <th class="text-center px-3 py-2 border">🇨🇭 Schweiz</th>
+            <th class="text-center px-3 py-2 border">🇩🇪 Deutschland</th>
+            <th class="text-center px-3 py-2 border">🇦🇹 Österreich</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              ["Rentenvers./AHV","4,35% (AHV)","9,30% (RV)","10,25% (PV)"],
+              ["Krankenvers.","via PK+Prämie","7,30% (GKV)","3,87% (KV)"],
+              ["Arbeitslosenvers.","1,10% (ALV)","1,30% (AV)","3,00% (AV)"],
+              ["Berufsvorsorge","~7% (BVG/PK)","—","1,20% (UV)"],
+              ["SV gesamt AN","~13–14%","~21%","~18,82%"],
+              ["Einkommensteuer","kantonal variabel","progressiv 14–45%","progressiv 20–55%"],
+            ].map(r=>(
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-medium text-gray-800">{r[0]}</td>
+                {r.slice(1).map(c=><td class="text-center px-3 py-2 border text-gray-600 text-xs">{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Lohn Schweiz 2026</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Was ist ein guter Lohn in der Schweiz 2026?",a:"Der Medianlohn in der Schweiz liegt bei ca. 7.000–7.500 CHF/Monat brutto. Mit 8.000–10.000 CHF liegt man überdurchschnittlich gut. In Zürich und Zug sind Löhne typisch höher als im Rest des Landes."},
+          {q:"Wer zahlt Quellensteuer in der Schweiz?",a:"Quellensteuer zahlen ausländische Arbeitnehmer ohne Niederlassungsbewilligung C. Schweizer Staatsangehörige und C-Permit-Inhaber zahlen ordentliche Einkommensteuer (Steuererklärung). Seit 2021 können Quellenbesteuerte unter bestimmten Bedingungen die ordentliche Veranlagung beantragen."},
+          {q:"Was ist die Säule 3a in der Schweiz?",a:"Säule 3a ist das gebundene private Vorsorgen mit Steuerabzug. 2026 darf man max. 7.258 CHF/Jahr (Angestellte) einzahlen und voll vom steuerbaren Einkommen abziehen. Bei Pensionierung oder Immobilienkauf wird das Kapital ausgezahlt."},
+          {q:"Wie funktioniert die Pensionskasse (BVG)?",a:"Arbeitnehmer und Arbeitgeber zahlen je mindestens 7% des koordinierten Lohns (BVG-pflichtiger Lohn: zwischen 25.725 und 88.200 CHF/Jahr) in die Pensionskasse. Die meisten PKs zahlen mehr als das gesetzliche Minimum."},
+        ].map(f=>(<div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/ch/mehrwertsteuer-rechner',label:'MwSt Schweiz (8,1%)'},{href:'/de/brutto-netto-rechner',label:'Brutto-Netto DE'},{href:'/at/brutto-netto-rechner',label:'Brutto-Netto AT'},{href:'/de/promille-rechner',label:'Promille Rechner'},{href:'/de/bmi-rechner',label:'BMI Rechner'},{href:'/de/pace-rechner',label:'Pace Rechner'}].map(r=>(
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    function fmtCHF(n:number){return (n.toFixed(2)).replace(/\B(?=(\d{3})+(?!\d))/g,"'")+" CHF";}
+    (window as any).calcCHLohn=function(){
+      const brutto=parseFloat((document.getElementById('ch-brutto') as HTMLInputElement).value)||0;
+      const qstSatz=parseFloat((document.getElementById('ch-kanton') as HTMLSelectElement).value)||0;
+      const pk=parseFloat((document.getElementById('ch-pk') as HTMLInputElement).value)||7;
+      const nbu=parseFloat((document.getElementById('ch-nbu') as HTMLInputElement).value)||1;
+      const kz=parseFloat((document.getElementById('ch-kz') as HTMLInputElement).value)||0;
+      // SV Abzüge
+      const ahv=brutto*0.0435;
+      const alv=brutto*0.011;
+      const pkAbz=brutto*(pk/100);
+      const nbuAbz=brutto*(nbu/100);
+      const svTotal=ahv+alv+pkAbz+nbuAbz;
+      // Quellensteuer auf Brutto (vereinfacht)
+      const qst=qstSatz>0?brutto*(qstSatz/100):0;
+      const netto=brutto-svTotal-qst+kz;
+      const r=document.getElementById('ch-result')!;r.classList.remove('hidden');
+      document.getElementById('ch-netto')!.textContent=fmtCHF(netto);
+      document.getElementById('ch-sv')!.textContent=fmtCHF(svTotal);
+      document.getElementById('ch-qst')!.textContent=qstSatz>0?fmtCHF(qst):'keine';
+      document.getElementById('ch-year')!.textContent=fmtCHF(netto*12);
+      // Detail-Tabelle
+      const rows=[
+        ['Bruttolohn',fmtCHF(brutto)],
+        ['AHV/IV/EO (4,35%)','-'+fmtCHF(ahv)],
+        ['ALV (1,10%)','-'+fmtCHF(alv)],
+        [`Pensionskasse AN (${pk}%)`,'-'+fmtCHF(pkAbz)],
+        [`NBU-Prämie (${nbu}%)`,'-'+fmtCHF(nbuAbz)],
+        qstSatz>0?['Quellensteuer ('+qstSatz+'%)','-'+fmtCHF(qst)]:null,
+        kz>0?['Kinderzulagen','+'+fmtCHF(kz)]:null,
+        ['<strong>Nettolohn</strong>','<strong>'+fmtCHF(netto)+'</strong>'],
+      ].filter(Boolean);
+      document.getElementById('ch-detail')!.innerHTML='<tbody>'+rows.map(r=>`<tr class="border-b border-gray-100"><td class="px-3 py-1.5 text-gray-600">${r![0]}</td><td class="px-3 py-1.5 text-right font-medium">${r![1]}</td></tr>`).join('')+'</tbody>';
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

@@ -1,0 +1,90 @@
+---
+const year = 2026;
+const footerLinks = {
+  "Gehalt & Steuern": [
+    {href:'/de/brutto-netto-rechner',label:'Brutto-Netto Rechner'},
+    {href:'/de/tvoed-rechner',label:'TVöD Rechner'},
+    {href:'/de/tv-l-rechner',label:'TV-L Rechner'},
+    {href:'/de/stundenlohn-rechner',label:'Stundenlohn'},
+    {href:'/de/minijob-rechner',label:'Minijob Rechner'},
+  ],
+  "Gesundheit": [
+    {href:'/de/bmi-rechner',label:'BMI Rechner'},
+    {href:'/de/kalorien-rechner',label:'Kalorienrechner'},
+    {href:'/de/idealgewicht-rechner',label:'Idealgewicht'},
+    {href:'/de/promille-rechner',label:'Promille Rechner'},
+    {href:'/de/vitamin-d-rechner',label:'Vitamin D'},
+  ],
+  "Mathematik": [
+    {href:'/de/prozent-rechner',label:'Prozentrechner'},
+    {href:'/de/dreisatz-rechner',label:'Dreisatz'},
+    {href:'/de/pythagoras-rechner',label:'Pythagoras'},
+    {href:'/de/flaeche-rechner',label:'Flächenrechner'},
+    {href:'/de/umrechnung-cm-inch',label:'cm ↔ Inch'},
+  ],
+};
+---
+<footer class="bg-gray-900 text-gray-300 mt-12">
+  <div class="max-w-5xl mx-auto px-4 py-10">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
+
+      <!-- Brand -->
+      <div class="col-span-2 md:col-span-2">
+        <a href="/" class="flex items-center gap-2 font-bold text-white text-lg mb-3">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+          RechnerBox
+        </a>
+        <p class="text-xs text-gray-400 leading-relaxed mb-3">
+          Kostenlose Online-Rechner für Deutschland, Österreich und die Schweiz.
+          Alle Angaben aktuell für {year}.
+        </p>
+        <div class="flex gap-2">
+          <a href="/de/" class="text-xs px-2.5 py-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-gray-300">🇩🇪 DE</a>
+          <a href="/at/" class="text-xs px-2.5 py-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-gray-300">🇦🇹 AT</a>
+          <a href="/ch/" class="text-xs px-2.5 py-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-gray-300">🇨🇭 CH</a>
+        </div>
+      </div>
+
+      <!-- Link columns -->
+      {Object.entries(footerLinks).map(([cat, links]) => (
+        <div>
+          <div class="font-semibold text-white text-sm mb-3">{cat}</div>
+          <ul class="space-y-1.5">
+            {links.map(l => (
+              <li><a href={l.href} class="text-xs text-gray-400 hover:text-white transition">{l.label}</a></li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <!-- CH & AT quick links -->
+    <div class="border-t border-gray-800 pt-5 mb-5">
+      <div class="flex flex-wrap gap-3 text-xs text-gray-500">
+        <span class="text-gray-600 font-medium">🇦🇹 AT:</span>
+        <a href="/at/brutto-netto-rechner" class="hover:text-white">Brutto-Netto</a>
+        <a href="/at/pendlerpauschale-rechner" class="hover:text-white">Pendlerpauschale</a>
+        <a href="/at/einkommensteuer-rechner" class="hover:text-white">Einkommensteuer</a>
+        <span class="text-gray-700">|</span>
+        <span class="text-gray-600 font-medium">🇨🇭 CH:</span>
+        <a href="/ch/lohnrechner-schweiz" class="hover:text-white">Lohnrechner CHF</a>
+        <a href="/ch/mehrwertsteuer-rechner" class="hover:text-white">MWST 8,1%</a>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="border-t border-gray-800 pt-5 flex flex-col md:flex-row justify-between items-center gap-3">
+      <p class="text-xs text-gray-500">
+        © {year} RechnerBox.eu – Alle Rechner ohne Gewähr. Kein Ersatz für Steuerberater.
+      </p>
+      <div class="flex flex-wrap gap-4 text-xs text-gray-500">
+        <a href="/impressum" class="hover:text-white transition">Impressum</a>
+        <a href="/datenschutz" class="hover:text-white transition">Datenschutz</a>
+        <a href="/sitemap-index.xml" class="hover:text-white transition">Sitemap</a>
+      </div>
+    </div>
+  </div>
+</footer>

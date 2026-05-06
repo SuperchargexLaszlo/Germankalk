@@ -1,0 +1,208 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Goldpreis Rechner 2026","url":"https://rechnerbox.eu/de/goldpreis-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie berechne ich den Wert meines Goldes?","acceptedAnswer":{"@type":"Answer","text":"Goldwert = Gewicht (g) × Feinheit / 1000 × Goldpreis pro Gramm. Beispiel: 10g 585er Gold (14 Karat) = 10 × 0,585 × 88,50 €/g = 517,73 € (bei 88,50 €/g Feingoldpreis)."}},
+    {"@type":"Question","name":"Was ist der aktuelle Goldpreis 2026?","acceptedAnswer":{"@type":"Answer","text":"Der Goldpreis schwankt täglich. Im Mai 2026 liegt der Goldpreis bei ca. 85–92 €/g bzw. 2.650–2.850 €/Feinunze. Für den aktuellen Preis empfehlen wir die Einstellung in unserem Rechner."}},
+    {"@type":"Question","name":"Was bedeutet 585er Gold?","acceptedAnswer":{"@type":"Answer","text":"585er Gold (14 Karat) enthält 58,5% reines Gold und 41,5% andere Metalle. 750er Gold (18 Karat) enthält 75% Gold. 999er ist Feingold (nahezu reines Gold)."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Goldpreis Rechner 2026 – Goldwert in Gramm & Feinunze berechnen"
+  description="Goldwert berechnen: 585, 750, 999er Gold in Gramm oder Karat. Aktuelle Goldpreise 2026. Schmuck, Barren und Münzen bewerten. Kostenloser Goldrechner."
+  canonical="https://rechnerbox.eu/de/goldpreis-rechner"
+  hreflangDE="/de/goldpreis-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Goldpreis Rechner
+    </nav>
+    <h1>Goldpreis Rechner 2026 – Goldwert berechnen</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Goldwert für Schmuck, Barren und Münzen berechnen – nach Gewicht, Legierung und aktuellem Goldpreis. Sofort und kostenlos.
+    </p>
+
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-yellow-800 mb-1">📊 Goldpreis Mai 2026 (Schätzung)</p>
+      <p class="text-sm text-yellow-700">Feinunze (31,1g): ca. <strong>2.740 € / 2.980 $</strong> · Pro Gramm Feingold: ca. <strong>88,10 €</strong> · Quelle: Aktuellen Preis bitte unten eingeben.</p>
+    </div>
+
+    <div class="calc-box">
+      <div class="flex flex-wrap gap-2 mb-5">
+        {[{id:'g',l:'Gramm → Wert'},{id:'fu',l:'Feinunzen'},{id:'anp',l:'Ankaufspreis'}].map((t,i)=>(
+          <button onclick={`setGPMode('${t.id}')`} id={`gptab-${t.id}`}
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${i===0?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`}>{t.l}</button>
+        ))}
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Goldlegierung</label>
+          <select class="calc-select" id="gp-leg">
+            <option value="999">999 / 24 Karat – Feingold</option>
+            <option value="986">986 / Münzgold</option>
+            <option value="900">900 / 21,6 Karat</option>
+            <option value="750">750 / 18 Karat</option>
+            <option value="585" selected>585 / 14 Karat</option>
+            <option value="500">500 / 12 Karat</option>
+            <option value="375">375 / 9 Karat</option>
+            <option value="333">333 / 8 Karat</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Goldpreis (€/g Feingold)</label>
+          <input class="calc-input" type="number" id="gp-preis" value="88.10" step="0.10" />
+          <p class="text-xs text-gray-400 mt-1">Feinunze ÷ 31,1 = Preis/g</p>
+        </div>
+      </div>
+
+      <!-- Mode: Gramm -->
+      <div id="gp-g">
+        <div class="mb-4">
+          <label class="calc-label">Gewicht (Gramm)</label>
+          <input class="calc-input" type="number" id="gp-gramm" value="10" step="0.01" />
+        </div>
+      </div>
+
+      <!-- Mode: Feinunzen -->
+      <div id="gp-fu" class="hidden">
+        <div class="mb-4">
+          <label class="calc-label">Feinunzen (troy oz)</label>
+          <input class="calc-input" type="number" id="gp-oz" value="1" step="0.001" />
+          <p class="text-xs text-gray-400 mt-1">1 Feinunze = 31,1035 Gramm</p>
+        </div>
+      </div>
+
+      <!-- Mode: Ankaufspreis -->
+      <div id="gp-anp" class="hidden">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="calc-label">Gewicht (Gramm)</label>
+            <input class="calc-input" type="number" id="gp-anp-g" value="10" step="0.01" />
+          </div>
+          <div>
+            <label class="calc-label">Ankaufsquote (%)</label>
+            <input class="calc-input" type="number" id="gp-quote" value="80" min="50" max="99" />
+            <p class="text-xs text-gray-400 mt-1">Goldankäufer zahlen i.d.R. 70–92%</p>
+          </div>
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calcGP()">Goldwert berechnen</button>
+      <div class="calc-result hidden" id="gp-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div><div class="result-value" id="gp-r1">–</div><div class="result-label" id="gp-l1">Materialwert</div></div>
+          <div><div class="result-value text-2xl" id="gp-r2">–</div><div class="result-label" id="gp-l2">Feingoldanteil</div></div>
+          <div><div class="result-value text-xl" id="gp-r3">–</div><div class="result-label" id="gp-l3">€/Gramm</div></div>
+          <div><div class="result-value text-xl" id="gp-r4">–</div><div class="result-label">Feingold (g)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="mt-8">
+      <h2>Goldlegierungen – Feingehalt-Tabelle</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-yellow-50 text-gray-700">
+            <th class="text-left px-3 py-2 border">Stempel</th>
+            <th class="text-center px-3 py-2 border">Karat</th>
+            <th class="text-center px-3 py-2 border">Feingehalt</th>
+            <th class="text-center px-3 py-2 border">Wert/g (ca.)</th>
+            <th class="text-left px-3 py-2 border">Verwendung</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              ["999","24 K","99,9%","~88,10 €","Barren, Anlagemünzen"],
+              ["750","18 K","75,0%","~66,08 €","Hochwertiger Schmuck"],
+              ["585","14 K","58,5%","~51,54 €","Standard Goldschmuck (DE)"],
+              ["375","9 K","37,5%","~33,04 €","Einfacher Schmuck, GB/AU"],
+              ["333","8 K","33,3%","~29,34 €","Älterer Schmuck (vor 1884)"],
+            ].map(r => (
+              <tr class="hover:bg-yellow-50">
+                <td class="px-3 py-2 border font-bold text-yellow-700">{r[0]}</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{r[1]}</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{r[2]}</td>
+                <td class="text-center px-3 py-2 border text-green-700 font-medium">{r[3]}</td>
+                <td class="px-3 py-2 border text-gray-500 text-xs">{r[4]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Goldpreis Rechner</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wie erkenne ich das Feinheitsstempel auf Gold?",a:"Goldschmuck trägt meist einen eingestempelten Zahlencode: 585 (14 Karat), 750 (18 Karat), 999 (Feingold). Älterer Schmuck kann auch Buchstaben wie 'G' oder 'GF' für vergoldet tragen – das ist kein massives Gold."},
+          {q:"Wo kann ich Gold zum besten Preis verkaufen?",a:"Goldankäufer zahlen typischerweise 75–90% des Materialwerts. Banken zahlen oft weniger. Online-Ankäufer (z.B. Degussa, Philoro) bieten transparente Preise. Beim Juwelier hängt der Preis stark vom Ort ab."},
+          {q:"Ist Gold eine gute Geldanlage 2026?",a:"Gold gilt als Inflationsschutz und Krisenmetall, entwickelt sich aber nicht gleichmäßig. Langfristig (20+ Jahre) hat Gold den Inflationsausgleich geschafft. Für kurzfristige Rendite ist Gold eher ungeeignet. Finanzberatung empfehlenswert."},
+          {q:"Was ist der Unterschied zwischen Goldpreis in Euro und Dollar?",a:"Der internationale Goldpreis wird in US-Dollar je Feinunze (troy oz, 31,1g) notiert. Der Euro-Preis ergibt sich durch den EUR/USD Wechselkurs. Ein starker Dollar bedeutet günstigeres Gold in Euro."},
+        ].map(f => (
+          <div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>
+        ))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/prozent-rechner',label:'Prozentrechner'},{href:'/de/sprit-rechner',label:'Spritrechner'},{href:'/de/mwst-rechner',label:'MwSt Rechner'},{href:'/de/paypal-gebuehren-rechner',label:'PayPal Gebühren'},{href:'/de/dreisatz-rechner',label:'Dreisatz'},{href:'/de/stundenlohn-rechner',label:'Stundenlohn'}].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    let gpMode='g';
+    const gpModes=['g','fu','anp'];
+    function fmtE(n:number,d=2){return n.toFixed(d).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.')+' €';}
+    function fmtN(n:number,d=4){return n.toFixed(d).replace('.',',');}
+    (window as any).setGPMode=function(m:string){
+      gpMode=m; gpModes.forEach(x=>{
+        document.getElementById('gp-'+x)?.classList.toggle('hidden',x!==m);
+        const t=document.getElementById('gptab-'+x);
+        if(t)t.className=`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${x===m?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`;
+      });
+      document.getElementById('gp-result')?.classList.add('hidden');
+    };
+    (window as any).calcGP=function(){
+      const leg=parseFloat((document.getElementById('gp-leg') as HTMLSelectElement).value)/1000;
+      const preis=parseFloat((document.getElementById('gp-preis') as HTMLInputElement).value)||88.10;
+      let gramm=0,wert=0;
+      if(gpMode==='g'){
+        gramm=parseFloat((document.getElementById('gp-gramm') as HTMLInputElement).value)||0;
+        const feingold=gramm*leg; wert=feingold*preis;
+        const res=document.getElementById('gp-result')!;res.classList.remove('hidden');
+        document.getElementById('gp-r1')!.textContent=fmtE(wert);document.getElementById('gp-l1')!.textContent='Materialwert';
+        document.getElementById('gp-r2')!.textContent=fmtN(leg*100,1)+' %';document.getElementById('gp-l2')!.textContent='Feingehalt';
+        document.getElementById('gp-r3')!.textContent=fmtE(leg*preis)+'/g';document.getElementById('gp-l3')!.textContent='Wert/Gramm';
+        document.getElementById('gp-r4')!.textContent=fmtN(feingold,3)+' g';
+      } else if(gpMode==='fu'){
+        const oz=parseFloat((document.getElementById('gp-oz') as HTMLInputElement).value)||1;
+        gramm=oz*31.1035; const feingold=gramm*leg; wert=feingold*preis;
+        const res=document.getElementById('gp-result')!;res.classList.remove('hidden');
+        document.getElementById('gp-r1')!.textContent=fmtE(wert);document.getElementById('gp-l1')!.textContent='Materialwert';
+        document.getElementById('gp-r2')!.textContent=fmtN(gramm,2)+' g';document.getElementById('gp-l2')!.textContent='Gewicht total';
+        document.getElementById('gp-r3')!.textContent=fmtE(wert/oz)+'/oz';document.getElementById('gp-l3')!.textContent='Preis/Feinunze';
+        document.getElementById('gp-r4')!.textContent=fmtN(feingold,3)+' g Fein';
+      } else {
+        gramm=parseFloat((document.getElementById('gp-anp-g') as HTMLInputElement).value)||0;
+        const quote=parseFloat((document.getElementById('gp-quote') as HTMLInputElement).value)/100;
+        const feingold=gramm*leg; const materialwert=feingold*preis; const ankauf=materialwert*quote;
+        const res=document.getElementById('gp-result')!;res.classList.remove('hidden');
+        document.getElementById('gp-r1')!.textContent=fmtE(materialwert);document.getElementById('gp-l1')!.textContent='Materialwert';
+        document.getElementById('gp-r2')!.textContent=fmtE(ankauf);document.getElementById('gp-l2')!.textContent='Ankaufspreis';
+        document.getElementById('gp-r3')!.textContent=fmtE(materialwert-ankauf);document.getElementById('gp-l3')!.textContent='Differenz';
+        document.getElementById('gp-r4')!.textContent=fmtN(feingold,3)+' g Fein';
+      }
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

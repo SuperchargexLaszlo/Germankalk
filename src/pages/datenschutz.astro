@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+<BaseLayout title="Datenschutz – RechnerBox.eu" description="Datenschutzerklärung für RechnerBox.eu. Keine Cookies, keine Datenspeicherung bei Berechnungen.">
+  <Header slot="header"/>
+  <div class="max-w-2xl mx-auto px-4 py-12">
+    <h1>Datenschutzerklärung</h1>
+    <h2>1. Allgemeine Hinweise</h2>
+    <p class="text-sm text-gray-600">Der Schutz Ihrer persönlichen Daten ist uns wichtig. Alle Berechnungen auf RechnerBox.eu erfolgen lokal in Ihrem Browser. Es werden keine eingegebenen Daten an unsere Server übertragen oder gespeichert.</p>
+    <h2>2. Verantwortlicher</h2>
+    <p class="text-sm text-gray-600">Verantwortlicher im Sinne der DSGVO: [Ihr Name], [Adresse], kontakt@rechnerbox.eu</p>
+    <h2>3. Hosting & Server-Logs</h2>
+    <p class="text-sm text-gray-600">Diese Website wird über einen europäischen Hosting-Provider betrieben. Beim Aufruf der Website werden technische Daten (IP-Adresse anonymisiert, Browsertyp, Zeitstempel) für maximal 7 Tage in Server-Logs gespeichert. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Sicherheit).</p>
+    <h2>4. Cookies</h2>
+    <p class="text-sm text-gray-600">Diese Website verwendet keine eigenen Tracking-Cookies. Falls Google AdSense eingebunden wird, können Drittanbieter-Cookies gesetzt werden. Sie können dem widersprechen unter: <a href="https://adssettings.google.com" class="text-primary-600" target="_blank" rel="noopener">Google Anzeigeneinstellungen</a>.</p>
+    <h2>5. Google AdSense</h2>
+    <p class="text-sm text-gray-600">Diese Website kann Google AdSense verwenden. Betreiber: Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland. Google kann dabei Cookies setzen. Weitere Informationen: <a href="https://policies.google.com/privacy" class="text-primary-600" target="_blank" rel="noopener">Google Datenschutz</a>.</p>
+    <h2>6. Ihre Rechte</h2>
+    <p class="text-sm text-gray-600">Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenportabilität und Widerspruch. Kontakt: datenschutz@rechnerbox.eu</p>
+    <p class="text-xs text-gray-400 mt-6">Stand: Januar 2026</p>
+  </div>
+  <Footer slot="footer"/>
+</BaseLayout>

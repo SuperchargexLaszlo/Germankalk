@@ -1,0 +1,145 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {"@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Brutto-Netto Rechner 2026","url":"https://rechnerbox.eu/de/brutto-netto-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie viel Netto bleibt von 3000 Euro Brutto?","acceptedAnswer":{"@type":"Answer","text":"Bei einem Bruttolohn von 3.000 € (Steuerklasse I, keine Kirchensteuer, West) bleiben im Jahr 2026 ungefähr 1.975–2.050 € netto, je nach Bundesland und Krankenkassenbeitrag."}},
+    {"@type":"Question","name":"Was ist der Unterschied zwischen Steuerklasse 1 und 3?","acceptedAnswer":{"@type":"Answer","text":"Steuerklasse 1 gilt für Singles ohne Kinder. Steuerklasse 3 ist für Verheiratete vorteilhaft, wenn ein Partner deutlich mehr verdient – sie zahlen dann weniger Lohnsteuer, der andere Partner ist in Klasse 5."}},
+    {"@type":"Question","name":"Welche Abzüge gibt es beim Bruttolohn?","acceptedAnswer":{"@type":"Answer","text":"Vom Bruttolohn werden abgezogen: Lohnsteuer + Solidaritätszuschlag + ggf. Kirchensteuer sowie die Sozialversicherungsbeiträge (Kranken-, Pflege-, Renten-, Arbeitslosenversicherung)."}}
+  ]}
+]};
+// DE 2026 tax rates
+const SV = { kv:0.073, pv:0.01775, rv:0.093, av:0.013 }; // AN-Anteil
+---
+<BaseLayout
+  title="Brutto-Netto Rechner 2026 Deutschland – Nettogehalt berechnen"
+  description="Brutto-Netto Rechner für Deutschland 2026: Nettogehalt mit Steuerklasse, Kirchensteuer, Bundesland und Sonderzahlungen berechnen. Kostenlos."
+  canonical="https://rechnerbox.eu/de/brutto-netto-rechner"
+  hreflangDE="/de/brutto-netto-rechner"
+  hreflangAT="/at/brutto-netto-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Brutto-Netto Rechner
+    </nav>
+    <h1>Brutto-Netto Rechner 2026 – Deutschland</h1>
+    <p class="text-lg text-gray-600 mb-6">Berechnen Sie Ihr genaues Nettogehalt für 2026 – inkl. Lohnsteuer, Solidaritätszuschlag, Kirchensteuer und alle Sozialversicherungsbeiträge.</p>
+
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Bruttolohn (€/Monat)</label>
+          <input class="calc-input" type="number" id="bn-brutto" value="3000" min="0" step="50" />
+        </div>
+        <div>
+          <label class="calc-label">Steuerklasse</label>
+          <select class="calc-select" id="bn-stk">
+            <option value="1">Klasse 1 – Ledig</option>
+            <option value="2">Klasse 2 – Alleinerziehend</option>
+            <option value="3">Klasse 3 – Verheiratet (Hauptverdiener)</option>
+            <option value="4">Klasse 4 – Verheiratet (gleich)</option>
+            <option value="5">Klasse 5 – Verheiratet (Zweitverdiener)</option>
+            <option value="6">Klasse 6 – Zweiter Job</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Kirchensteuer</label>
+          <select class="calc-select" id="bn-kist">
+            <option value="0">Keine Kirchensteuer</option>
+            <option value="0.09">Bayern/Baden-W. (8%)</option>
+            <option value="0.09">Übrige Bundesländer (9%)</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Krankenversicherung</label>
+          <select class="calc-select" id="bn-kv">
+            <option value="0.073">GKV – Arbeitnehmer (7,3%)</option>
+            <option value="0.08">GKV mit Zusatzbeitrag ca. (8,0%)</option>
+            <option value="0">PKV (pauschal 0)</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcBN()">Nettogehalt berechnen</button>
+      <div class="calc-result hidden" id="bn-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div><div class="result-value text-2xl" id="bn-netto">–</div><div class="result-label">Netto / Monat</div></div>
+          <div><div class="result-value text-2xl" id="bn-lst">–</div><div class="result-label">Lohnsteuer</div></div>
+          <div><div class="result-value text-2xl" id="bn-sv">–</div><div class="result-label">Sozialvers.</div></div>
+          <div><div class="result-value text-2xl" id="bn-year">–</div><div class="result-label">Netto / Jahr</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box mt-4">💡 <strong>Stand 2026:</strong> Grundfreibetrag 12.084 €, Solidaritätszuschlag ab 18.130 € zu versteuerndem Einkommen. Rentenversicherung 18,6%, Arbeitslosenversicherung 2,6%.</div>
+
+    <section class="mt-6">
+      <h2>Steuerabzüge in Deutschland 2026</h2>
+      <div class="overflow-x-auto"><table class="w-full text-sm border-collapse">
+        <thead><tr class="bg-gray-100"><th class="text-left px-3 py-2 border border-gray-200">Abzug</th><th class="px-3 py-2 border border-gray-200">Satz (AN-Anteil)</th><th class="px-3 py-2 border border-gray-200">Bemessungsgrenze</th></tr></thead>
+        <tbody class="divide-y divide-gray-200">
+          {[['Rentenversicherung','9,3%','West: 8.050 €/Mo'],['Krankenversicherung','7,3% + Zusatz','keine BBG'],['Pflegeversicherung','1,775% (+0,6% kinderlos)','keine BBG'],['Arbeitslosenversicherung','1,3%','West: 8.050 €/Mo'],['Lohnsteuer','progressiv','ab Grundfreibetrag'],['Solidaritätszuschlag','5,5% der LSt','ab 18.130 €/J']].map(r=>(
+            <tr class="hover:bg-gray-50">{r.map((c,i)=><td class={`px-3 py-2 border border-gray-200 ${i===0?'font-medium text-gray-800':'text-center text-gray-600'}`}>{c}</td>)}</tr>
+          ))}
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="mt-6"><h2>FAQ – Brutto-Netto 2026</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wann lohnt sich ein Wechsel zur Steuerklasse 3?",a:"Steuerklasse 3 lohnt sich, wenn ein Ehepartner deutlich mehr verdient. Der Hauptverdiener zahlt weniger Lohnsteuer, der Zweitverdiener ist in Klasse 5 höher belastet. Insgesamt macht es keinen Unterschied bei der Jahressteuer."},
+          {q:"Wie hoch ist der Solidaritätszuschlag 2026?",a:"Der Soli (5,5% der Lohnsteuer) gilt 2026 erst ab einem zu versteuernden Einkommen von 18.130 €/Jahr (Singles). Unter dieser Grenze entfällt der Soli komplett."},
+          {q:"Was ist der Unterschied zwischen Brutto- und Nettolohn?",a:"Der Bruttolohn ist das vereinbarte Gehalt vor Abzügen. Der Nettolohn ist das, was tatsächlich überwiesen wird – nach Abzug von Lohnsteuer, Soli, Kirchensteuer und Sozialversicherungsbeiträgen."},
+        ].map(f=>(<div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>))}
+      </div>
+    </section>
+  </article>
+
+  <script>
+    // Simplified DE 2026 Brutto-Netto calculation (approximation)
+    function calcLohnsteuer(jahresBrutto: number, stk: number): number {
+      const gfb = 12084; // Grundfreibetrag 2026
+      let zvE = Math.max(0, jahresBrutto - 1230 - gfb); // Werbungskosten-Pauschale
+      if (stk === 3) zvE = Math.max(0, jahresBrutto * 2 - 2460 - gfb * 2) / 2;
+      if (stk === 5) zvE = jahresBrutto * 1.3;
+      if (stk === 6) return jahresBrutto * 0.25;
+      if (zvE <= 0) return 0;
+      let lst = 0;
+      if (zvE <= 17005) { const y=(zvE-gfb)/10000; lst=(979.18*y+1400)*y; }
+      else if (zvE <= 66761) { const z=(zvE-17005)/10000; lst=(192.59*z+2397)*z+1025.38; }
+      else if (zvE <= 277825) lst = 0.42*zvE-10602.13;
+      else lst = 0.45*zvE-18936.88;
+      if (stk === 2) lst = Math.max(0, lst - 1908);
+      return Math.max(0, lst);
+    }
+    function fmt(n:number){return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,'.')+' €';}
+    (window as any).calcBN = function(){
+      const brutto = parseFloat((document.getElementById('bn-brutto') as HTMLInputElement).value);
+      const stk = parseInt((document.getElementById('bn-stk') as HTMLSelectElement).value);
+      const kvRate = parseFloat((document.getElementById('bn-kv') as HTMLSelectElement).value);
+      if(isNaN(brutto)||brutto<=0) return;
+      const jb = brutto * 12;
+      const lst12 = calcLohnsteuer(jb, stk);
+      const lstM = lst12 / 12;
+      const soli = lstM > 160 ? lstM * 0.055 : 0;
+      const rv = Math.min(brutto, 8050) * 0.093;
+      const kv = brutto * kvRate;
+      const pv = brutto * 0.01775;
+      const av = Math.min(brutto, 8050) * 0.013;
+      const sv = rv + kv + pv + av;
+      const abz = lstM + soli + sv;
+      const netto = brutto - abz;
+      const r = document.getElementById('bn-result')!;
+      r.classList.remove('hidden');
+      document.getElementById('bn-netto')!.textContent = fmt(netto);
+      document.getElementById('bn-lst')!.textContent = fmt(lstM + soli);
+      document.getElementById('bn-sv')!.textContent = fmt(sv);
+      document.getElementById('bn-year')!.textContent = fmt(netto * 12);
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

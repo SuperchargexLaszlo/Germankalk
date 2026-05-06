@@ -1,0 +1,13 @@
+Az SVG fájlokat a rechnerbox_bonus.zip / public/og/ mappájából
+másold a D:\DEV\Germankalk\public\og\ mappába:
+
+og-default.svg
+og-de.svg
+og-at.svg
+og-ch.svg
+og-brutto-netto.svg
+og-bmi.svg
+og-paypal.svg
+og-elterngeld.svg
+og-rente.svg
+og-quellensteuer.svg

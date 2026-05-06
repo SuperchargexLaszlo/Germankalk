@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"kg in lbs Rechner 2026","url":"https://rechnerbox.eu/de/kg-lbs-rechner","applicationCategory":"UtilitiesApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie viel kg sind 1 lbs?","acceptedAnswer":{"@type":"Answer","text":"1 Pfund (lb) = 0,453592 Kilogramm. Umgekehrt: 1 kg = 2,20462 lbs. Einfache Näherung: kg × 2,2 ≈ lbs."}},
+    {"@type":"Question","name":"Wie viel kg sind 100 lbs?","acceptedAnswer":{"@type":"Answer","text":"100 lbs = 45,36 kg. Formel: lbs × 0,4536 = kg."}},
+    {"@type":"Question","name":"Was ist der Unterschied zwischen Pfund und lbs?","acceptedAnswer":{"@type":"Answer","text":"Lbs (pounds) ist das englische Pfund. Das deutsche Pfund ist 500g. Das englische Pfund (lbs) ist dagegen ca. 453,6g – also etwas weniger."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="kg in lbs umrechnen 2026 – Kilogramm, Pfund, Ounce Rechner"
+  description="Kilogramm in Pfund (lbs) und Unzen (oz) umrechnen. Körpergewicht, Hanteln, Medikamentendosierung. Umrechnungstabelle kg ↔ lbs. Kostenlos."
+  canonical="https://rechnerbox.eu/de/kg-lbs-rechner"
+  hreflangDE="/de/kg-lbs-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › kg in lbs
+    </nav>
+    <h1>kg in lbs umrechnen – Kilogramm & Pfund</h1>
+    <p class="text-lg text-gray-600 mb-6">Kilogramm in Pfund (lbs) und Unzen (oz) umrechnen – und umgekehrt. Mit Schnelltabelle für Körpergewicht und Sport.</p>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-blue-800 mb-1">💡 Schnellformel</p>
+      <p class="text-sm text-blue-700"><strong>1 kg = 2,2046 lbs</strong> · <strong>1 lbs = 0,4536 kg</strong> · <strong>1 oz = 28,35 g</strong> · <strong>1 Stone = 6,35 kg</strong></p>
+    </div>
+
+    <div class="calc-box">
+      <div class="flex flex-wrap gap-2 mb-5">
+        {[{id:'kzl',l:'kg → lbs'},{id:'lzk',l:'lbs → kg'},{id:'stone',l:'Stone → kg'}].map((t,i)=>(
+          <button onclick={`setKLMode('${t.id}')`} id={`kltab-${t.id}`}
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${i===0?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`}>{t.l}</button>
+        ))}
+      </div>
+      <div id="kl-kzl">
+        <div class="mb-4"><label class="calc-label">Kilogramm (kg)</label>
+          <input class="calc-input" type="number" id="kl-kg" value="75" step="0.1" /></div>
+      </div>
+      <div id="kl-lzk" class="hidden">
+        <div class="mb-4"><label class="calc-label">Pfund (lbs)</label>
+          <input class="calc-input" type="number" id="kl-lbs" value="165" step="0.1" /></div>
+      </div>
+      <div id="kl-stone" class="hidden">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div><label class="calc-label">Stone</label><input class="calc-input" type="number" id="kl-st" value="11" min="0"/></div>
+          <div><label class="calc-label">Pfund (lbs)</label><input class="calc-input" type="number" id="kl-stlbs" value="7" min="0" max="13"/></div>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcKL()">Umrechnen</button>
+      <div class="calc-result hidden" id="kl-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center" id="kl-res-grid"></div>
+      </div>
+    </div>
+
+    <section class="mt-8">
+      <h2>Umrechnungstabelle kg ↔ lbs</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="px-3 py-2 border text-center">kg</th><th class="px-3 py-2 border text-center">lbs</th>
+            <th class="px-3 py-2 border text-center">kg</th><th class="px-3 py-2 border text-center">lbs</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[[1,2.2,60,132.3],[5,11.0,70,154.3],[10,22.0,80,176.4],[20,44.1,90,198.4],[30,66.1,100,220.5],[40,88.2,110,242.5],[50,110.2,120,264.6]].map(r=>(
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border text-center font-medium text-gray-800">{r[0]}</td>
+                <td class="px-3 py-2 border text-center text-gray-600">{r[1]}</td>
+                <td class="px-3 py-2 border text-center font-medium text-gray-800">{r[2]}</td>
+                <td class="px-3 py-2 border text-center text-gray-600">{r[3]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – kg und lbs</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Was ist der Unterschied zwischen Pfund (lbs) und dem deutschen Pfund?",a:"Das englische Pfund (lbs, Pound) = 453,592 g. Das deutsche Pfund (historisch) = 500 g. Im Alltag meinen Deutsche mit 'ein Pfund' meist 500 g. Im internationalen Kontext (Sport, Medizin) bedeutet Pfund immer lbs = 453,6 g."},
+          {q:"Wie viel kg wiegt eine Person mit 200 lbs?",a:"200 lbs × 0,4536 = 90,72 kg. In den USA wird Körpergewicht oft in lbs angegeben – 200 lbs entspricht einem leichten Übergewicht bei mittlerer Körpergröße."},
+          {q:"Was sind Stone und wie werden sie berechnet?",a:"Stone ist ein britisches Gewichtsmaß: 1 Stone = 14 lbs = 6,35 kg. In Großbritannien und Irland wird Körpergewicht oft in Stone angegeben. Beispiel: 11 Stone 7 lbs = 73 kg."},
+          {q:"Welche Hanteln kaufen – kg oder lbs?",a:"In Deutschland werden Hanteln fast ausschließlich in kg angegeben. In US-amerikanischen Shops und Markennamen findet man lbs. Merkhilfe: 10 lbs ≈ 4,5 kg, 25 lbs ≈ 11,3 kg, 45 lbs ≈ 20,4 kg."},
+        ].map(f=>(<div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Umrechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/umrechnung-cm-inch',label:'cm ↔ Inch'},{href:'/de/celsius-fahrenheit',label:'°C ↔ °F'},{href:'/de/bmi-rechner',label:'BMI Rechner'},{href:'/de/idealgewicht-rechner',label:'Idealgewicht'},{href:'/de/kalorien-rechner',label:'Kalorien'},{href:'/de/pace-rechner',label:'Pace Rechner'}].map(r=>(
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    let klMode='kzl';
+    const klModes=['kzl','lzk','stone'];
+    function fmtN(n:number,d=2){return n.toFixed(d).replace('.',',');}
+    (window as any).setKLMode=function(m:string){
+      klMode=m; klModes.forEach(x=>{
+        document.getElementById('kl-'+x)?.classList.toggle('hidden',x!==m);
+        const t=document.getElementById('kltab-'+x);
+        if(t)t.className=`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${x===m?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`;
+      });
+      document.getElementById('kl-result')?.classList.add('hidden');
+    };
+    function showGrid(items:{v:string,l:string}[]){
+      document.getElementById('kl-res-grid')!.innerHTML=items.map(i=>`<div><div class="result-value text-xl">${i.v}</div><div class="result-label">${i.l}</div></div>`).join('');
+      document.getElementById('kl-result')!.classList.remove('hidden');
+    }
+    (window as any).calcKL=function(){
+      if(klMode==='kzl'){
+        const kg=parseFloat((document.getElementById('kl-kg') as HTMLInputElement).value)||0;
+        const lbs=kg*2.20462; const oz=kg*35.274; const st=Math.floor(kg/6.35035); const stlbs=(kg-st*6.35035)*2.20462;
+        showGrid([{v:fmtN(lbs)+' lbs',l:'Pfund'},{v:fmtN(oz,1)+' oz',l:'Unzen'},{v:st+"'"+fmtN(stlbs,1)+'"',l:'Stone+lbs'},{v:fmtN(kg*1000,0)+' g',l:'Gramm'}]);
+      } else if(klMode==='lzk'){
+        const lbs=parseFloat((document.getElementById('kl-lbs') as HTMLInputElement).value)||0;
+        const kg=lbs*0.453592; const oz=lbs*16; const st=Math.floor(lbs/14); const stlbs=lbs%14;
+        showGrid([{v:fmtN(kg)+' kg',l:'Kilogramm'},{v:fmtN(oz,1)+' oz',l:'Unzen'},{v:st+"'"+fmtN(stlbs,1)+'"',l:'Stone+lbs'},{v:fmtN(kg*1000,0)+' g',l:'Gramm'}]);
+      } else {
+        const st=parseFloat((document.getElementById('kl-st') as HTMLInputElement).value)||0;
+        const stlbs=parseFloat((document.getElementById('kl-stlbs') as HTMLInputElement).value)||0;
+        const totalLbs=st*14+stlbs; const kg=totalLbs*0.453592;
+        showGrid([{v:fmtN(kg)+' kg',l:'Kilogramm'},{v:fmtN(totalLbs,1)+' lbs',l:'Pfund gesamt'},{v:fmtN(kg*1000,0)+' g',l:'Gramm'},{v:fmtN(kg/1000,4)+' t',l:'Tonnen'}]);
+      }
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

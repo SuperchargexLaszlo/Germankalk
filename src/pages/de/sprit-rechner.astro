@@ -1,0 +1,203 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Spritrechner 2026","url":"https://rechnerbox.eu/de/sprit-rechner","applicationCategory":"UtilitiesApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie berechne ich den Spritverbrauch auf 100 km?","acceptedAnswer":{"@type":"Answer","text":"Formel: Verbrauch (l/100km) = getankte Liter / gefahrene Kilometer × 100. Beispiel: 40 Liter auf 500 km = 8 l/100km."}},
+    {"@type":"Question","name":"Wie hoch ist der durchschnittliche Spritverbrauch in Deutschland?","acceptedAnswer":{"@type":"Answer","text":"Der Durchschnitt liegt 2026 bei ca. 7–8 l/100km für Benziner und 6–7 l/100km für Diesel. SUVs verbrauchen meist 10–14 l/100km, Kleinwagen 5–6 l/100km."}},
+    {"@type":"Question","name":"Was kosten 100 km Fahrt?","acceptedAnswer":{"@type":"Answer","text":"Bei 8 l/100km und 1,85 €/l Benzin kosten 100 km = 14,80 €. Die Gesamtkosten beinhalten auch Versicherung, Wartung und Abschreibung – ca. 30–50 Cent pro Kilometer."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Spritrechner 2026 – Kraftstoffverbrauch & Kosten berechnen"
+  description="Spritverbrauch, Kraftstoffkosten und CO2-Ausstoß berechnen. Benzin, Diesel, E10, Erdgas. Aktueller Spritrechner 2026 – kostenlos und schnell."
+  canonical="https://rechnerbox.eu/de/sprit-rechner"
+  hreflangDE="/de/sprit-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Spritrechner
+    </nav>
+    <h1>Spritrechner 2026 – Verbrauch & Kosten</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Kraftstoffverbrauch berechnen, Tankkosten ermitteln und CO₂-Ausstoß berechnen – für Benzin, Diesel, E10 und Erdgas.
+    </p>
+
+    <div class="calc-box">
+      <div class="flex flex-wrap gap-2 mb-5">
+        {[{id:'vb',l:'Verbrauch l/100km'},{id:'kosten',l:'Fahrtkosten'},{id:'tank',l:'Tankreichweite'}].map((t,i)=>(
+          <button onclick={`setSPMode('${t.id}')`} id={`sptab-${t.id}`}
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${i===0?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`}>{t.l}</button>
+        ))}
+      </div>
+
+      <!-- Mode 1: Verbrauch berechnen -->
+      <div id="sp-vb">
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+          <div><label class="calc-label">Getankte Liter</label><input class="calc-input" type="number" id="sp-liter" value="45" step="0.1"/></div>
+          <div><label class="calc-label">Gefahrene km</label><input class="calc-input" type="number" id="sp-km" value="560"/></div>
+          <div><label class="calc-label">Kraftstoffpreis (€/l)</label><input class="calc-input" type="number" id="sp-preis1" value="1.85" step="0.01"/></div>
+        </div>
+      </div>
+
+      <!-- Mode 2: Fahrtkosten -->
+      <div id="sp-kosten" class="hidden">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+          <div><label class="calc-label">Strecke (km)</label><input class="calc-input" type="number" id="sp-strecke" value="500"/></div>
+          <div><label class="calc-label">Verbrauch (l/100km)</label><input class="calc-input" type="number" id="sp-verbrauch2" value="7.5" step="0.1"/></div>
+          <div><label class="calc-label">Kraftstoffpreis (€/l)</label><input class="calc-input" type="number" id="sp-preis2" value="1.85" step="0.01"/></div>
+          <div><label class="calc-label">Hin- & Rückfahrt?</label>
+            <select class="calc-select" id="sp-hin"><option value="1">Einzel</option><option value="2">Hin & Zurück</option></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 3: Tankreichweite -->
+      <div id="sp-tank" class="hidden">
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div><label class="calc-label">Tankinhalt (Liter)</label><input class="calc-input" type="number" id="sp-tank-vol" value="55" step="1"/></div>
+          <div><label class="calc-label">Verbrauch (l/100km)</label><input class="calc-input" type="number" id="sp-tank-vb" value="7.5" step="0.1"/></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div>
+          <label class="calc-label">Kraftstoffart</label>
+          <select class="calc-select" id="sp-kraftstoff">
+            <option value="benzin;2.31">Benzin (Super E10) – 2,31 kg CO₂/l</option>
+            <option value="diesel;2.65">Diesel – 2,65 kg CO₂/l</option>
+            <option value="autogas;1.63">Autogas (LPG) – 1,63 kg CO₂/l</option>
+            <option value="cng;2.17">Erdgas (CNG) – 2,17 kg CO₂/kg</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Mitfahrer</label>
+          <select class="calc-select" id="sp-personen">
+            <option value="1">1 Person (allein)</option>
+            <option value="2">2 Personen</option>
+            <option value="3">3 Personen</option>
+            <option value="4">4 Personen</option>
+            <option value="5">5 Personen</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calcSP()">Berechnen</button>
+
+      <div class="calc-result hidden" id="sp-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div><div class="result-value" id="sp-r1">–</div><div class="result-label" id="sp-l1">l/100km</div></div>
+          <div><div class="result-value text-2xl" id="sp-r2">–</div><div class="result-label" id="sp-l2">Kosten gesamt</div></div>
+          <div><div class="result-value text-xl" id="sp-r3">–</div><div class="result-label" id="sp-l3">Pro Person</div></div>
+          <div><div class="result-value text-xl" id="sp-r4">–</div><div class="result-label">CO₂ (kg)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box mt-4">
+      ⛽ <strong>Aktuelle Kraftstoffpreise (ca. Mai 2026):</strong> Super E10 ca. 1,82 €/l · Diesel ca. 1,68 €/l · Autogas ca. 0,98 €/l
+    </div>
+
+    <section class="mt-8">
+      <h2>Verbrauchsvergleich nach Fahrzeugklasse 2026</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border">Fahrzeugklasse</th>
+            <th class="text-center px-3 py-2 border">Benzin l/100km</th>
+            <th class="text-center px-3 py-2 border">Diesel l/100km</th>
+            <th class="text-center px-3 py-2 border">Kosten/100km*</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              ["Kleinstwagen (VW Polo, Fiesta)","5,5","4,5","~9,80 €"],
+              ["Kompaktklasse (Golf, Focus)","7,0","5,8","~12,30 €"],
+              ["Mittelklasse (A4, 3er BMW)","8,5","6,8","~14,80 €"],
+              ["SUV/Kombi (Tiguan, Octavia)","10,0","8,0","~17,50 €"],
+              ["Großes SUV (X5, Q7)","13,5","10,5","~23,50 €"],
+              ["Elektro (kWh/100km)","18 kWh","–","~4,50 €"],
+            ].map(r => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-medium text-gray-800">{r[0]}</td>
+                {r.slice(1).map(c => <td class="text-center px-3 py-2 border text-gray-600">{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="text-xs text-gray-400 mt-1">* Bei 1,82 €/l Benzin bzw. 1,68 €/l Diesel</p>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Spritrechner</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wie berechne ich den Verbrauch auf 100 km?",a:"Füllen Sie beim nächsten Tanken voll, notieren Sie den Kilometerstand. Beim übernächsten Tanken: (getankte Liter) × 100 / (gefahrene km). Beispiel: 42l / 520km × 100 = 8,08 l/100km."},
+          {q:"Wie kann ich meinen Spritverbrauch senken?",a:"Reifen auf richtigen Druck prüfen, gleichmäßig fahren, früh schalten, Klimaanlage gezielt nutzen, unnötiges Gepäck ausräumen. Tempomat auf der Autobahn spart 10–15% Kraftstoff."},
+          {q:"Was kostet 1 km fahren?",a:"Bei 8 l/100km und 1,82 €/l Benzin kostet 1 km etwa 14,6 Cent. Inklusive Versicherung, Kfz-Steuer und Wartung kommen Gesamtkosten von ca. 30–50 Cent pro Kilometer zusammen."},
+          {q:"Wie viel CO₂ stoße ich auf 100 km aus?",a:"Ein Benziner mit 8 l/100km stößt ca. 18,5 kg CO₂ aus (8l × 2,31 kg/l). Das Bundesamt empfiehlt zur Klimaneutralität, Fahrten unter 100km auf die Bahn umzusteigen."},
+        ].map(f => (
+          <div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>
+        ))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/prozent-rechner',label:'Prozentrechner'},{href:'/de/goldpreis-rechner',label:'Goldpreis'},{href:'/de/stundenlohn-rechner',label:'Stundenlohn'},{href:'/de/arbeitszeit-rechner',label:'Arbeitszeit'},{href:'/de/dreisatz-rechner',label:'Dreisatz'},{href:'/de/mwst-rechner',label:'MwSt Rechner'}].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    let spMode='vb';
+    const spModes=['vb','kosten','tank'];
+    function fmtE(n:number,d=2){return n.toFixed(d).replace('.',',')+'€';}
+    function fmtN(n:number,d=2){return n.toFixed(d).replace('.',',');}
+    (window as any).setSPMode=function(m:string){
+      spMode=m; spModes.forEach(x=>{
+        document.getElementById('sp-'+x)?.classList.toggle('hidden',x!==m);
+        const t=document.getElementById('sptab-'+x);
+        if(t)t.className=`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${x===m?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`;
+      });
+      document.getElementById('sp-result')?.classList.add('hidden');
+    };
+    function getCO2Factor(){const v=(document.getElementById('sp-kraftstoff') as HTMLSelectElement).value.split(';');return parseFloat(v[1]);}
+    function showRes(r1:string,r2:string,r3:string,r4:string,l1='l/100km',l2='Kosten',l3='Pro Person'){
+      ['r1','r2','r3','r4'].forEach((id,i)=>{document.getElementById('sp-'+id)!.textContent=[r1,r2,r3,r4][i];});
+      ['l1','l2','l3'].forEach((id,i)=>{document.getElementById('sp-'+id)!.textContent=[l1,l2,l3][i];});
+      document.getElementById('sp-result')!.classList.remove('hidden');
+    }
+    (window as any).calcSP=function(){
+      const pers=parseInt((document.getElementById('sp-personen') as HTMLSelectElement).value)||1;
+      const co2=getCO2Factor();
+      if(spMode==='vb'){
+        const lit=parseFloat((document.getElementById('sp-liter') as HTMLInputElement).value)||0;
+        const km=parseFloat((document.getElementById('sp-km') as HTMLInputElement).value)||1;
+        const preis=parseFloat((document.getElementById('sp-preis1') as HTMLInputElement).value)||0;
+        const vb=lit/km*100; const kosten=lit*preis; const co2t=lit*co2;
+        showRes(fmtN(vb,1)+' l/100km',fmtE(kosten),fmtE(kosten/pers),'~'+fmtN(co2t,1)+' kg');
+      } else if(spMode==='kosten'){
+        const str=parseFloat((document.getElementById('sp-strecke') as HTMLInputElement).value)||0;
+        const vb=parseFloat((document.getElementById('sp-verbrauch2') as HTMLInputElement).value)||0;
+        const preis=parseFloat((document.getElementById('sp-preis2') as HTMLInputElement).value)||0;
+        const fakt=parseInt((document.getElementById('sp-hin') as HTMLSelectElement).value)||1;
+        const gesKm=str*fakt; const lit=gesKm*vb/100; const kosten=lit*preis;
+        const co2t=lit*co2;
+        showRes(fmtN(vb,1)+' l/100km',fmtE(kosten),fmtE(kosten/pers),'~'+fmtN(co2t,1)+' kg','Verbrauch','Gesamt ('+fmtN(gesKm,0)+' km)','Pro Person');
+      } else {
+        const vol=parseFloat((document.getElementById('sp-tank-vol') as HTMLInputElement).value)||55;
+        const vb=parseFloat((document.getElementById('sp-tank-vb') as HTMLInputElement).value)||7.5;
+        const reich=vol/vb*100;
+        showRes(fmtN(vb,1)+' l/100km',fmtN(reich,0)+' km','—','—','Verbrauch','Reichweite','—');
+      }
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

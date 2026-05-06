@@ -1,0 +1,169 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Mehrwertsteuer Rechner Schweiz 2026","url":"https://rechnerbox.eu/ch/mehrwertsteuer-rechner",
+   "applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"CHF"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie hoch ist die Mehrwertsteuer in der Schweiz 2026?",
+     "acceptedAnswer":{"@type":"Answer","text":"Die Schweizer Mehrwertsteuer (MWST) beträgt 2026: Normalsatz 8,1%, Sondersatz für Beherbergung 3,8%, Sondersatz für Grundversorgung (Lebensmittel, Bücher, Zeitungen) 2,6%."}},
+    {"@type":"Question","name":"Was fällt unter den reduzierten Mehrwertsteuersatz in der Schweiz?",
+     "acceptedAnswer":{"@type":"Answer","text":"Zum reduzierten Satz von 2,6% gehören Lebensmittel (nicht Restaurantbesuche), alkoholfreie Getränke, Bücher, Zeitungen, Medikamente und Tierfutter. Restaurantbesuche: Normalsatz 8,1%."}},
+    {"@type":"Question","name":"Was ist der Unterschied zwischen Schweizer MWST und deutscher MwSt?",
+     "acceptedAnswer":{"@type":"Answer","text":"Deutschland: Normalsatz 19%, ermäßigt 7%. Schweiz: Normalsatz 8,1%, reduziert 2,6%, Beherbergung 3,8%. Die Schweiz hat damit deutlich niedrigere Mehrwertsteuersätze als Deutschland."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Mehrwertsteuer Rechner Schweiz 2026 – MWST 8.1% berechnen"
+  description="Schweizer MWST 2026 berechnen: 8,1% Normalsatz, 3,8% Beherbergung, 2,6% reduziert. Netto zu Brutto oder Brutto zu Netto in CHF. Kostenloser MWST-Rechner."
+  canonical="https://rechnerbox.eu/ch/mehrwertsteuer-rechner"
+  hreflangCH="/ch/mehrwertsteuer-rechner"
+  hreflangDE="/de/mwst-rechner"
+  hreflangAT="/de/mwst-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/ch/" class="hover:text-primary-600">Schweiz</a> › Mehrwertsteuer Rechner
+    </nav>
+    <h1>Mehrwertsteuer Rechner Schweiz 2026 – MWST</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Schweizer MWST schnell berechnen: Netto zu Brutto oder Brutto zu Netto. Alle Steuersätze 2026 inkl. Normalsatz 8,1%, Sondersatz 3,8% und reduzierter Satz 2,6%.
+    </p>
+
+    <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-red-800 mb-2">🇨🇭 MWST-Sätze Schweiz 2026</p>
+      <div class="grid grid-cols-3 gap-3 text-xs">
+        {[["Normalsatz","8,1%","Meiste Waren & Dienstleistungen"],["Beherbergung","3,8%","Hotels, Ferienwohnungen"],["Reduziert","2,6%","Lebensmittel, Bücher, Medikamente"]].map(([l,v,d])=>(
+          <div class="bg-white rounded-lg p-2 border border-red-100 text-center">
+            <div class="font-medium text-red-800">{l}</div>
+            <div class="text-xl font-bold text-red-700 my-1">{v}</div>
+            <div class="text-gray-500">{d}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Betrag (CHF)</label>
+          <input class="calc-input" type="number" id="ch-mwst-amt" value="1000" step="0.05" />
+        </div>
+        <div>
+          <label class="calc-label">MWST-Satz</label>
+          <select class="calc-select" id="ch-mwst-satz">
+            <option value="0.081">8,1% – Normalsatz</option>
+            <option value="0.038">3,8% – Beherbergung</option>
+            <option value="0.026">2,6% – Reduzierter Satz</option>
+            <option value="0.19">19% – Deutschland (Vergleich)</option>
+            <option value="0.07">7% – Deutschland ermäßigt</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Richtung</label>
+          <select class="calc-select" id="ch-mwst-dir">
+            <option value="netto">Netto → Brutto</option>
+            <option value="brutto">Brutto → Netto</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcCHMwst()">Berechnen</button>
+      <div class="calc-result hidden" id="ch-mwst-result">
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div><div class="result-value" id="ch-mwst-netto">–</div><div class="result-label">Nettobetrag</div></div>
+          <div><div class="result-value text-2xl" id="ch-mwst-steuer">–</div><div class="result-label">MWST-Betrag</div></div>
+          <div><div class="result-value" id="ch-mwst-brutto">–</div><div class="result-label">Bruttobetrag</div></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="mt-8">
+      <h2>MWST Schweiz 2026 – Welcher Satz gilt wofür?</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border">Kategorie</th>
+            <th class="text-center px-3 py-2 border">MWST-Satz</th>
+            <th class="text-left px-3 py-2 border">Beispiele</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              ["Normalsatz 8,1%","8,1%","Kleidung, Elektronik, Restaurant, Dienstleistungen, Alkohol"],
+              ["Sondersatz Beherbergung","3,8%","Hotel, Hostel, Ferienwohnung (nur Übernachtung, Frühstück 8,1%)"],
+              ["Reduzierter Satz","2,6%","Lebensmittel, alkoholfr. Getränke, Bücher, Zeitungen, Medikamente, Saatgut"],
+              ["Befreit (0%)","0%","Gesundheitsleistungen, Schulbildung, Versicherungen, Bankdienstleistungen"],
+            ].map(r=>(
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-semibold text-primary-700">{r[0]}</td>
+                <td class="text-center px-3 py-2 border font-bold">{r[1]}</td>
+                <td class="px-3 py-2 border text-gray-600 text-xs">{r[2]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8">
+      <h2>MWST-Vergleich: Schweiz vs. Deutschland vs. Österreich</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100">
+            <th class="text-left px-3 py-2 border">Satztyp</th>
+            <th class="text-center px-3 py-2 border">🇨🇭 Schweiz</th>
+            <th class="text-center px-3 py-2 border">🇩🇪 Deutschland</th>
+            <th class="text-center px-3 py-2 border">🇦🇹 Österreich</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[["Normalsatz","8,1%","19%","20%"],["Ermäßigt","2,6%","7%","10%"],["Sondersatz","3,8% (Hotel)","—","13% (Hotel)"]].map(r=>(
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-medium text-gray-800">{r[0]}</td>
+                {r.slice(1).map((c,i)=><td class={`text-center px-3 py-2 border font-semibold ${i===0?'text-red-600':'text-gray-600'}`}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – MWST Schweiz</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Ab wann bin ich in der Schweiz MWST-pflichtig?",a:"Unternehmen sind ab einem Jahresumsatz von 100.000 CHF (aus steuerbaren Leistungen) MWST-pflichtig. Unterhalb dieser Grenze kann man sich freiwillig registrieren. Die Anmeldung erfolgt bei der ESTV (Eidgenössische Steuerverwaltung)."},
+          {q:"Wie rechne ich die MWST aus einem Bruttobetrag heraus?",a:"Netto = Brutto / 1,081 (bei 8,1%). MWST = Brutto - Netto. Beispiel: 1.081 CHF brutto → 1.000 CHF netto, 81 CHF MWST."},
+          {q:"Gilt die Schweizer MWST auch für Online-Einkäufe aus dem Ausland?",a:"Ja. Seit 2019 müssen ausländische Online-Händler mit über 100.000 CHF Umsatz in der Schweiz die MWST abführen. Kleinmengen unter 65 CHF können aber weiterhin ohne MWST eingeführt werden."},
+          {q:"Wann wurde der Schweizer MWST-Satz erhöht?",a:"Der Schweizer Normalsatz wurde von 7,7% auf 8,1% erhöht – gültig ab dem 1. Januar 2024. Die Erhöhung dient der Finanzierung der AHV (Altersrente)."},
+        ].map(f=>(<div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/ch/lohnrechner-schweiz',label:'Lohnrechner CH'},{href:'/de/mwst-rechner',label:'MwSt DE (19%)'},{href:'/de/paypal-gebuehren-rechner',label:'PayPal Gebühren'},{href:'/de/prozent-rechner',label:'Prozentrechner'},{href:'/de/dreisatz-rechner',label:'Dreisatz'},{href:'/de/brutto-netto-rechner',label:'Brutto-Netto DE'}].map(r=>(
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    function fmtCHF(n:number){return n.toFixed(2).replace('.',',')+" CHF";}
+    (window as any).calcCHMwst=function(){
+      const amt=parseFloat((document.getElementById('ch-mwst-amt') as HTMLInputElement).value)||0;
+      const satz=parseFloat((document.getElementById('ch-mwst-satz') as HTMLSelectElement).value)||0;
+      const dir=(document.getElementById('ch-mwst-dir') as HTMLSelectElement).value;
+      let netto:number,steuer:number,brutto:number;
+      if(dir==='netto'){netto=amt;brutto=amt*(1+satz);steuer=brutto-netto;}
+      else{brutto=amt;netto=amt/(1+satz);steuer=brutto-netto;}
+      const r=document.getElementById('ch-mwst-result')!;r.classList.remove('hidden');
+      document.getElementById('ch-mwst-netto')!.textContent=fmtCHF(netto);
+      document.getElementById('ch-mwst-steuer')!.textContent=fmtCHF(steuer);
+      document.getElementById('ch-mwst-brutto')!.textContent=fmtCHF(brutto);
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

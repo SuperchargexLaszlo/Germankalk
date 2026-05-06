@@ -1,0 +1,209 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Stundenlohn Rechner 2026","url":"https://rechnerbox.eu/de/stundenlohn-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie berechne ich meinen Stundenlohn aus dem Monatsgehalt?","acceptedAnswer":{"@type":"Answer","text":"Stundenlohn = Monatsgehalt × 3 / (Wochenstunden × 13). Einfacher: Bei 40h/Woche entspricht ein Monatsgehalt von 4.000 € einem Stundenlohn von ca. 23,08 €."}},
+    {"@type":"Question","name":"Wie hoch ist der Mindestlohn 2026?","acceptedAnswer":{"@type":"Answer","text":"Der gesetzliche Mindestlohn beträgt in Deutschland seit Januar 2025 12,82 € pro Stunde brutto. Für 2026 sind weitere Anpassungen durch die Mindestlohnkommission möglich."}},
+    {"@type":"Question","name":"Was verdiene ich netto bei 15 Euro Stundenlohn?","acceptedAnswer":{"@type":"Answer","text":"Bei 15 €/h und 40h/Woche = 2.600 €/Monat brutto. Nach Steuerabzug (Klasse I) und SV-Abzügen bleiben ca. 1.730–1.800 € netto übrig."}},
+    {"@type":"Question","name":"Wie viele Stunden arbeite ich im Monat?","acceptedAnswer":{"@type":"Answer","text":"Ein Vollzeitmitarbeiter mit 40h/Woche arbeitet durchschnittlich 173,33 Stunden pro Monat (= 40h × 52 Wochen / 12 Monate)."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Stundenlohn Rechner 2026 – Monatsgehalt in Stundenlohn umrechnen"
+  description="Stundenlohn aus Monatsgehalt berechnen und umgekehrt. Mindestlohn 2026: 12,82 €/h. Brutto & Netto, alle Wochenarbeitszeiten. Kostenloser Rechner."
+  canonical="https://rechnerbox.eu/de/stundenlohn-rechner"
+  hreflangDE="/de/stundenlohn-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Stundenlohn Rechner
+    </nav>
+    <h1>Stundenlohn Rechner 2026 – Gehalt umrechnen</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Monatsgehalt in Stundenlohn umrechnen und umgekehrt – für alle Wochenarbeitszeiten. Mindestlohn 2026: <strong>12,82 €/Stunde</strong>.
+    </p>
+
+    <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-green-800 mb-1">💡 Mindestlohn 2026</p>
+      <p class="text-sm text-green-700">Gesetzlicher Mindestlohn: <strong>12,82 €/Stunde</strong> · Bei 40h/Woche = <strong>2.220,13 €/Monat</strong> brutto · Bei 30h/Woche = <strong>1.665,10 €/Monat</strong></p>
+    </div>
+
+    <div class="calc-box">
+      <div class="flex flex-wrap gap-2 mb-5">
+        {[{id:'mzs',l:'Monatsgehalt → Stundenlohn'},{id:'szm',l:'Stundenlohn → Monatsgehalt'},{id:'jzs',l:'Jahresgehalt → Stundenlohn'}].map((t,i) => (
+          <button onclick={`setSLMode('${t.id}')`} id={`sltab-${t.id}`}
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${i===0?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`}>{t.l}</button>
+        ))}
+      </div>
+
+      <!-- Mode 1: Monat → Stunde -->
+      <div id="sl-mzs">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="calc-label">Bruttogehalt (€/Monat)</label>
+            <input class="calc-input" type="number" id="sl-monat" value="3000" step="50" />
+          </div>
+          <div>
+            <label class="calc-label">Wochenstunden</label>
+            <select class="calc-select" id="sl-wh1">
+              <option value="40">40h (Vollzeit)</option>
+              <option value="38.5">38,5h (Öffentl. Dienst)</option>
+              <option value="35">35h (IG Metall)</option>
+              <option value="32">32h (4-Tage-Woche)</option>
+              <option value="30">30h (Teilzeit)</option>
+              <option value="20">20h (Halbtags)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 2: Stunde → Monat -->
+      <div id="sl-szm" class="hidden">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="calc-label">Stundenlohn brutto (€)</label>
+            <input class="calc-input" type="number" id="sl-stunde" value="18.50" step="0.10" />
+          </div>
+          <div>
+            <label class="calc-label">Wochenstunden</label>
+            <select class="calc-select" id="sl-wh2">
+              <option value="40">40h (Vollzeit)</option>
+              <option value="38.5">38,5h (Öffentl. Dienst)</option>
+              <option value="35">35h (IG Metall)</option>
+              <option value="30">30h (Teilzeit)</option>
+              <option value="20">20h (Halbtags)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 3: Jahr → Stunde -->
+      <div id="sl-jzs" class="hidden">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="calc-label">Jahresgehalt brutto (€)</label>
+            <input class="calc-input" type="number" id="sl-jahr" value="42000" step="1000" />
+          </div>
+          <div>
+            <label class="calc-label">Wochenstunden</label>
+            <select class="calc-select" id="sl-wh3">
+              <option value="40">40h (Vollzeit)</option>
+              <option value="38.5">38,5h</option>
+              <option value="35">35h</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calcSL()">Stundenlohn berechnen</button>
+      <div class="calc-result hidden" id="sl-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div><div class="result-value" id="sl-r1">–</div><div class="result-label" id="sl-l1">Stundenlohn</div></div>
+          <div><div class="result-value text-2xl" id="sl-r2">–</div><div class="result-label" id="sl-l2">Monatsgehalt</div></div>
+          <div><div class="result-value text-xl" id="sl-r3">–</div><div class="result-label">Jahresgehalt</div></div>
+          <div><div class="result-value text-xl" id="sl-r4">–</div><div class="result-label">Std./Monat</div></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="mt-8">
+      <h2>Stundenlohn-Tabelle 2026 (40h/Woche)</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border">Bruttogehalt/Monat</th>
+            <th class="text-center px-3 py-2 border">Stundenlohn (40h)</th>
+            <th class="text-center px-3 py-2 border">Stundenlohn (38,5h)</th>
+            <th class="text-center px-3 py-2 border">Netto ca. (Kl.I)</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              [2000,11.54,11.99,1410],[2500,14.42,14.99,1700],[3000,17.31,17.99,1975],
+              [3500,20.19,20.99,2220],[4000,23.08,23.99,2465],[5000,28.85,29.99,2900],
+              [6000,34.62,35.98,3340],[8000,46.15,47.97,4100],
+            ].map(r => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-medium text-gray-800">{(r[0] as number).toLocaleString('de-DE')} €</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{(r[1] as number).toFixed(2).replace('.',',')} €</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{(r[2] as number).toFixed(2).replace('.',',')} €</td>
+                <td class="text-center px-3 py-2 border text-green-700">~{(r[3] as number).toLocaleString('de-DE')} €</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Stundenlohn 2026</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wie berechne ich den Stundenlohn aus dem Monatsgehalt?",a:"Formel: Stundenlohn = Monatsgehalt × 12 / (Wochenstunden × 52). Kurzformel für 40h/Woche: Monatsgehalt / 173,33. Beispiel: 3.000 € / 173,33 = 17,31 €/h."},
+          {q:"Wie viele Stunden hat ein Monat bei 40 Wochenstunden?",a:"Durchschnittlich 173,33 Stunden (= 40h × 52 Wochen / 12 Monate). Einzelne Monate schwanken je nach Arbeitstagen zwischen ca. 152 und 192 Stunden."},
+          {q:"Was ist ein guter Stundenlohn 2026?",a:"Der Medianlohn in Deutschland liegt 2026 bei ca. 20–23 €/h brutto (Vollzeit). Unter 12,82 €/h ist gesetzlich nicht erlaubt. Ab 25 €/h gelten Sie als gut bezahlt, ab 40 €/h als sehr gut."},
+          {q:"Wie rechne ich den Stundenlohn auf Tageslohn um?",a:"Tageslohn = Stundenlohn × tägliche Arbeitszeit. Bei 8h/Tag und 18 €/h = 144 €/Tag. Für Reisekostenabrechnungen ist der Tageslohn relevant."},
+        ].map(f => (
+          <div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>
+        ))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/brutto-netto-rechner',label:'Brutto-Netto'},{href:'/de/minijob-rechner',label:'Minijob Rechner'},{href:'/de/arbeitszeit-rechner',label:'Arbeitszeitrechner'},{href:'/de/tvoed-rechner',label:'TVöD Rechner'},{href:'/de/urlaubsgeld-rechner',label:'Urlaubsgeld'},{href:'/de/krankengeld-rechner',label:'Krankengeld'}].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    let slMode = 'mzs';
+    const slModes = ['mzs','szm','jzs'];
+    function fmtE(n: number, d=2) { return n.toFixed(d).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.')+' €'; }
+    function stdzPro(wh: number) { return wh * 52 / 12; }
+    (window as any).setSLMode = function(m: string) {
+      slMode = m; slModes.forEach(x => {
+        document.getElementById('sl-'+x)?.classList.toggle('hidden', x!==m);
+        const t = document.getElementById('sltab-'+x);
+        if(t) t.className = `px-3 py-1.5 rounded-lg text-sm font-medium border transition ${x===m?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`;
+      });
+      document.getElementById('sl-result')?.classList.add('hidden');
+    };
+    function estimateNetto(b: number) {
+      const j=b*12; let lst=0;
+      if(j>12084){if(j<=17005){const y=(j-12084)/10000;lst=(979.18*y+1400)*y;}else if(j<=66761){const z=(j-17005)/10000;lst=(192.59*z+2397)*z+1025.38;}else lst=0.42*j-10602;}
+      return b - lst/12 - b*(0.073+0.01775+0.093+0.013);
+    }
+    (window as any).calcSL = function() {
+      let stundenlohn=0,monat=0,jahr=0,stdpm=0;
+      if(slMode==='mzs'){
+        monat=parseFloat((document.getElementById('sl-monat') as HTMLInputElement).value)||0;
+        const wh=parseFloat((document.getElementById('sl-wh1') as HTMLSelectElement).value);
+        stdpm=stdzPro(wh); stundenlohn=monat/stdpm; jahr=monat*12;
+      } else if(slMode==='szm'){
+        stundenlohn=parseFloat((document.getElementById('sl-stunde') as HTMLInputElement).value)||0;
+        const wh=parseFloat((document.getElementById('sl-wh2') as HTMLSelectElement).value);
+        stdpm=stdzPro(wh); monat=stundenlohn*stdpm; jahr=monat*12;
+      } else {
+        jahr=parseFloat((document.getElementById('sl-jahr') as HTMLInputElement).value)||0;
+        const wh=parseFloat((document.getElementById('sl-wh3') as HTMLSelectElement).value);
+        stdpm=stdzPro(wh); monat=jahr/12; stundenlohn=monat/stdpm;
+      }
+      const netto=estimateNetto(monat);
+      const r=document.getElementById('sl-result')!; r.classList.remove('hidden');
+      document.getElementById('sl-r1')!.textContent=fmtE(stundenlohn)+'/h';
+      document.getElementById('sl-r2')!.textContent=fmtE(monat);
+      document.getElementById('sl-r3')!.textContent=fmtE(jahr,0);
+      document.getElementById('sl-r4')!.textContent=stdpm.toFixed(1).replace('.',',')+'h';
+      document.getElementById('sl-l1')!.textContent=slMode==='mzs'?'Stundenlohn':'Stundenlohn';
+      document.getElementById('sl-l2')!.textContent=slMode==='szm'?'Monatsgehalt':'Monatsgehalt';
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

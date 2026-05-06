@@ -1,0 +1,158 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"TVöD Rechner 2026","url":"https://rechnerbox.eu/de/tvoed-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie hoch ist das TVöD Gehalt 2026?","acceptedAnswer":{"@type":"Answer","text":"Im TVöD Bund/VKA 2026 reichen die Gehälter von ca. 2.254 € (EG 1, Stufe 1) bis 8.685 € (EG 15, Stufe 5) brutto. Die genaue Eingruppierung richtet sich nach Tätigkeit und Berufserfahrung."}},
+    {"@type":"Question","name":"Was ist der Unterschied zwischen TVöD und TV-L?","acceptedAnswer":{"@type":"Answer","text":"TVöD gilt für Beschäftigte des Bundes und der Kommunen (VKA). TV-L gilt für Beschäftigte der Bundesländer. TV-L liegt in höheren EG meist etwas unter TVöD Bund."}},
+    {"@type":"Question","name":"Wie viele Stufen gibt es im TVöD?","acceptedAnswer":{"@type":"Answer","text":"Im TVöD gibt es 6 Erfahrungsstufen. Stufe 6 wird in EG 13–15 nicht vergeben. Stufe 1→2: 1 Jahr, 2→3: 2 Jahre, 3→4: 3 Jahre, 4→5: 4 Jahre, 5→6: 5 Jahre."}}
+  ]}
+]};
+const TVOED_BUND: Record<string, number[]> = {
+  "EG 1":[2254,2405,2491,2580,2622,2661],"EG 2":[2503,2674,2778,2878,2951,3022],
+  "EG 3":[2695,2892,2997,3100,3147,3195],"EG 4":[2816,3017,3159,3296,3369,3443],
+  "EG 5":[2973,3200,3398,3530,3680,3757],"EG 6":[3082,3340,3543,3716,3895,3978],
+  "EG 7":[3201,3466,3680,3882,3998,4083],"EG 8":[3347,3618,3845,4017,4154,4244],
+  "EG 9a":[3448,3724,3950,4164,4378,4478],"EG 9b":[3565,3850,4098,4329,4582,4694],
+  "EG 9c":[3787,4095,4358,4595,4870,4992],"EG 10":[4032,4360,4643,4927,5186,5315],
+  "EG 11":[4418,4773,5090,5392,5734,5878],"EG 12":[4978,5378,5733,6087,6530,6694],
+  "EG 13":[5590,6024,6430,6837,7232,0],"EG 14":[6047,6509,6982,7401,7826,0],
+  "EG 15":[6701,7199,7729,8243,8685,0],
+};
+const egs = Object.keys(TVOED_BUND);
+---
+<BaseLayout
+  title="TVöD Rechner 2026 – Gehalt im öffentlichen Dienst berechnen"
+  description="TVöD Gehalt 2026 sofort berechnen: Entgeltgruppe, Erfahrungsstufe, Bund und VKA. Aktuelle Entgelttabelle TVöD 2026. Kostenlos."
+  canonical="https://rechnerbox.eu/de/tvoed-rechner"
+  hreflangDE="/de/tvoed-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › TVöD Rechner
+    </nav>
+    <h1>TVöD Rechner 2026 – Gehalt öffentlicher Dienst</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Berechnen Sie Ihr TVöD-Bruttogehalt 2026 nach Entgeltgruppe und Erfahrungsstufe – für Bund und Kommunen (VKA). Automatische Berechnung bei Auswahl.
+    </p>
+
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label class="calc-label">Entgeltgruppe</label>
+          <select class="calc-select" id="tvoed-eg">
+            {egs.map(eg => <option value={eg}>{eg}</option>)}
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Erfahrungsstufe</label>
+          <select class="calc-select" id="tvoed-stufe">
+            <option value="0">Stufe 1</option>
+            <option value="1">Stufe 2</option>
+            <option value="2">Stufe 3</option>
+            <option value="3">Stufe 4</option>
+            <option value="4">Stufe 5</option>
+            <option value="5">Stufe 6</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Beschäftigungsumfang</label>
+          <select class="calc-select" id="tvoed-vz">
+            <option value="1">Vollzeit (100%)</option>
+            <option value="0.9">Teilzeit 90%</option>
+            <option value="0.8">Teilzeit 80%</option>
+            <option value="0.75">Teilzeit 75%</option>
+            <option value="0.5">Teilzeit 50%</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcTVoeD()">Gehalt berechnen</button>
+      <div class="calc-result hidden" id="tvoed-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div><div class="result-value" id="tv-brutto">–</div><div class="result-label">Brutto / Monat</div></div>
+          <div><div class="result-value text-2xl" id="tv-netto">–</div><div class="result-label">Netto* / Monat</div></div>
+          <div><div class="result-value text-xl" id="tv-year">–</div><div class="result-label">Brutto / Jahr</div></div>
+          <div><div class="result-value text-xl" id="tv-jah13">–</div><div class="result-label">+Jahressonderzahl.</div></div>
+        </div>
+        <p class="text-xs text-gray-400 mt-2">* Netto-Schätzung: Steuerklasse I, keine Kirchensteuer, GKV</p>
+      </div>
+    </div>
+
+    <div class="info-box mt-4">
+      📌 <strong>TVöD 2026:</strong> Werte nach der Einigung von März 2024 (+5,5% bzw. mind. 340€). EG 15 hat max. Stufe 5. Jahressonderzahlung: 60–90% eines Monatsgehalts je nach Tarifgebiet.
+    </div>
+
+    <section class="mt-8">
+      <h2>TVöD Entgelttabelle 2026 (Bund/VKA – Auszug)</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead>
+            <tr class="bg-gray-100 text-gray-700">
+              <th class="text-left px-3 py-2 border">EG</th>
+              <th class="text-center px-3 py-2 border">S 1</th>
+              <th class="text-center px-3 py-2 border">S 2</th>
+              <th class="text-center px-3 py-2 border">S 3</th>
+              <th class="text-center px-3 py-2 border">S 4</th>
+              <th class="text-center px-3 py-2 border">S 5</th>
+              <th class="text-center px-3 py-2 border">S 6</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {Object.entries(TVOED_BUND).filter(([eg]) =>
+              ["EG 5","EG 6","EG 9a","EG 9b","EG 10","EG 11","EG 12","EG 13"].includes(eg)
+            ).map(([eg, stufen]) => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-3 py-2 border font-semibold text-gray-800">{eg}</td>
+                {stufen.map(s => <td class="text-center px-3 py-2 border text-gray-600">{s > 0 ? s.toLocaleString('de-DE') + ' €' : '–'}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8">
+      <h2>Stufenlaufzeiten im TVöD</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100"><th class="text-left px-3 py-2 border">Übergang</th><th class="px-3 py-2 border text-center">Wartezeit</th><th class="px-3 py-2 border text-center">Kumuliert</th></tr></thead>
+          <tbody>
+            {[["Stufe 1 → 2","1 Jahr","nach 1 Jahr"],["Stufe 2 → 3","2 Jahre","nach 3 Jahren"],["Stufe 3 → 4","3 Jahre","nach 6 Jahren"],["Stufe 4 → 5","4 Jahre","nach 10 Jahren"],["Stufe 5 → 6 (EG 1–12)","5 Jahre","nach 15 Jahren"]].map(r => (
+              <tr class="hover:bg-gray-50">{r.map((c,i) => <td class={`px-3 py-2 border ${i===0?'font-medium text-gray-800':'text-center text-gray-600'}`}>{c}</td>)}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8">
+      <h2>FAQ – TVöD Gehalt 2026</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wann gibt es eine TVöD Gehaltserhöhung 2026?",a:"Nach der Einigung von März 2024 gelten die erhöhten Gehälter seit März 2024. Neue Tarifverhandlungen laufen in der Regel alle 2–3 Jahre. Beobachten Sie Meldungen des dbb und ver.di."},
+          {q:"Wie hoch ist die Jahressonderzahlung im TVöD?",a:"Die Jahressonderzahlung (ehemals Weihnachtsgeld) beträgt je nach EG und Tarifgebiet 60–90% eines Monatsentgelts. Sie wird im November ausgezahlt."},
+          {q:"Was ist der Unterschied zwischen TVöD Bund und VKA?",a:"TVöD Bund gilt für Bundesbehörden, TVöD VKA für kommunale Arbeitgeber. Die Entgelttabellen sind identisch, aber Sonderzahlungen und einige Rahmenbedingungen können abweichen."},
+          {q:"Wie wird die Erfahrungsstufe bei Neueinstellungen festgelegt?",a:"Bei Neueinstellungen beginnt man in der Regel in Stufe 1. Einschlägige Berufserfahrung von mehr als einem Jahr kann vom Arbeitgeber anerkannt werden, um in Stufe 2 oder höher einzusteigen."},
+        ].map(f => (
+          <div class="faq-item">
+            <div class="faq-q">{f.q}</div>
+            <div class="faq-a">{f.a}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/tv-l-rechner',label:'TV-L Rechner'},{href:'/de/brutto-netto-rechner',label:'Brutto-Netto'},{href:'/de/krankengeld-rechner',label:'Krankengeld'},{href:'/de/arbeitszeit-rechner',label:'Arbeitszeitrechner'},{href:'/de/minijob-rechner',label:'Minijob Rechner'},{href:'/de/urlaubsgeld-rechner',label:'Urlaubsgeld'}].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>

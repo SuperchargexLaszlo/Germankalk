@@ -1,0 +1,174 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Industrieminuten Rechner 2026","url":"https://rechnerbox.eu/de/industrieminuten-rechner","applicationCategory":"BusinessApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Was sind Industrieminuten?","acceptedAnswer":{"@type":"Answer","text":"Industrieminuten (auch Industriestunden oder Dezimalzeit) teilen die Stunde in 100 statt 60 Teile. 1 Industrieminute = 0,6 normale Minuten. Wird für Lohnabrechnung und Zeiterfassung genutzt."}},
+    {"@type":"Question","name":"Wie rechne ich normale Zeit in Industrieminuten um?","acceptedAnswer":{"@type":"Answer","text":"Industrieminuten = normale Minuten / 60 × 100. Beispiel: 45 Minuten = 45/60 × 100 = 75 Industrieminuten."}},
+    {"@type":"Question","name":"Was sind 0,75 Stunden in normaler Zeit?","acceptedAnswer":{"@type":"Answer","text":"0,75 Stunden = 0,75 × 60 = 45 Minuten. Die Dezimalstunde 0,75 entspricht also 45 Minuten."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Industrieminuten Rechner 2026 – Dezimalzeit umrechnen"
+  description="Industrieminuten in normale Zeit umrechnen und umgekehrt. Dezimalstunden für Lohnabrechnung und Zeiterfassung. Kostenloser Industriezeit-Rechner 2026."
+  canonical="https://rechnerbox.eu/de/industrieminuten-rechner"
+  hreflangDE="/de/industrieminuten-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Industrieminuten Rechner
+    </nav>
+    <h1>Industrieminuten Rechner 2026 – Dezimalzeit umrechnen</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Industrieminuten (Dezimalstunden) in normale Stunden und Minuten umrechnen – für Lohnabrechnung, Stundenzettel und Zeiterfassung.
+    </p>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+      <p class="text-sm font-semibold text-blue-800 mb-1">💡 Industrieminuten erklärt</p>
+      <p class="text-sm text-blue-700"><strong>1 Industrieminute = 0,6 Minuten</strong> (normal) · <strong>1 normale Minute = 1,667 Industrieminuten</strong> · Eine Stunde = 100 Industrieminuten</p>
+    </div>
+
+    <div class="calc-box">
+      <div class="flex flex-wrap gap-2 mb-5">
+        {[{id:'nzi',l:'Normal → Industrie'},{id:'izn',l:'Industrie → Normal'},{id:'batch',l:'Mehrere Zeiten addieren'}].map((t,i)=>(
+          <button onclick={`setIMMode('${t.id}')`} id={`imtab-${t.id}`}
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${i===0?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`}>{t.l}</button>
+        ))}
+      </div>
+
+      <!-- Normal → Industrie -->
+      <div id="im-nzi">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div><label class="calc-label">Stunden</label><input class="calc-input" type="number" id="im-std" value="7" min="0" max="24"/></div>
+          <div><label class="calc-label">Minuten</label><input class="calc-input" type="number" id="im-min" value="45" min="0" max="59"/></div>
+        </div>
+      </div>
+
+      <!-- Industrie → Normal -->
+      <div id="im-izn" class="hidden">
+        <div class="mb-4">
+          <label class="calc-label">Dezimalstunden (z.B. 7,75)</label>
+          <input class="calc-input" type="number" id="im-dez" value="7.75" step="0.01" min="0" />
+          <p class="text-xs text-gray-400 mt-1">Industriestunden werden als Dezimalzahl mit Punkt geschrieben (z.B. 7,75 = 7h 45min)</p>
+        </div>
+      </div>
+
+      <!-- Batch: mehrere Zeiten -->
+      <div id="im-batch" class="hidden">
+        <div class="mb-3">
+          <label class="calc-label">Zeiten eingeben (eine pro Zeile: HH:MM oder Dezimal)</label>
+          <textarea class="calc-input h-32 resize-none font-mono text-sm" id="im-batch-input"
+            placeholder="08:30&#10;07:45&#10;8.5&#10;9:15&#10;7.75"></textarea>
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calcIM()">Umrechnen</button>
+      <div class="calc-result hidden" id="im-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center" id="im-res-grid"></div>
+        <div class="mt-3 bg-white rounded-xl p-3 font-mono text-sm text-gray-700 text-center hidden" id="im-batch-res"></div>
+      </div>
+    </div>
+
+    <div class="info-box mt-4">
+      📊 <strong>Warum Industrieminuten?</strong> In der Lohnbuchhaltung wird Zeit oft dezimal erfasst, weil Dezimalzahlen einfacher zu addieren und zu multiplizieren sind (z.B. 7,5h × 18€/h = 135€). Mit normaler Zeit wäre es: 7h 30min × 18€ – was einen Umrechnungsschritt erfordert.
+    </div>
+
+    <section class="mt-8">
+      <h2>Umrechnungstabelle Industrieminuten ↔ normale Zeit</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-center px-3 py-2 border">Normal (h:mm)</th>
+            <th class="text-center px-3 py-2 border">Dezimalstunden</th>
+            <th class="text-center px-3 py-2 border">Normal (h:mm)</th>
+            <th class="text-center px-3 py-2 border">Dezimalstunden</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[["0:15","0,25","4:00","4,00"],["0:30","0,50","6:00","6,00"],["0:45","0,75","7:30","7,50"],
+              ["1:00","1,00","7:45","7,75"],["1:30","1,50","8:00","8,00"],["2:00","2,00","8:30","8,50"],
+              ["2:15","2,25","9:00","9,00"],["3:00","3,00","10:00","10,00"]].map(r=>(
+              <tr class="hover:bg-gray-50">
+                <td class="text-center px-3 py-2 border font-medium text-primary-700">{r[0]}</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{r[1]}</td>
+                <td class="text-center px-3 py-2 border font-medium text-primary-700">{r[2]}</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{r[3]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Industrieminuten</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Warum werden Industrieminuten in der Lohnabrechnung genutzt?",a:"Dezimalstunden können direkt multipliziert werden: 7,75h × 20€/h = 155€. Mit normaler Zeit (7:45h) müsste man erst umrechnen. Die meisten Zeiterfassungssysteme und ERP-Software rechnen automatisch in Dezimalstunden."},
+          {q:"Was sind 0,25 Stunden in Minuten?",a:"0,25 × 60 = 15 Minuten. Die gängigsten Dezimalwerte: 0,25 = 15min, 0,50 = 30min, 0,75 = 45min, 1,00 = 60min."},
+          {q:"Wie rechne ich 7h 20min in Dezimalstunden um?",a:"7 + (20/60) = 7 + 0,333 = 7,333 Dezimalstunden. Oder: Gesamtminuten / 60 = (7×60+20)/60 = 440/60 = 7,333."},
+          {q:"Was sind Industrieminuten bei der Arbeitszeiterfassung?",a:"In vielen deutschen Betrieben wird die Arbeitszeit auf volle 15 Minuten (0,25h) oder auf Industrieminuten (1/100h) gerundet. Das Rundungsverfahren muss im Arbeitsvertrag oder Betriebsvereinbarung festgelegt sein."},
+        ].map(f=>(<div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/arbeitszeit-rechner',label:'Arbeitszeitrechner'},{href:'/de/stundenlohn-rechner',label:'Stundenlohn'},{href:'/de/brutto-netto-rechner',label:'Brutto-Netto'},{href:'/de/minijob-rechner',label:'Minijob'},{href:'/de/urlaubsgeld-rechner',label:'Urlaubsgeld'},{href:'/de/dreisatz-rechner',label:'Dreisatz'}].map(r=>(
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    let imMode='nzi';
+    const imModes=['nzi','izn','batch'];
+    function pad(n:number){return String(Math.floor(n)).padStart(2,'0');}
+    function decToHHMM(dec:number){const h=Math.floor(dec);const m=Math.round((dec-h)*60);return pad(h)+':'+pad(m);}
+    function fmtD(n:number){return n.toFixed(4).replace(/\.?0+$/,'').replace('.',',');}
+    (window as any).setIMMode=function(m:string){
+      imMode=m; imModes.forEach(x=>{
+        document.getElementById('im-'+x)?.classList.toggle('hidden',x!==m);
+        const t=document.getElementById('imtab-'+x);
+        if(t)t.className=`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${x===m?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`;
+      });
+      document.getElementById('im-result')?.classList.add('hidden');
+    };
+    function showGrid(items:{v:string,l:string}[]){
+      document.getElementById('im-res-grid')!.innerHTML=items.map(i=>`<div><div class="result-value text-xl">${i.v}</div><div class="result-label">${i.l}</div></div>`).join('');
+      document.getElementById('im-batch-res')!.classList.add('hidden');
+      document.getElementById('im-result')!.classList.remove('hidden');
+    }
+    (window as any).calcIM=function(){
+      if(imMode==='nzi'){
+        const h=parseInt((document.getElementById('im-std') as HTMLInputElement).value)||0;
+        const m=parseInt((document.getElementById('im-min') as HTMLInputElement).value)||0;
+        const dec=h+m/60; const indMin=m/60*100;
+        showGrid([{v:fmtD(dec)+'h',l:'Dezimalstunden'},{v:Math.round(indMin)+' IM',l:'Industrieminuten'},{v:h+'h '+m+'min',l:'Normal (HH:MM)'},{v:Math.round(dec*100)/100+' h',l:'Gerundet'}]);
+      } else if(imMode==='izn'){
+        const dec=parseFloat((document.getElementById('im-dez') as HTMLInputElement).value)||0;
+        showGrid([{v:decToHHMM(dec),l:'Normal (HH:MM)'},{v:Math.floor(dec)+'h '+Math.round((dec%1)*60)+'min',l:'Stunden + Minuten'},{v:Math.round(dec*100)+' IM',l:'Industrieminuten'},{v:fmtD(dec*(1/100)*60)+' min',l:'Minuten total'}]);
+      } else {
+        const lines=(document.getElementById('im-batch-input') as HTMLTextAreaElement).value.split('\n').filter(l=>l.trim());
+        let totalDec=0; let parsed:string[]=[];
+        lines.forEach(l=>{
+          l=l.trim();
+          if(l.includes(':')){const [h,m]=l.split(':').map(Number);const d=h+m/60;totalDec+=d;parsed.push(`${l} → ${fmtD(d)}h`);}
+          else{const d=parseFloat(l.replace(',','.'));if(!isNaN(d)){totalDec+=d;parsed.push(`${l}h → ${decToHHMM(d)}`);};}
+        });
+        document.getElementById('im-res-grid')!.innerHTML=[
+          {v:fmtD(totalDec)+'h',l:'Gesamt Dez.'},{v:decToHHMM(totalDec),l:'Gesamt Normal'},
+          {v:Math.round(totalDec*100)+' IM',l:'Industrieminuten'},{v:lines.length+' Einträge',l:'Anzahl'},
+        ].map(i=>`<div><div class="result-value text-xl">${i.v}</div><div class="result-label">${i.l}</div></div>`).join('');
+        const bres=document.getElementById('im-batch-res')!;bres.classList.remove('hidden');
+        bres.innerHTML='<div class="text-left"><div class="font-semibold mb-2 text-gray-700">Einzelpositionen:</div>'+parsed.map(p=>`<div class="text-gray-600">${p}</div>`).join('')+'</div>';
+        document.getElementById('im-result')!.classList.remove('hidden');
+      }
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+---
+<BaseLayout title="Pendlerpauschale Rechner Österreich 2026" description="Österreichische Pendlerpauschale 2026 berechnen: klein, groß und Pendlereuro. Mit Kilometerrechner und aktuellen Werten." canonical="https://rechnerbox.eu/at/pendlerpauschale-rechner" hreflangAT="/at/pendlerpauschale-rechner">
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/at/" class="hover:text-primary-600">Österreich</a> › Pendlerpauschale</nav>
+    <h1>Pendlerpauschale Rechner Österreich 2026</h1>
+    <p class="text-lg text-gray-600 mb-6">Berechnen Sie Ihre Pendlerpauschale und den Pendlereuro für die Steuererklärung 2026.</p>
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div><label class="calc-label">Entfernung Wohnung-Arbeit (km, einfach)</label><input class="calc-input" type="number" id="pp-km" value="35" min="0"/></div>
+        <div><label class="calc-label">Öffentliche Verkehrsmittel zumutbar?</label>
+          <select class="calc-select" id="pp-ov"><option value="small">Nein → Große Pendlerpauschale</option><option value="big">Ja → Kleine Pendlerpauschale</option></select>
+        </div>
+        <div><label class="calc-label">Arbeitstage pro Monat</label><input class="calc-input" type="number" id="pp-days" value="20" min="1" max="23"/></div>
+      </div>
+      <button class="calc-btn" onclick="calcPP()">Pendlerpauschale berechnen</button>
+      <div class="calc-result hidden" id="pp-result">
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div><div class="result-value" id="pp-pp">–</div><div class="result-label">Pauschale/Jahr</div></div>
+          <div><div class="result-value" id="pp-pe">–</div><div class="result-label">Pendlereuro/Jahr</div></div>
+          <div><div class="result-value" id="pp-total">–</div><div class="result-label">Gesamt/Jahr</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="info-box mt-4">📌 <strong>Pendlerpauschale 2026 (große):</strong> 20–40 km: 1.476€/J | 40–60 km: 2.568€/J | über 60 km: 3.672€/J. Pendlereuro: 2€ × einfache Entfernung.</div>
+    <section class="mt-6"><h2>FAQ</h2><div class="space-y-3">
+      <div class="faq-item"><div class="faq-q">Was ist der Unterschied zwischen großer und kleiner Pendlerpauschale?</div><div class="faq-a">Die große Pendlerpauschale gilt, wenn die Nutzung öffentlicher Verkehrsmittel nicht zumutbar ist (z.B. kein öffentliches Verkehrsmittel, mehr als 1,5h Fahrtzeit). Die kleine Pauschale gilt bei zumutbarer ÖV-Nutzung.</div></div>
+      <div class="faq-item"><div class="faq-q">Was ist der Pendlereuro?</div><div class="faq-a">Der Pendlereuro ist eine direkte Steuerreduktion von 2€ pro Kilometer einfacher Wegstrecke pro Jahr. Er wird von der Lohnsteuer abgezogen.</div></div>
+    </div></section>
+  </article>
+  <script>
+    const PP_GROSS=[{km:20,val:0},{km:40,val:1476},{km:60,val:2568},{km:999,val:3672}];
+    const PP_KLEIN=[{km:20,val:0},{km:40,val:372},{km:60,val:1476},{km:999,val:2568}];
+    function fmtEur(n:number){return n.toLocaleString('de-AT',{minimumFractionDigits:0})+' €';}
+    (window as any).calcPP=function(){
+      const km=parseFloat((document.getElementById('pp-km') as HTMLInputElement).value)||0;
+      const ov=(document.getElementById('pp-ov') as HTMLSelectElement).value;
+      const days=parseInt((document.getElementById('pp-days') as HTMLInputElement).value)||20;
+      const table=ov==='small'?PP_GROSS:PP_KLEIN;
+      let pp=0;for(const t of table){if(km>=t.km)pp=t.val;}
+      const months=days>=10?12:days>=4?6:0;
+      pp=pp*(months/12);
+      const pe=2*km;const total=pp+pe;
+      const r=document.getElementById('pp-result')!;r.classList.remove('hidden');
+      document.getElementById('pp-pp')!.textContent=fmtEur(pp);
+      document.getElementById('pp-pe')!.textContent=fmtEur(pe);
+      document.getElementById('pp-total')!.textContent=fmtEur(total);
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

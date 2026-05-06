@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e1b4b;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="rgba(0,0,0,0.3)"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="950" cy="80" r="200" fill="white" fill-opacity="0.05"/>
+  <circle cx="1100" cy="500" r="150" fill="white" fill-opacity="0.04"/>
+  <circle cx="100" cy="550" r="120" fill="white" fill-opacity="0.04"/>
+
+  <!-- White card -->
+  <rect x="60" y="60" width="1080" height="510" rx="24" fill="white" fill-opacity="0.12" filter="url(#shadow)"/>
+
+  <!-- Calculator icon (top left) -->
+  <rect x="100" y="110" width="80" height="80" rx="14" fill="white" fill-opacity="0.2"/>
+  <line x1="118" y1="133" x2="162" y2="133" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <line x1="118" y1="150" x2="162" y2="150" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <line x1="118" y1="167" x2="145" y2="167" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <rect x="152" y="161" width="20" height="20" rx="4" fill="white" fill-opacity="0.6"/>
+  <line x1="157" y1="171" x2="167" y2="171" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="162" y1="166" x2="162" y2="176" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Site name -->
+  <text x="200" y="165" font-family="Arial, sans-serif" font-weight="700" font-size="28" fill="white" fill-opacity="0.9">RechnerBox.eu</text>
+
+  <!-- Main title -->
+  <text x="100" y="310" font-family="Arial, sans-serif" font-weight="800" font-size="68" fill="white"
+    filter="url(#shadow)">BMI Rechner 2026</text>
+  
+
+  <!-- Subtitle -->
+  <text x="100" y="470" font-family="Arial, sans-serif" font-weight="400" font-size="36" fill="white" fill-opacity="0.85">Body-Mass-Index nach WHO berechnen</text>
+
+  <!-- Bottom bar -->
+  <rect x="60" y="530" width="1080" height="2" fill="white" fill-opacity="0.2"/>
+  <text x="100" y="570" font-family="Arial, sans-serif" font-size="24" fill="white" fill-opacity="0.7">Kostenlos · Ohne Anmeldung · Aktuell 2026</text>
+
+  <!-- Flag decorations -->
+  <text x="980" y="570" font-size="36">🇩🇪</text>
+  <text x="1040" y="570" font-size="36">🇦🇹</text>
+  <text x="1100" y="570" font-size="36">🇨🇭</text>
+</svg>

@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+---
+<BaseLayout title="Brutto-Netto Rechner Österreich 2026 – AK Gehaltsrechner" description="Österreichischen Nettolohn berechnen 2026: mit SV-Beiträgen, Lohnsteuer und Absetzbeträgen. AK-konform, kostenlos." canonical="https://rechnerbox.eu/at/brutto-netto-rechner" hreflangAT="/at/brutto-netto-rechner" hreflangDE="/de/brutto-netto-rechner">
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/at/" class="hover:text-primary-600">Österreich</a> › Brutto-Netto Rechner</nav>
+    <h1>Brutto-Netto Rechner Österreich 2026</h1>
+    <p class="text-lg text-gray-600 mb-6">Berechnen Sie Ihren Nettolohn in Österreich 2026 – mit aktuellen SV-Beiträgen, Lohnsteuer und Absetzbeträgen (AK-Methode).</p>
+    <div class="calc-box">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div><label class="calc-label">Bruttolohn (€/Monat)</label><input class="calc-input" type="number" id="abn-brutto" value="2500" step="50"/></div>
+        <div><label class="calc-label">Alleinverdiener?</label>
+          <select class="calc-select" id="abn-av">
+            <option value="0">Nein</option>
+            <option value="364">Ja – Alleinverdienerabsetzbetrag (364€/Jahr)</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcATBN()">Nettolohn berechnen</button>
+      <div class="calc-result hidden" id="abn-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div><div class="result-value text-2xl" id="abn-netto">–</div><div class="result-label">Netto / Monat</div></div>
+          <div><div class="result-value text-2xl" id="abn-sv">–</div><div class="result-label">SV-Beiträge</div></div>
+          <div><div class="result-value text-2xl" id="abn-lst">–</div><div class="result-label">Lohnsteuer</div></div>
+          <div><div class="result-value text-2xl" id="abn-year">–</div><div class="result-label">Netto / Jahr</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="info-box mt-4">📌 <strong>AT 2026:</strong> KV 3,87% | UV 1,2% | PV 10,25% | AV 3% | WBF 0,5%. AVAB: 1.684 €/Jahr. Verkehrsabsetzbetrag: 463 €/Jahr.</div>
+    <section class="mt-6"><h2>Unterschiede DE vs. AT</h2>
+      <table class="w-full text-sm border-collapse"><thead><tr class="bg-gray-100"><th class="text-left px-3 py-2 border">Abzug</th><th class="text-center px-3 py-2 border">Deutschland</th><th class="text-center px-3 py-2 border">Österreich</th></tr></thead>
+      <tbody>
+        {[['Rentenversicherung','9,3%','10,25% (PV)'],['Krankenversicherung','7,3%','3,87% (KV)'],['Arbeitslosenversicherung','1,3%','3% (AV)'],['Sonstiges','Pflegevers.','UV 1,2%, WBF 0,5%'],['Steuerklassen','6 Klassen','Keine (Absetzbeträge)']].map(r=>(
+          <tr class="hover:bg-gray-50">{r.map((c,i)=><td class={`px-3 py-2 border ${i===0?'font-medium':''} ${i>0?'text-center':''}`}>{c}</td>)}</tr>
+        ))}
+      </tbody></table>
+    </section>
+    <section class="mt-6"><h2>FAQ</h2><div class="space-y-3">
+      <div class="faq-item"><div class="faq-q">Wie hoch ist der SV-Beitrag in Österreich 2026?</div><div class="faq-a">In Österreich zahlen Arbeitnehmer 2026 insgesamt ca. 18,12% Sozialversicherungsbeiträge (KV 3,87%, PV 10,25%, AV 3%, UV 1,2%, WBF 0,5% = 18,82% ohne Wohnbauförderung).</div></div>
+      <div class="faq-item"><div class="faq-q">Was ist der Alleinverdienerabsetzbetrag?</div><div class="faq-a">Der Alleinverdienerabsetzbetrag (AVAB) beträgt 2026 364 €/Jahr und steht verheirateten Personen zu, deren Partner weniger als 6.937 € jährlich verdient.</div></div>
+    </div></section>
+  </article>
+  <script>
+    function fmtEur(n:number){return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,'.')+' €';}
+    function calcATLst(jbe:number,avab:number):number{
+      const zvE=Math.max(0,jbe-avab-463-1684);
+      if(zvE<=12816)return 0;
+      if(zvE<=20818)return(zvE-12816)*0.2;
+      if(zvE<=34835)return 1600+(zvE-20818)*0.3;
+      if(zvE<=66612)return 5807+(zvE-34835)*0.4;
+      if(zvE<=99266)return 18918+(zvE-66612)*0.48;
+      if(zvE<=1000000)return 34631+(zvE-99266)*0.5;
+      return 484718+(zvE-1000000)*0.55;
+    }
+    (window as any).calcATBN=function(){
+      const brutto=parseFloat((document.getElementById('abn-brutto') as HTMLInputElement).value)||0;
+      const av=parseFloat((document.getElementById('abn-av') as HTMLSelectElement).value)||0;
+      const sv=brutto*(0.0387+0.012+0.1025+0.03+0.005);
+      const jLst=calcATLst(brutto*12-sv*12,av);
+      const lst=jLst/12;const netto=brutto-sv-lst;
+      const r=document.getElementById('abn-result')!;r.classList.remove('hidden');
+      document.getElementById('abn-netto')!.textContent=fmtEur(netto);
+      document.getElementById('abn-sv')!.textContent=fmtEur(sv);
+      document.getElementById('abn-lst')!.textContent=fmtEur(lst);
+      document.getElementById('abn-year')!.textContent=fmtEur(netto*12);
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>

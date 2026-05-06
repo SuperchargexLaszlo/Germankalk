@@ -1,0 +1,216 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+const schema = {
+  "@context":"https://schema.org","@graph":[
+  {"@type":"WebApplication","name":"Vitamin D Rechner 2026","url":"https://rechnerbox.eu/de/vitamin-d-rechner","applicationCategory":"HealthApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
+  {"@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Wie viel Vitamin D brauche ich täglich?","acceptedAnswer":{"@type":"Answer","text":"Die Deutsche Gesellschaft für Ernährung empfiehlt 800 IE (20 µg) täglich für Erwachsene ohne ausreichende Sonneneinstrahlung. Bei Mangel können Ärzte 1.000–4.000 IE täglich empfehlen."}},
+    {"@type":"Question","name":"Was ist der Unterschied zwischen IE und Mikrogramm bei Vitamin D?","acceptedAnswer":{"@type":"Answer","text":"1 µg Vitamin D3 = 40 IE. Also: 800 IE = 20 µg. Beide Angaben finden sich auf Nahrungsergänzungsmitteln – unser Rechner wandelt sie sofort um."}},
+    {"@type":"Question","name":"Welcher Vitamin D Spiegel ist optimal?","acceptedAnswer":{"@type":"Answer","text":"Der optimale 25-OH-Vitamin-D-Spiegel im Blut liegt bei 40–80 ng/ml (100–200 nmol/l). Unter 20 ng/ml gilt als Mangel, unter 30 ng/ml als suboptimal."}}
+  ]}
+]};
+---
+<BaseLayout
+  title="Vitamin D Rechner 2026 – IE in µg umrechnen & Bedarf berechnen"
+  description="Vitamin D Bedarf berechnen und IE in Mikrogramm (µg) umrechnen. DGE-Empfehlungen 2026, Risikogruppen und Blutspiegel-Tabelle. Kostenloser Vitamin-D-Rechner."
+  canonical="https://rechnerbox.eu/de/vitamin-d-rechner"
+  hreflangDE="/de/vitamin-d-rechner"
+  schema={schema}
+>
+  <Header slot="header" />
+  <article class="max-w-3xl mx-auto px-4 py-8">
+    <nav class="text-xs text-gray-400 mb-4">
+      <a href="/" class="hover:text-primary-600">Startseite</a> ›
+      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Vitamin D Rechner
+    </nav>
+    <h1>Vitamin D Rechner 2026 – IE & µg umrechnen</h1>
+    <p class="text-lg text-gray-600 mb-6">
+      Vitamin D IE (Internationale Einheiten) in Mikrogramm (µg) umrechnen, Tagesbedarf berechnen und Blutspiegel einordnen – nach DGE-Empfehlung 2026.
+    </p>
+
+    <div class="calc-box">
+      <div class="flex flex-wrap gap-2 mb-5">
+        {[{id:'conv',l:'IE ↔ µg umrechnen'},{id:'bedarf',l:'Tagesbedarf'},{id:'spiegel',l:'Blutspiegel einordnen'}].map((t,i)=>(
+          <button onclick={`setVDMode('${t.id}')`} id={`vdtab-${t.id}`}
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${i===0?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`}>{t.l}</button>
+        ))}
+      </div>
+
+      <!-- Mode 1: Konversion -->
+      <div id="vd-conv">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="calc-label">Internationale Einheiten (IE)</label>
+            <input class="calc-input" type="number" id="vd-ie" value="2000" step="100" />
+          </div>
+          <div>
+            <label class="calc-label">Mikrogramm (µg)</label>
+            <input class="calc-input" type="number" id="vd-ug" value="50" step="1" />
+          </div>
+        </div>
+        <div class="flex gap-3 mb-4">
+          <button onclick="convIE()" class="flex-1 py-2 bg-primary-100 hover:bg-primary-200 text-primary-800 font-medium rounded-lg text-sm transition">IE → µg umrechnen</button>
+          <button onclick="convUG()" class="flex-1 py-2 bg-primary-100 hover:bg-primary-200 text-primary-800 font-medium rounded-lg text-sm transition">µg → IE umrechnen</button>
+        </div>
+      </div>
+
+      <!-- Mode 2: Tagesbedarf -->
+      <div id="vd-bedarf" class="hidden">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="calc-label">Alter</label>
+            <select class="calc-select" id="vd-alter">
+              <option value="baby">Säuglinge (0–12 Monate)</option>
+              <option value="kind">Kinder (1–17 Jahre)</option>
+              <option value="adult" selected>Erwachsene (18–65 Jahre)</option>
+              <option value="senior">Senioren (65+)</option>
+              <option value="schwanger">Schwangerschaft / Stillzeit</option>
+            </select>
+          </div>
+          <div>
+            <label class="calc-label">Sonnenexposition</label>
+            <select class="calc-select" id="vd-sonne">
+              <option value="wenig">Wenig (Büroarbeit, Winter)</option>
+              <option value="mittel" selected>Mittel (gelegentlich draußen)</option>
+              <option value="viel">Viel (tägl. 30 min im Freien)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 3: Spiegel einordnen -->
+      <div id="vd-spiegel" class="hidden">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="calc-label">Ihr 25-OH-Vitamin-D-Wert</label>
+            <input class="calc-input" type="number" id="vd-wert" value="35" step="1" />
+          </div>
+          <div>
+            <label class="calc-label">Einheit</label>
+            <select class="calc-select" id="vd-einheit">
+              <option value="ngml">ng/ml (nmol/l × 0,4)</option>
+              <option value="nmoll">nmol/l (ng/ml × 2,5)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button class="calc-btn" id="vd-btn" onclick="calcVD()">Berechnen</button>
+      <div class="calc-result hidden" id="vd-result">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center" id="vd-res-grid"></div>
+        <p class="text-xs text-gray-400 mt-2" id="vd-note"></p>
+      </div>
+    </div>
+
+    <div class="info-box mt-4">
+      ☀️ <strong>1 µg Vitamin D3 = 40 IE</strong> · Tagesbedarf DGE: 800 IE (20 µg) · Obere sichere Grenze: 4.000 IE (100 µg) täglich · Bei Vitamin-D-Mangel: Arzt aufsuchen!
+    </div>
+
+    <section class="mt-8">
+      <h2>Vitamin D Spiegel – Referenzwerte 2026</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead><tr class="bg-gray-100 text-gray-700">
+            <th class="text-left px-3 py-2 border">Bewertung</th>
+            <th class="text-center px-3 py-2 border">ng/ml</th>
+            <th class="text-center px-3 py-2 border">nmol/l</th>
+            <th class="text-center px-3 py-2 border">Maßnahme</th>
+          </tr></thead>
+          <tbody class="divide-y divide-gray-100">
+            {[
+              ["Schwerer Mangel","< 10","< 25","Dringend Arzt aufsuchen",true],
+              ["Mangel","10–20","25–50","Supplementierung empfohlen",true],
+              ["Suboptimal","20–30","50–75","Supplementierung sinnvoll",false],
+              ["Optimal ✅","30–60","75–150","Kein Handlungsbedarf",false],
+              ["Hoher Bereich","60–100","150–250","Beobachten",false],
+              ["Mögliche Toxizität","> 100","> 250","Arzt aufsuchen",true],
+            ].map(r => (
+              <tr class={`hover:bg-gray-50 ${r[4] ? 'bg-red-50' : r[3]==='Optimal ✅'?'bg-green-50':''}`}>
+                <td class="px-3 py-2 border font-medium text-gray-800">{r[0]}</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{r[1]}</td>
+                <td class="text-center px-3 py-2 border text-gray-600">{r[2]}</td>
+                <td class="text-center px-3 py-2 border text-gray-600 text-xs">{r[3]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8"><h2>FAQ – Vitamin D 2026</h2>
+      <div class="space-y-3">
+        {[
+          {q:"Wann sollte ich Vitamin D einnehmen?",a:"Vitamin D3 wird idealerweise morgens mit einer fetthaltigen Mahlzeit eingenommen, da es fettlöslich ist. Die Kombination mit Vitamin K2 (MK-7, 100–200 µg täglich) wird von manchen Experten empfohlen, um Kalzium in die Knochen statt in Arterien zu lenken."},
+          {q:"Wie lange dauert es, einen Vitamin D Mangel zu beheben?",a:"Bei einem mittleren Mangel und täglicher Einnahme von 2.000–4.000 IE dauert es ca. 2–3 Monate, bis der Spiegel im optimalen Bereich liegt. Ein Nachtest beim Arzt nach 3 Monaten ist empfehlenswert."},
+          {q:"Kann man zu viel Vitamin D einnehmen?",a:"Ja. Die sichere Obergrenze liegt bei 4.000 IE (100 µg) täglich für Erwachsene. Chronische Überdosierungen können zu Kalziumablagerungen führen. Sehr hohe Dosen (10.000+ IE/Tag) sollten nur unter ärztlicher Aufsicht eingenommen werden."},
+          {q:"Welches Vitamin D kaufen – D2 oder D3?",a:"Vitamin D3 (Cholecalciferol) ist die bioaktivere Form und die bevorzugte Wahl. Vitamin D2 (Ergocalciferol) wird oft aus pflanzlichen Quellen gewonnen und eignet sich für Veganer, ist aber weniger effektiv im Erhöhen des Blutspiegels."},
+        ].map(f => (
+          <div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>
+        ))}
+      </div>
+    </section>
+    <section class="mt-8"><h2>Weitere Rechner</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[{href:'/de/bmi-rechner',label:'BMI Rechner'},{href:'/de/kalorien-rechner',label:'Kalorienrechner'},{href:'/de/idealgewicht-rechner',label:'Idealgewicht'},{href:'/de/pace-rechner',label:'Pace Rechner'},{href:'/de/ssw-rechner',label:'SSW Rechner'},{href:'/de/promille-rechner',label:'Promille Rechner'}].map(r => (
+          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
+        ))}
+      </div>
+    </section>
+  </article>
+  <script>
+    let vdMode='conv';
+    const vdModes=['conv','bedarf','spiegel'];
+    (window as any).setVDMode=function(m:string){
+      vdMode=m; vdModes.forEach(x=>{
+        document.getElementById('vd-'+x)?.classList.toggle('hidden',x!==m);
+        const t=document.getElementById('vdtab-'+x);
+        if(t)t.className=`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${x===m?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`;
+      });
+      document.getElementById('vd-result')?.classList.add('hidden');
+    };
+    function showVD(items:{v:string,l:string}[],note=''){
+      const g=document.getElementById('vd-res-grid')!;
+      g.innerHTML=items.map(i=>`<div><div class="result-value text-xl">${i.v}</div><div class="result-label">${i.l}</div></div>`).join('');
+      document.getElementById('vd-note')!.textContent=note;
+      document.getElementById('vd-result')!.classList.remove('hidden');
+    }
+    (window as any).convIE=function(){
+      const ie=parseFloat((document.getElementById('vd-ie') as HTMLInputElement).value)||0;
+      (document.getElementById('vd-ug') as HTMLInputElement).value=(ie/40).toFixed(1);
+      showVD([{v:(ie/40).toFixed(1)+' µg',l:'Mikrogramm'},{v:ie+' IE',l:'Internationale Einh.'},{v:(ie/40/1000000).toFixed(6).replace('.',',')+' g',l:'Gramm'},{v:ie>=4000?'⚠️ Hoch':ie>=800?'✅ Empfohlen':'⬇️ Niedrig',l:'DGE-Einordnung'}],'1 µg = 40 IE · DGE-Empfehlung Erwachsene: 800 IE (20 µg)');
+    };
+    (window as any).convUG=function(){
+      const ug=parseFloat((document.getElementById('vd-ug') as HTMLInputElement).value)||0;
+      (document.getElementById('vd-ie') as HTMLInputElement).value=(ug*40).toString();
+      showVD([{v:(ug*40).toFixed(0)+' IE',l:'Internationale Einh.'},{v:ug+' µg',l:'Mikrogramm'},{v:ug>=100?'⚠️ Hoch':ug>=20?'✅ Empfohlen':'⬇️ Niedrig',l:'DGE-Einordnung'},{v:ug*40>=4000?'Vorsicht':ug*40>=800?'OK':'Erhöhen',l:'Empfehlung'}],'1 µg = 40 IE · Obere Grenze: 100 µg (4.000 IE) täglich');
+    };
+    (window as any).calcVD=function(){
+      if(vdMode==='conv'){(window as any).convIE();return;}
+      if(vdMode==='bedarf'){
+        const alter=(document.getElementById('vd-alter') as HTMLSelectElement).value;
+        const sonne=(document.getElementById('vd-sonne') as HTMLSelectElement).value;
+        const base:{[k:string]:number}={baby:400,kind:600,adult:800,senior:1000,schwanger:600}[alter]||800;
+        const sonneMult:{[k:string]:number}={wenig:1.5,mittel:1.0,viel:0.5}[sonne]||1.0;
+        const rec=Math.round(base*sonneMult/100)*100;
+        showVD([{v:rec+' IE',l:'Empfohlen/Tag'},{v:(rec/40).toFixed(0)+' µg',l:'in Mikrogramm'},{v:rec>=4000?'⚠️ Grenze':rec>=2000?'Mittel':'Normal',l:'Einordnung'},{v:'4.000 IE',l:'Obere Grenze'}],'Individuelle Anpassung durch Arzt empfohlen. Diese Empfehlung ersetzt keine ärztliche Beratung.');
+      }
+      if(vdMode==='spiegel'){
+        const wert=parseFloat((document.getElementById('vd-wert') as HTMLInputElement).value)||0;
+        const einh=(document.getElementById('vd-einheit') as HTMLSelectElement).value;
+        const ngml=einh==='ngml'?wert:wert*0.4;
+        const nmoll=einh==='nmoll'?wert:wert*2.5;
+        let status='',empf='';
+        if(ngml<10){status='⛔ Schwerer Mangel';empf='Arzt aufsuchen!';}
+        else if(ngml<20){status='⚠️ Mangel';empf='Supplementierung nötig';}
+        else if(ngml<30){status='⬇️ Suboptimal';empf:'Supplementierung sinnvoll';}
+        else if(ngml<60){status='✅ Optimal';empf='Kein Handlungsbedarf';}
+        else if(ngml<100){status='⬆️ Hoch';empf='Beobachten';}
+        else{status='⛔ Sehr hoch';empf='Arzt aufsuchen!';}
+        showVD([{v:ngml.toFixed(1)+' ng/ml',l:'Ihr Wert'},{v:nmoll.toFixed(0)+' nmol/l',l:'In nmol/l'},{v:status,l:'Bewertung'},{v:empf,l:'Empfehlung'}],'Referenzbereich optimal: 30–60 ng/ml (75–150 nmol/l)');
+      }
+    };
+  </script>
+  <Footer slot="footer" />
+</BaseLayout>
