@@ -17,11 +17,4 @@ export default defineConfig({
       },
     }),
   ],
-  i18n: {
-    defaultLocale: 'de',
-    locales: ['de', 'at', 'ch'],
-    routing: {
-      prefixDefaultLocale: false,
-    },
-  },
 });
