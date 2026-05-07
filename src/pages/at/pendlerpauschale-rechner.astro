@@ -2,9 +2,18 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 ---
 <BaseLayout title="Pendlerpauschale Rechner Österreich 2026" description="Österreichische Pendlerpauschale 2026 berechnen: klein, groß und Pendlereuro. Mit Kilometerrechner und aktuellen Werten." canonical="https://rechnerbox.eu/at/pendlerpauschale-rechner" hreflangAT="/at/pendlerpauschale-rechner">
   <Header slot="header" />
+  <CalcHero
+    title="Pendlerpauschale Rechner Österreich 2026"
+    subtitle="Berechnen Sie Ihre Pendlerpauschale und den Pendlereuro für die Steuererklärung 2026."
+    breadcrumbLabel="Pendlerpauschale"
+    country="Oesterreich"
+    countryHref="/at/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/at/" class="hover:text-primary-600">Österreich</a> › Pendlerpauschale</nav>
     <h1>Pendlerpauschale Rechner Österreich 2026</h1>

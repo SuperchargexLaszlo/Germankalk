@@ -2,9 +2,18 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 ---
 <BaseLayout title="BMI Rechner 2026 – Body-Mass-Index berechnen" description="BMI berechnen für Erwachsene, Frauen, Männer. WHO-Kategorien und Idealgewicht. Kostenloser BMI-Rechner 2026." canonical="https://rechnerbox.eu/de/bmi-rechner" hreflangDE="/de/bmi-rechner">
   <Header slot="header" />
+  <CalcHero
+    title="BMI Rechner 2026"
+    subtitle="Body-Mass-Index nach WHO-Standard – mit Idealgewicht und Einordnung."
+    breadcrumbLabel="BMI Rechner"
+    country="Deutschland"
+    countryHref="/de/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › BMI Rechner</nav>
     <h1>BMI Rechner 2026</h1>

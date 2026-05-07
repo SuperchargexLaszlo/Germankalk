@@ -1,0 +1,362 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+  tag?: string;
+  breadcrumbLabel?: string;
+  breadcrumbHref?: string;
+  country?: string;
+  countryHref?: string;
+}
+const {
+  title,
+  subtitle = '',
+  tag = 'Aktuell 2026',
+  breadcrumbLabel = '',
+  breadcrumbHref = '#',
+  country = 'Deutschland',
+  countryHref = '/de/',
+} = Astro.props;
+
+// Split title at dash or em-dash for visual treatment
+const dashIdx = title.search(/[-–]/);
+let titleMain = title;
+let titleSub  = '';
+if (dashIdx > 0) {
+  titleMain = title.slice(0, dashIdx).trim();
+  titleSub  = title.slice(dashIdx + 1).trim();
+}
+---
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=DM+Mono:wght@500&display=swap" rel="stylesheet" />
+
+<div class="rc-hero">
+  <div class="rc-hero-glow" aria-hidden="true"></div>
+  <div class="rc-hero-grid"  aria-hidden="true"></div>
+  <div class="rc-hero-inner">
+    <nav class="rc-breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Startseite</a>
+      <span aria-hidden="true">›</span>
+      <a href={countryHref}>{country}</a>
+      <span aria-hidden="true">›</span>
+      <span>{breadcrumbLabel || titleMain}</span>
+    </nav>
+
+    <div class="rc-hero-text">
+      {tag && <span class="rc-hero-tag">{tag}</span>}
+      <h1 class="rc-h1">
+        {titleMain}
+        {titleSub && <span class="rc-h1-sub"> {titleSub}</span>}
+      </h1>
+      {subtitle && <p class="rc-subtitle">{subtitle}</p>}
+    </div>
+
+    <slot name="kpis" />
+  </div>
+</div>
+
+<style is:global>
+/* ══════════════════════════════════════════════════
+   RECHNERBOX DESIGN SYSTEM  – global fintech styles
+   ══════════════════════════════════════════════════ */
+
+/* ─── Fonts ───────────────────────────────────── */
+body, .rc-page *, article * {
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+/* ─── Page bg ─────────────────────────────────── */
+body { background: #f0f4fa !important; }
+
+/* ─── Hero ────────────────────────────────────── */
+.rc-hero {
+  position: relative;
+  background: #05101f;
+  padding: 3rem 1.5rem 2.75rem;
+  overflow: hidden;
+}
+.rc-hero-glow {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 8%  50%, rgba(0,180,255,.13) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 80% at 92% 20%, rgba(16,185,129,.10) 0%, transparent 50%);
+}
+.rc-hero-grid {
+  position: absolute; inset: 0; pointer-events: none; opacity: .05;
+  background-image:
+    linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.rc-hero-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+}
+.rc-breadcrumb {
+  display: flex; gap: .45rem; align-items: center; flex-wrap: wrap;
+  font-size: .74rem; color: #4b6680; margin-bottom: 1.4rem;
+}
+.rc-breadcrumb a { color: #4b6680; text-decoration: none; }
+.rc-breadcrumb a:hover { color: #93c5fd; }
+.rc-hero-text { margin-bottom: 0; }
+.rc-hero-tag {
+  display: inline-flex; align-items: center;
+  background: rgba(0,180,255,.13); border: 1px solid rgba(0,180,255,.28);
+  color: #38bdf8; font-size: .7rem; font-weight: 700;
+  letter-spacing: .09em; text-transform: uppercase;
+  padding: .28rem .72rem; border-radius: 999px; margin-bottom: .9rem;
+}
+.rc-h1 {
+  font-family: 'Sora', system-ui, sans-serif !important;
+  font-size: clamp(1.9rem, 5.5vw, 3.4rem);
+  font-weight: 800; line-height: 1.1;
+  color: #f8fafc; margin: 0 0 .6rem;
+  letter-spacing: -.02em;
+}
+.rc-h1-sub {
+  color: transparent;
+  background: linear-gradient(90deg, #38bdf8, #34d399);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.rc-subtitle {
+  font-size: 1rem; color: #6b8cad; font-weight: 400; margin: 0;
+}
+
+/* ─── Page content wrapper ────────────────────── */
+.rc-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4.5rem;
+}
+
+/* ─── CALC BOX ────────────────────────────────── */
+.calc-box {
+  background: #ffffff !important;
+  border-radius: 22px !important;
+  border: 1px solid rgba(0,0,0,.06) !important;
+  box-shadow:
+    0 1px 0 rgba(0,0,0,.04),
+    0 4px 6px -2px rgba(0,0,0,.05),
+    0 20px 40px -8px rgba(0,0,0,.10) !important;
+  padding: 1.75rem 1.75rem 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+  max-width: none !important;
+}
+
+/* ─── Labels ──────────────────────────────────── */
+.calc-label {
+  font-size: .75rem !important;
+  font-weight: 700 !important;
+  color: #334155 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .05em !important;
+  margin-bottom: .45rem !important;
+  display: block;
+}
+
+/* ─── Inputs ──────────────────────────────────── */
+.calc-input, .calc-select {
+  width: 100%;
+  padding: .9rem 1rem .9rem 1.1rem !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 11px !important;
+  font-family: 'DM Mono', monospace !important;
+  font-size: 1.05rem !important;
+  font-weight: 500 !important;
+  color: #0f172a !important;
+  background: #f8fafc !important;
+  transition: border-color .18s, box-shadow .18s, background .18s !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-appearance: none;
+}
+.calc-input:hover, .calc-select:hover {
+  border-color: #cbd5e1 !important;
+  background: #f1f5f9 !important;
+}
+.calc-input:focus, .calc-select:focus {
+  border-color: #3b82f6 !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.14) !important;
+}
+.calc-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right .85rem center !important;
+  padding-right: 2.5rem !important;
+}
+
+/* ─── Button ──────────────────────────────────── */
+.calc-btn {
+  width: 100%;
+  padding: 1rem 1.5rem !important;
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 13px !important;
+  font-family: 'Sora', sans-serif !important;
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  letter-spacing: .01em !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: .5rem !important;
+  box-shadow: 0 4px 0 #0369a1, 0 6px 14px rgba(14,165,233,.32) !important;
+  transition: all .18s ease !important;
+  position: relative !important;
+  top: 0 !important;
+  margin-top: 1.25rem !important;
+  text-transform: none !important;
+  text-decoration: none !important;
+}
+.calc-btn:hover {
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%) !important;
+  box-shadow: 0 6px 0 #0369a1, 0 8px 22px rgba(14,165,233,.42) !important;
+  top: -2px !important;
+}
+.calc-btn:active {
+  top: 3px !important;
+  box-shadow: 0 1px 0 #0369a1, 0 3px 8px rgba(14,165,233,.25) !important;
+}
+
+/* ─── Result area ─────────────────────────────── */
+.calc-result {
+  margin-top: 1.5rem !important;
+  padding: 1.4rem 1.35rem !important;
+  background: #f0f9ff !important;
+  border: 2px solid #bae6fd !important;
+  border-radius: 14px !important;
+  animation: rcFadeIn .3s ease !important;
+}
+.calc-result.hidden { display: none !important; }
+@keyframes rcFadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+
+/* ─── Result values ───────────────────────────── */
+.result-value {
+  font-family: 'DM Mono', monospace !important;
+  font-size: 1.35rem !important;
+  font-weight: 500 !important;
+  color: #0c4a6e !important;
+  line-height: 1.2 !important;
+}
+.result-label {
+  font-size: .75rem !important;
+  color: #0284c7 !important;
+  font-weight: 600 !important;
+  margin-top: .3rem !important;
+}
+
+/* ─── Info box ────────────────────────────────── */
+.info-box {
+  display: flex !important;
+  gap: .85rem !important;
+  align-items: flex-start !important;
+  background: #fffbeb !important;
+  border: 2px solid #fcd34d !important;
+  border-radius: 14px !important;
+  padding: 1.1rem 1.2rem !important;
+  margin: 1.5rem 0 !important;
+  font-size: .88rem !important;
+  color: #78350f !important;
+  line-height: 1.65 !important;
+}
+
+/* ─── Section headings ────────────────────────── */
+.rc-content h2,
+.rc-content section h2,
+article h2 {
+  font-family: 'Sora', system-ui, sans-serif !important;
+  font-size: 1.3rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  margin: 2rem 0 1rem !important;
+  padding-bottom: .55rem !important;
+  border-bottom: 2px solid #e2e8f0 !important;
+}
+
+/* ─── Tables ──────────────────────────────────── */
+.rc-content table, article table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,.07);
+  font-size: .88rem;
+}
+.rc-content table thead tr, article table thead tr {
+  background: #0f172a !important;
+}
+.rc-content table thead th, article table thead th {
+  padding: .85rem 1rem;
+  text-align: left;
+  color: #e2e8f0 !important;
+  font-family: 'Sora', sans-serif;
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  border: none !important;
+}
+.rc-content table tbody td, article table tbody td {
+  padding: .9rem 1rem;
+  border-bottom: 1px solid #f1f5f9 !important;
+  color: #334155 !important;
+  background: none !important;
+}
+.rc-content table tbody tr:last-child td,
+article table tbody tr:last-child td { border-bottom: none !important; }
+.rc-content table tbody tr:hover td,
+article table tbody tr:hover td { background: #f8fafc !important; }
+
+/* ─── FAQ ─────────────────────────────────────── */
+.faq-item {
+  background: #fff !important;
+  border-radius: 12px !important;
+  border: 2px solid #e2e8f0 !important;
+  overflow: hidden !important;
+  margin-bottom: .55rem !important;
+  transition: border-color .2s, box-shadow .2s !important;
+}
+.faq-item:hover { border-color: #bae6fd !important; box-shadow: 0 4px 12px rgba(0,0,0,.06) !important; }
+.faq-q {
+  padding: 1rem 1.2rem !important;
+  font-size: .93rem !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  cursor: pointer !important;
+  background: none !important;
+  border: none !important;
+  display: block !important;
+}
+.faq-a {
+  padding: 0 1.2rem 1rem !important;
+  font-size: .87rem !important;
+  color: #475569 !important;
+  line-height: 1.72 !important;
+  border-top: 1px solid #f1f5f9 !important;
+  margin-top: .1rem !important;
+}
+
+/* ─── Article wrapper (page content area) ─────── */
+article.max-w-3xl {
+  max-width: 900px !important;
+  padding-top: 0 !important;
+}
+article.max-w-3xl > nav { display: none !important; }    /* hide old breadcrumb */
+article.max-w-3xl > h1  { display: none !important; }    /* hide old H1 (shown in hero) */
+article.max-w-3xl > p.text-lg { display: none !important; } /* hide old subtitle */
+
+/* ─── Responsive ──────────────────────────────── */
+@media (max-width: 600px) {
+  .calc-box { padding: 1.25rem !important; border-radius: 16px !important; }
+  .rc-hero { padding: 2.25rem 1.25rem 2rem; }
+}
+</style>

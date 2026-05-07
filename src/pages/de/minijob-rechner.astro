@@ -2,202 +2,744 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 const schema = {
   "@context":"https://schema.org","@graph":[
   {"@type":"WebApplication","name":"Minijob Rechner 2026","url":"https://rechnerbox.eu/de/minijob-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
   {"@type":"FAQPage","mainEntity":[
-    {"@type":"Question","name":"Wie viel darf ich im Minijob 2026 verdienen?","acceptedAnswer":{"@type":"Answer","text":"Die Minijob-Grenze 2026 liegt bei 556 € pro Monat (entspricht dem Mindestlohn von 12,82 €/h × 43,33 Stunden). Wer dauerhaft mehr verdient, wird in die Gleitzone (Midijob) eingestuft."}},
-    {"@type":"Question","name":"Was zahlt der Arbeitgeber beim Minijob?","acceptedAnswer":{"@type":"Answer","text":"Der Arbeitgeber zahlt beim gewerblichen Minijob pauschal 28% auf das Minijob-Entgelt: 13% Rentenversicherung, 13% Krankenversicherung, 2% Pauschalsteuer. Dazu kommt der Beitrag zur gesetzlichen Unfallversicherung."}},
-    {"@type":"Question","name":"Was verdient der Minijobber netto?","acceptedAnswer":{"@type":"Answer","text":"Minijobber erhalten ihren vollen Verdienst ohne Abzüge, wenn der Arbeitgeber die Pauschalbeiträge trägt. Ausnahme: Eigener RV-Beitrag (3,6%) wird abgezogen, wenn keine Befreiung beantragt wurde."}},
-    {"@type":"Question","name":"Was ist der Unterschied zwischen Minijob und Midijob?","acceptedAnswer":{"@type":"Answer","text":"Minijob: bis 556 €/Monat, pauschale Arbeitgeberbeiträge. Midijob (Gleitzone): 556,01 bis 2.000 €/Monat, reduzierte Arbeitnehmerbeiträge. Ab 2.001 € gilt das normale Sozialversicherungsrecht."}}
+    {"@type":"Question","name":"Wie viel darf ich im Minijob 2026 verdienen?","acceptedAnswer":{"@type":"Answer","text":"Die Minijob-Grenze 2026 liegt bei 556 € pro Monat."}},
+    {"@type":"Question","name":"Was zahlt der Arbeitgeber beim Minijob?","acceptedAnswer":{"@type":"Answer","text":"Der Arbeitgeber zahlt beim gewerblichen Minijob pauschal ca. 31,3% auf das Minijob-Entgelt."}},
   ]}
 ]};
 ---
 <BaseLayout
   title="Minijob Rechner 2026 – Verdienst, Stunden & Abgaben berechnen"
-  description="Minijob 2026 berechnen: Verdienst, Arbeitsstunden, Arbeitgeber-Abgaben und Midijob-Grenze. Minijob-Grenze 556 €/Monat. Kostenloser Minijob-Rechner."
+  description="Minijob 2026 berechnen: Verdienst, Arbeitsstunden, Arbeitgeber-Abgaben und Midijob-Grenze. Minijob-Grenze 556 €/Monat."
   canonical="https://rechnerbox.eu/de/minijob-rechner"
   hreflangDE="/de/minijob-rechner"
   schema={schema}
 >
   <Header slot="header" />
-  <article class="max-w-3xl mx-auto px-4 py-8">
-    <nav class="text-xs text-gray-400 mb-4">
-      <a href="/" class="hover:text-primary-600">Startseite</a> ›
-      <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Minijob Rechner
-    </nav>
-    <h1>Minijob Rechner 2026 – Verdienst & Abgaben</h1>
-    <p class="text-lg text-gray-600 mb-6">
-      Berechnen Sie Ihren Minijob-Verdienst 2026, die maximalen Arbeitsstunden und alle Arbeitgeber-Abgaben. Minijob-Grenze: <strong>556 €/Monat</strong> (Mindestlohn 12,82 €/h).
-    </p>
+  <CalcHero
+    title="MinijobRechner"
+    subtitle="Verdienst, Arbeitsstunden & AG-Abgaben sofort berechnen"
+    breadcrumbLabel="Minijob Rechner"
+    country="Deutschland"
+    countryHref="/de/"
+  />
 
-    <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-      <p class="text-sm font-semibold text-green-800 mb-1">💡 Minijob-Grenze 2026</p>
-      <p class="text-sm text-green-700">Max. <strong>556 € / Monat</strong> (6.672 €/Jahr). Bei Mindestlohn 12,82 €/h = max. <strong>43,4 Stunden/Monat</strong>.</p>
-    </div>
 
-    <div class="calc-box">
-      <div class="flex flex-wrap gap-2 mb-5">
-        {[{id:'stunden',l:'Stunden → Verdienst'},{id:'verdienst',l:'Verdienst → Stunden'},{id:'ag-kosten',l:'AG-Gesamtkosten'}].map((t,i) => (
-          <button onclick={`setMJMode('${t.id}')`} id={`mjtab-${t.id}`}
-            class={`px-3 py-1.5 rounded-lg text-sm font-medium border transition ${i===0?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`}>{t.l}</button>
-        ))}
-      </div>
+  <link slot="head" rel="preconnect" href="https://fonts.googleapis.com" />
+  <link slot="head" rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link slot="head" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@500&display=swap" rel="stylesheet" />
 
-      <!-- Mode: Stunden → Verdienst -->
-      <div id="mj-stunden">
-        <div class="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <label class="calc-label">Stunden pro Monat</label>
-            <input class="calc-input" type="number" id="mj-h" value="40" min="1" max="50" step="0.5" />
+  <div class="mj-page">
+
+    <!-- ═══ HERO ═══ -->
+    <div class="mj-hero">
+      <div class="mj-hero-glow"></div>
+      <div class="mj-hero-grid"></div>
+      <div class="mj-hero-inner">
+        <nav class="mj-breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Startseite</a><span aria-hidden="true">›</span>
+          <a href="/de/">Deutschland</a><span aria-hidden="true">›</span>
+          <span>Minijob Rechner</span>
+        </nav>
+
+        <div class="mj-hero-text">
+          <div class="mj-hero-tag">Aktuell 2026</div>
+          <h1 class="mj-h1">Minijob<br><span class="mj-h1-accent">Rechner</span></h1>
+          <p class="mj-subtitle">Verdienst, Arbeitsstunden & AG-Abgaben sofort berechnen</p>
+        </div>
+
+        <div class="mj-kpi-row">
+          <div class="mj-kpi">
+            <div class="mj-kpi-icon">💶</div>
+            <div class="mj-kpi-val">556 €</div>
+            <div class="mj-kpi-lbl">Grenze / Monat</div>
           </div>
-          <div>
-            <label class="calc-label">Stundenlohn (€)</label>
-            <input class="calc-input" type="number" id="mj-lohn" value="13.00" min="12.82" step="0.01" />
-            <p class="text-xs text-gray-400 mt-1">Mindestlohn 2026: 12,82 €/h</p>
+          <div class="mj-kpi-divider"></div>
+          <div class="mj-kpi">
+            <div class="mj-kpi-icon">⏱</div>
+            <div class="mj-kpi-val">43,4 h</div>
+            <div class="mj-kpi-lbl">Max. bei 12,82 €/h</div>
+          </div>
+          <div class="mj-kpi-divider"></div>
+          <div class="mj-kpi">
+            <div class="mj-kpi-icon">🏢</div>
+            <div class="mj-kpi-val">31,3 %</div>
+            <div class="mj-kpi-lbl">AG-Abgaben</div>
+          </div>
+          <div class="mj-kpi-divider"></div>
+          <div class="mj-kpi">
+            <div class="mj-kpi-icon">📋</div>
+            <div class="mj-kpi-val">12,82 €</div>
+            <div class="mj-kpi-lbl">Mindestlohn</div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Mode: Verdienst → Stunden -->
-      <div id="mj-verdienst" class="hidden">
-        <div class="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <label class="calc-label">Monatsverdienst (€)</label>
-            <input class="calc-input" type="number" id="mj-v" value="500" min="0" max="556" />
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <div class="mj-content">
+
+      <!-- CALCULATOR CARD -->
+      <div class="mj-card mj-calc-card">
+        <div class="mj-card-label">RECHNER</div>
+
+        <!-- Tabs -->
+        <div class="mj-tabs" role="tablist">
+          <button onclick="setMJMode('stunden')" id="mjtab-stunden"
+            class="mj-tab mj-tab--active" role="tab" aria-selected="true">
+            <span class="mj-tab-ico" aria-hidden="true">🕐</span>
+            <span>Stunden → Verdienst</span>
+          </button>
+          <button onclick="setMJMode('verdienst')" id="mjtab-verdienst"
+            class="mj-tab" role="tab" aria-selected="false">
+            <span class="mj-tab-ico" aria-hidden="true">💰</span>
+            <span>Verdienst → Stunden</span>
+          </button>
+          <button onclick="setMJMode('ag-kosten')" id="mjtab-ag-kosten"
+            class="mj-tab" role="tab" aria-selected="false">
+            <span class="mj-tab-ico" aria-hidden="true">🏢</span>
+            <span>AG-Gesamtkosten</span>
+          </button>
+        </div>
+
+        <!-- Panel: Stunden → Verdienst -->
+        <div id="mj-stunden" class="mj-panel" role="tabpanel">
+          <div class="mj-fields">
+            <div class="mj-field">
+              <label class="mj-label" for="mj-h">Stunden pro Monat</label>
+              <div class="mj-input-wrap">
+                <span class="mj-unit">h</span>
+                <input class="mj-input" type="number" id="mj-h"
+                  value="40" min="1" max="50" step="0.5" autocomplete="off" />
+              </div>
+            </div>
+            <div class="mj-field">
+              <label class="mj-label" for="mj-lohn">Stundenlohn</label>
+              <div class="mj-input-wrap">
+                <span class="mj-unit">€</span>
+                <input class="mj-input" type="number" id="mj-lohn"
+                  value="13.00" min="12.82" step="0.01" autocomplete="off" />
+              </div>
+              <p class="mj-hint">Mindestlohn 2026: 12,82 €/h</p>
+            </div>
           </div>
-          <div>
-            <label class="calc-label">Stundenlohn (€)</label>
-            <input class="calc-input" type="number" id="mj-v-lohn" value="13.00" min="12.82" step="0.01" />
+        </div>
+
+        <!-- Panel: Verdienst → Stunden -->
+        <div id="mj-verdienst" class="mj-panel mj-panel--hidden" role="tabpanel">
+          <div class="mj-fields">
+            <div class="mj-field">
+              <label class="mj-label" for="mj-v">Monatsverdienst</label>
+              <div class="mj-input-wrap">
+                <span class="mj-unit">€</span>
+                <input class="mj-input" type="number" id="mj-v"
+                  value="500" min="0" max="556" autocomplete="off" />
+              </div>
+            </div>
+            <div class="mj-field">
+              <label class="mj-label" for="mj-v-lohn">Stundenlohn</label>
+              <div class="mj-input-wrap">
+                <span class="mj-unit">€</span>
+                <input class="mj-input" type="number" id="mj-v-lohn"
+                  value="13.00" min="12.82" step="0.01" autocomplete="off" />
+              </div>
+            </div>
           </div>
+        </div>
+
+        <!-- Panel: AG-Kosten -->
+        <div id="mj-ag-kosten" class="mj-panel mj-panel--hidden" role="tabpanel">
+          <div class="mj-fields mj-fields--single">
+            <div class="mj-field">
+              <label class="mj-label" for="mj-ag-v">Monatsverdienst Minijobber</label>
+              <div class="mj-input-wrap">
+                <span class="mj-unit">€</span>
+                <input class="mj-input" type="number" id="mj-ag-v"
+                  value="500" min="0" max="556" autocomplete="off" />
+              </div>
+              <p class="mj-hint">Max. 556 € für Minijob · Über 556 € = Midijob / Sozialversicherungspflicht</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <button class="mj-btn" onclick="calcMJ()" type="button">
+          <span>Jetzt berechnen</span>
+          <svg class="mj-btn-arrow" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </button>
+
+        <!-- Results -->
+        <div class="mj-result mj-result--hidden" id="mj-result" aria-live="polite">
+          <div class="mj-result-top">
+            <span class="mj-result-heading">Ergebnis</span>
+            <span class="mj-status" id="mj-status"></span>
+          </div>
+          <div class="mj-res-grid" id="mj-res-grid"></div>
+          <p class="mj-res-note" id="mj-res-note"></p>
         </div>
       </div>
 
-      <!-- Mode: AG-Kosten -->
-      <div id="mj-ag-kosten" class="hidden">
-        <div class="mb-4">
-          <label class="calc-label">Monatsverdienst Minijobber (€)</label>
-          <input class="calc-input" type="number" id="mj-ag-v" value="500" min="0" max="556" />
-          <p class="text-xs text-gray-400 mt-1">Max. 556 € für Minijob. Über 556 € = Midijob/Sozialversicherungspflicht.</p>
+      <!-- INFO BOX -->
+      <div class="mj-infobox">
+        <div class="mj-infobox-icon" aria-hidden="true">📌</div>
+        <div class="mj-infobox-text">
+          <strong>Arbeitgeber-Abgaben Minijob 2026:</strong>
+          KV 13 % + RV 13 % + Pauschsteuer 2 % + UV ca. 1,6 % + Umlage U1/U2/Insolvenzgeld ca. 1,7 %
+          = ca. <strong>31,3 %</strong> auf den Verdienst.
         </div>
       </div>
 
-      <button class="calc-btn" onclick="calcMJ()">Berechnen</button>
-
-      <div class="calc-result hidden" id="mj-result">
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center" id="mj-res-grid"></div>
-        <p class="text-xs text-gray-400 mt-2" id="mj-res-note"></p>
-      </div>
-    </div>
-
-    <div class="info-box mt-4">
-      📌 <strong>Arbeitgeber-Abgaben Minijob 2026:</strong> KV 13% + RV 13% + Pauschsteuer 2% + UV (ca. 1,6%) + Umlage U1/U2/Insolvenzgeld (ca. 1,7%) = ca. <strong>31,3%</strong> auf den Verdienst.
-    </div>
-
-    <section class="mt-8">
-      <h2>Minijob vs. Midijob vs. Normalbeschäftigung</h2>
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm border-collapse">
-          <thead><tr class="bg-gray-100 text-gray-700">
-            <th class="text-left px-3 py-2 border">Art</th>
-            <th class="text-center px-3 py-2 border">Verdienstgrenze</th>
-            <th class="text-center px-3 py-2 border">AN-Beiträge</th>
-            <th class="text-center px-3 py-2 border">Lohnsteuer</th>
-          </tr></thead>
-          <tbody class="divide-y divide-gray-100">
-            {[
-              ["Minijob","bis 556 €/Mo","nur opt. RV 3,6%","pauschal 2% (AG)"],
-              ["Midijob (Gleitzone)","556–2.000 €/Mo","reduziert","normal"],
-              ["Normalbeschäftigung","ab 2.001 €/Mo","volle SV-Beiträge","normal"],
-            ].map(r => (
-              <tr class="hover:bg-gray-50">
-                <td class="px-3 py-2 border font-medium text-gray-800">{r[0]}</td>
-                {r.slice(1).map(c => <td class="text-center px-3 py-2 border text-gray-600">{c}</td>)}
+      <!-- COMPARISON TABLE -->
+      <section class="mj-section">
+        <h2 class="mj-h2">Minijob vs. Midijob vs. Normalbeschäftigung</h2>
+        <div class="mj-table-wrap">
+          <table class="mj-table">
+            <thead>
+              <tr>
+                <th>Art</th>
+                <th>Verdienstgrenze</th>
+                <th>AN-Beiträge</th>
+                <th>Lohnsteuer</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
+            </thead>
+            <tbody>
+              <tr class="mj-tr--hl">
+                <td><span class="mj-pill mj-pill--green">Minijob</span></td>
+                <td>bis 556 €/Mo</td>
+                <td>nur opt. RV 3,6 %</td>
+                <td>pauschal 2 % (AG)</td>
+              </tr>
+              <tr>
+                <td><span class="mj-pill mj-pill--amber">Midijob (Gleitzone)</span></td>
+                <td>556 – 2.000 €/Mo</td>
+                <td>reduziert</td>
+                <td>normal</td>
+              </tr>
+              <tr>
+                <td><span class="mj-pill mj-pill--gray">Normalbeschäftigung</span></td>
+                <td>ab 2.001 €/Mo</td>
+                <td>volle SV-Beiträge</td>
+                <td>normal</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-    <section class="mt-8"><h2>FAQ – Minijob 2026</h2>
-      <div class="space-y-3">
-        {[
-          {q:"Wie viele Stunden darf ich im Minijob arbeiten?",a:"Im Minijob 2026 gibt es keine gesetzlich festgelegte maximale Stundenzahl. Entscheidend ist der Verdienst: max. 556 €/Monat. Bei Mindestlohn (12,82 €/h) sind das ca. 43 Stunden monatlich."},
-          {q:"Darf ich mehrere Minijobs gleichzeitig haben?",a:"Ja, allerdings werden mehrere Minijob-Verdienste zusammengerechnet. Überschreiten sie zusammen 556 €/Monat, wird der Zweitjob sozialversicherungspflichtig. Ausnahme: Ein Minijob neben einem Hauptberuf."},
-          {q:"Bekomme ich Urlaub als Minijobber?",a:"Ja. Minijobber haben denselben gesetzlichen Urlaubsanspruch wie Vollzeitbeschäftigte (24 Werktage bei 6-Tage-Woche), anteilig berechnet auf ihre Arbeitstage pro Woche."},
-          {q:"Kann ich mich von der Rentenversicherungspflicht befreien lassen?",a:"Minijobber zahlen optional 3,6% RV-Eigenanteil (= voller RV-Schutz). Sie können sich befreien lassen – verlieren dann aber die Rentenansprüche. Ein Antrag auf Befreiung ist beim Arbeitgeber zu stellen."},
-        ].map(f => (
-          <div class="faq-item"><div class="faq-q">{f.q}</div><div class="faq-a">{f.a}</div></div>
-        ))}
-      </div>
-    </section>
-    <section class="mt-8"><h2>Weitere Rechner</h2>
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {[{href:'/de/brutto-netto-rechner',label:'Brutto-Netto'},{href:'/de/stundenlohn-rechner',label:'Stundenlohn'},{href:'/de/arbeitszeit-rechner',label:'Arbeitszeitrechner'},{href:'/de/urlaubsgeld-rechner',label:'Urlaubsgeld'},{href:'/de/krankengeld-rechner',label:'Krankengeld'},{href:'/de/buergergeld-rechner',label:'Bürgergeld'}].map(r => (
-          <a href={r.href} class="text-sm px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-300 rounded-lg text-gray-700 hover:text-primary-700 transition">{r.label} →</a>
-        ))}
-      </div>
-    </section>
-  </article>
+      <!-- FAQ -->
+      <section class="mj-section">
+        <h2 class="mj-h2">Häufige Fragen – Minijob 2026</h2>
+        <div class="mj-faq-list">
+          {[
+            {q:"Wie viele Stunden darf ich im Minijob arbeiten?",a:"Im Minijob 2026 gibt es keine gesetzlich festgelegte maximale Stundenzahl. Entscheidend ist der Verdienst: max. 556 €/Monat. Bei Mindestlohn (12,82 €/h) sind das ca. 43 Stunden monatlich."},
+            {q:"Darf ich mehrere Minijobs gleichzeitig haben?",a:"Ja, allerdings werden mehrere Minijob-Verdienste zusammengerechnet. Überschreiten sie zusammen 556 €/Monat, wird der Zweitjob sozialversicherungspflichtig. Ausnahme: Ein Minijob neben einem Hauptberuf."},
+            {q:"Bekomme ich Urlaub als Minijobber?",a:"Ja. Minijobber haben denselben gesetzlichen Urlaubsanspruch wie Vollzeitbeschäftigte (24 Werktage bei 6-Tage-Woche), anteilig berechnet auf ihre Arbeitstage pro Woche."},
+            {q:"Kann ich mich von der Rentenversicherungspflicht befreien lassen?",a:"Minijobber zahlen optional 3,6 % RV-Eigenanteil (= voller RV-Schutz). Sie können sich befreien lassen – verlieren dann aber die Rentenansprüche. Ein Antrag auf Befreiung ist beim Arbeitgeber zu stellen."},
+          ].map((f, i) => (
+            <div class="mj-faq-item" id={`faq-${i}`}>
+              <button class="mj-faq-q" onclick={`toggleFaq(${i})`} aria-expanded="false" aria-controls={`faq-a-${i}`}>
+                <span>{f.q}</span>
+                <svg class="mj-faq-chev" id={`faq-chev-${i}`} xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div class="mj-faq-a" id={`faq-a-${i}`} role="region">{f.a}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- RELATED -->
+      <section class="mj-section">
+        <h2 class="mj-h2">Weitere Rechner</h2>
+        <div class="mj-related">
+          {[
+            {href:'/de/brutto-netto-rechner',label:'Brutto-Netto Rechner',icon:'💼'},
+            {href:'/de/stundenlohn-rechner',label:'Stundenlohn Rechner',icon:'⏰'},
+            {href:'/de/arbeitszeit-rechner',label:'Arbeitszeitrechner',icon:'📅'},
+            {href:'/de/urlaubsgeld-rechner',label:'Urlaubsgeld Rechner',icon:'🏖'},
+            {href:'/de/krankengeld-rechner',label:'Krankengeld Rechner',icon:'🏥'},
+            {href:'/de/buergergeld-rechner',label:'Bürgergeld Rechner',icon:'📋'},
+          ].map(r => (
+            <a href={r.href} class="mj-rel-card">
+              <span class="mj-rel-ico" aria-hidden="true">{r.icon}</span>
+              <span class="mj-rel-lbl">{r.label}</span>
+              <svg class="mj-rel-arr" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+          ))}
+        </div>
+      </section>
+
+    </div><!-- /mj-content -->
+  </div><!-- /mj-page -->
+
+
+  <!-- ═══ SCRIPT ═══ -->
   <script>
     let mjMode = 'stunden';
-    const mjModes = ['stunden','verdienst','ag-kosten'];
-    const MINDESTLOHN = 12.82;
-    const MJ_GRENZE = 556;
-    function fmt(n: number, dec=2) { return n.toFixed(dec).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
-    function fmtE(n: number) { return fmt(n)+' €'; }
-    (window as any).setMJMode = function(m: string) {
-      mjMode = m;
-      mjModes.forEach(x => {
-        document.getElementById('mj-'+x)?.classList.toggle('hidden', x!==m);
-        const tab = document.getElementById('mjtab-'+x);
-        if(tab) tab.className = `px-3 py-1.5 rounded-lg text-sm font-medium border transition ${x===m?'bg-primary-600 text-white border-primary-600':'bg-white text-gray-600 border-gray-300 hover:border-primary-400'}`;
-      });
-      document.getElementById('mj-result')?.classList.add('hidden');
-    };
-    function showRes(items: {v:string,l:string}[], note='') {
-      const grid = document.getElementById('mj-res-grid')!;
-      grid.innerHTML = items.map(i => `<div><div class="result-value text-xl">${i.v}</div><div class="result-label">${i.l}</div></div>`).join('');
-      document.getElementById('mj-res-note')!.textContent = note;
-      document.getElementById('mj-result')!.classList.remove('hidden');
+    const MINDESTLOHN = 12.82, MJ_GRENZE = 556;
+
+    function fmt(n: number, dec = 2) {
+      return n.toFixed(dec).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
-    (window as any).calcMJ = function() {
+    function fmtE(n: number) { return fmt(n) + ' €'; }
+
+    (window as any).setMJMode = function (m: string) {
+      mjMode = m;
+      ['stunden', 'verdienst', 'ag-kosten'].forEach(x => {
+        const panel = document.getElementById('mj-' + x);
+        if (panel) panel.classList.toggle('mj-panel--hidden', x !== m);
+        const tab = document.getElementById('mjtab-' + x);
+        if (tab) {
+          tab.classList.toggle('mj-tab--active', x === m);
+          tab.setAttribute('aria-selected', x === m ? 'true' : 'false');
+        }
+      });
+      const res = document.getElementById('mj-result');
+      if (res) res.classList.add('mj-result--hidden');
+    };
+
+    function showRes(items: { v: string; l: string; sub?: string }[], note = '', status = '') {
+      const grid = document.getElementById('mj-res-grid')!;
+      grid.innerHTML = items.map(i =>
+        `<div class="mj-res-card">
+          <div class="mj-res-val">${i.v}</div>
+          <div class="mj-res-lbl">${i.l}</div>
+          ${i.sub ? `<div class="mj-res-sub">${i.sub}</div>` : ''}
+        </div>`
+      ).join('');
+
+      const badge = document.getElementById('mj-status')!;
+      badge.textContent = status;
+      badge.className = 'mj-status ' + (
+        status.includes('Minijob') ? 'mj-status--ok' :
+        status.includes('Midijob') ? 'mj-status--warn' : 'mj-status--err'
+      );
+
+      const noteEl = document.getElementById('mj-res-note')!;
+      noteEl.textContent = note;
+
+      const res = document.getElementById('mj-result')!;
+      res.classList.remove('mj-result--hidden');
+      res.classList.add('mj-result--pop');
+      setTimeout(() => res.classList.remove('mj-result--pop'), 400);
+    }
+
+    (window as any).calcMJ = function () {
       if (mjMode === 'stunden') {
-        const h = parseFloat((document.getElementById('mj-h') as HTMLInputElement).value)||0;
-        const lohn = parseFloat((document.getElementById('mj-lohn') as HTMLInputElement).value)||MINDESTLOHN;
-        const verdienst = h * lohn;
-        const status = verdienst <= MJ_GRENZE ? '✅ Minijob' : verdienst <= 2000 ? '⚡ Midijob' : '❌ Über Grenze';
-        const ag = verdienst * 0.313;
+        const h = parseFloat((document.getElementById('mj-h') as HTMLInputElement).value) || 0;
+        const lohn = parseFloat((document.getElementById('mj-lohn') as HTMLInputElement).value) || MINDESTLOHN;
+        const v = h * lohn;
+        const status = v <= MJ_GRENZE ? '✅ Minijob' : v <= 2000 ? '⚡ Midijob' : '❌ Über Grenze';
         showRes([
-          {v:fmtE(verdienst),l:'Verdienst/Monat'},
-          {v:fmtE(verdienst*0.964),l:'Netto (ohne opt. RV)'},
-          {v:fmtE(ag),l:'AG-Abgaben (31,3%)'},
-          {v:status,l:'Status'},
-        ], `Max. Stunden bei ${fmt(lohn)} €/h: ${fmt(MJ_GRENZE/lohn,1)} h/Monat`);
+          { v: fmtE(v), l: 'Verdienst/Monat', sub: 'Brutto' },
+          { v: fmtE(v * 0.964), l: 'Netto (ohne opt. RV)', sub: 'zum Mitnehmen' },
+          { v: fmtE(v * 0.313), l: 'AG-Abgaben', sub: '31,3 % Pauschale' },
+          { v: fmtE(v * 1.313), l: 'AG-Gesamtkosten', sub: 'inkl. Abgaben' },
+        ], `Max. Stunden bei ${fmt(lohn)} €/h: ${fmt(MJ_GRENZE / lohn, 1)} h/Monat`, status);
+
       } else if (mjMode === 'verdienst') {
-        const v = parseFloat((document.getElementById('mj-v') as HTMLInputElement).value)||0;
-        const lohn = parseFloat((document.getElementById('mj-v-lohn') as HTMLInputElement).value)||MINDESTLOHN;
-        const h = v / lohn;
-        const restPuffer = MJ_GRENZE - v;
+        const v = parseFloat((document.getElementById('mj-v') as HTMLInputElement).value) || 0;
+        const lohn = parseFloat((document.getElementById('mj-v-lohn') as HTMLInputElement).value) || MINDESTLOHN;
         showRes([
-          {v:fmt(h,1)+' h',l:'Stunden/Monat'},
-          {v:fmtE(v),l:'Brutto = Netto*'},
-          {v:fmtE(restPuffer > 0 ? restPuffer : 0),l:'Puffer bis Grenze'},
-          {v:fmtE(v*0.313),l:'AG-Abgaben'},
-        ], '* Bei Befreiung von der opt. RV');
+          { v: fmt(v / lohn, 1) + ' h', l: 'Stunden/Monat', sub: 'bei ' + fmt(lohn) + ' €/h' },
+          { v: fmtE(v), l: 'Brutto = Netto', sub: '* ohne opt. RV' },
+          { v: fmtE(Math.max(0, MJ_GRENZE - v)), l: 'Puffer bis Grenze', sub: 'bis 556 €' },
+          { v: fmtE(v * 0.313), l: 'AG-Abgaben', sub: '31,3 %' },
+        ], '* Bei Befreiung von der optionalen Rentenversicherung',
+          v <= MJ_GRENZE ? '✅ Minijob' : '⚡ Midijob');
+
       } else {
-        const v = parseFloat((document.getElementById('mj-ag-v') as HTMLInputElement).value)||0;
-        const ag_kv = v*0.13, ag_rv = v*0.13, ag_st = v*0.02, ag_uv = v*0.016, ag_uml = v*0.017;
-        const gesamt = v + ag_kv + ag_rv + ag_st + ag_uv + ag_uml;
+        const v = parseFloat((document.getElementById('mj-ag-v') as HTMLInputElement).value) || 0;
+        const kv = v * .13, rv = v * .13, st = v * .02, uv = v * .016, uml = v * .017;
         showRes([
-          {v:fmtE(v),l:'AN-Verdienst'},
-          {v:fmtE(ag_kv+ag_rv),l:'KV+RV Pauschale'},
-          {v:fmtE(ag_st+ag_uv+ag_uml),l:'Steuer+UV+Umlage'},
-          {v:fmtE(gesamt),l:'AG-Gesamtkosten'},
-        ], 'KV 13% + RV 13% + Pauschalsteuer 2% + UV 1,6% + Umlagen 1,7%');
+          { v: fmtE(v), l: 'AN-Verdienst', sub: 'Netto für AN' },
+          { v: fmtE(kv + rv), l: 'KV + RV', sub: '13 % + 13 %' },
+          { v: fmtE(st + uv + uml), l: 'Steuer + UV + Umlagen', sub: '2 % + 1,6 % + 1,7 %' },
+          { v: fmtE(v + kv + rv + st + uv + uml), l: 'AG-Gesamtkosten', sub: 'total / Monat' },
+        ], 'KV 13 % + RV 13 % + Pauschalsteuer 2 % + UV 1,6 % + Umlagen 1,7 %',
+          v <= MJ_GRENZE ? '✅ Minijob' : '❌ Über Grenze');
       }
     };
+
+    (window as any).toggleFaq = function (i: number) {
+      const a = document.getElementById('faq-a-' + i)!;
+      const btn = document.querySelector(`#faq-${i} .mj-faq-q`) as HTMLElement;
+      const chev = document.getElementById('faq-chev-' + i)!;
+      const open = !a.classList.contains('mj-faq-a--open');
+      a.classList.toggle('mj-faq-a--open', open);
+      chev.classList.toggle('mj-faq-chev--open', open);
+      if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+
+    document.addEventListener('DOMContentLoaded', () => (window as any).calcMJ());
   </script>
+
+
+  <!-- ═══ STYLES ═══ -->
+  <style is:global>
+    /* ─── Base ─────────────────────────────────── */
+    .mj-page, .mj-page * {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      box-sizing: border-box;
+    }
+    .mj-page { background: #f0f4fa; min-height: 100vh; }
+
+    /* ─── HERO ──────────────────────────────────── */
+    .mj-hero {
+      position: relative;
+      background: #05101f;
+      padding: 3.5rem 1.5rem 3rem;
+      overflow: hidden;
+    }
+    .mj-hero-glow {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 50%, rgba(0,180,255,.13) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 90% 20%, rgba(16,185,129,.10) 0%, transparent 50%);
+    }
+    .mj-hero-grid {
+      position: absolute; inset: 0; pointer-events: none; opacity: .06;
+      background-image:
+        linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    .mj-hero-inner { max-width: 900px; margin: 0 auto; position: relative; }
+
+    .mj-breadcrumb {
+      display: flex; gap: .45rem; align-items: center; flex-wrap: wrap;
+      font-size: .75rem; color: #5a7899; margin-bottom: 1.5rem;
+    }
+    .mj-breadcrumb a { color: #5a7899; text-decoration: none; }
+    .mj-breadcrumb a:hover { color: #93c5fd; }
+    .mj-breadcrumb span { color: #2d4a66; }
+
+    .mj-hero-text { margin-bottom: 2.5rem; }
+    .mj-hero-tag {
+      display: inline-flex; align-items: center; gap: .35rem;
+      background: rgba(0,180,255,.15); border: 1px solid rgba(0,180,255,.3);
+      color: #38bdf8; font-size: .72rem; font-weight: 600;
+      letter-spacing: .08em; text-transform: uppercase;
+      padding: .3rem .75rem; border-radius: 999px; margin-bottom: 1rem;
+    }
+    .mj-h1 {
+      font-family: 'Sora', system-ui, sans-serif;
+      font-size: clamp(2.5rem, 7vw, 4.5rem);
+      font-weight: 800; line-height: 1.0;
+      color: #f8fafc; margin: 0 0 .75rem;
+      letter-spacing: -.02em;
+    }
+    .mj-h1-accent {
+      background: linear-gradient(90deg, #38bdf8, #34d399);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .mj-subtitle {
+      font-size: 1.05rem; color: #6b8cad; font-weight: 400; margin: 0;
+    }
+
+    /* ─── KPI row ───────────────────────────────── */
+    .mj-kpi-row {
+      display: flex; flex-wrap: wrap; gap: 0;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px; overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+    .mj-kpi {
+      flex: 1; min-width: 120px;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 1.25rem 1rem; gap: .3rem;
+      transition: background .2s;
+    }
+    .mj-kpi:hover { background: rgba(255,255,255,.06); }
+    .mj-kpi-divider {
+      width: 1px; background: rgba(255,255,255,.07);
+      align-self: stretch; flex-shrink: 0;
+    }
+    .mj-kpi-icon { font-size: 1.25rem; margin-bottom: .1rem; }
+    .mj-kpi-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.35rem; font-weight: 500;
+      color: #f0f9ff; line-height: 1.1;
+    }
+    .mj-kpi-lbl { font-size: .7rem; color: #5a7899; text-align: center; }
+
+    /* ─── Content ───────────────────────────────── */
+    .mj-content { max-width: 900px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+    /* ─── Card ──────────────────────────────────── */
+    .mj-card {
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow:
+        0 1px 0 0 rgba(0,0,0,.06),
+        0 4px 6px -1px rgba(0,0,0,.05),
+        0 24px 48px -8px rgba(0,0,0,.12);
+      padding: 2rem 2rem 1.75rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(0,0,0,.06);
+    }
+    .mj-card-label {
+      font-size: .65rem; font-weight: 700; letter-spacing: .1em;
+      color: #94a3b8; margin-bottom: 1.25rem;
+    }
+
+    /* ─── Tabs ──────────────────────────────────── */
+    .mj-tabs {
+      display: flex; flex-wrap: wrap; gap: .5rem;
+      background: #f1f5f9; border-radius: 14px;
+      padding: .4rem; margin-bottom: 2rem;
+    }
+    .mj-tab {
+      flex: 1; min-width: 130px;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+      padding: .75rem 1rem; border-radius: 10px;
+      border: 2px solid transparent; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .875rem; font-weight: 600;
+      color: #64748b; background: transparent;
+      transition: all .2s ease; white-space: nowrap;
+    }
+    .mj-tab:hover:not(.mj-tab--active) {
+      background: #e2e8f0; color: #334155;
+    }
+    .mj-tab--active {
+      background: #ffffff; color: #0f172a;
+      border-color: #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    }
+    .mj-tab-ico { font-size: 1rem; flex-shrink: 0; }
+
+    /* ─── Inputs ────────────────────────────────── */
+    .mj-panel { animation: panelIn .2s ease; }
+    .mj-panel--hidden { display: none !important; }
+    @keyframes panelIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+    .mj-fields {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .mj-fields--single { grid-template-columns: 1fr; }
+    @media (max-width: 520px) { .mj-fields { grid-template-columns: 1fr; } }
+
+    .mj-field { display: flex; flex-direction: column; gap: .5rem; }
+    .mj-label {
+      font-size: .8rem; font-weight: 600; color: #334155;
+      text-transform: uppercase; letter-spacing: .05em;
+    }
+    .mj-input-wrap { position: relative; }
+    .mj-unit {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-family: 'DM Mono', monospace;
+      font-size: .9rem; font-weight: 500; color: #94a3b8;
+      pointer-events: none; z-index: 1;
+    }
+    .mj-input {
+      width: 100%; padding: .95rem 1rem .95rem 2.4rem;
+      border: 2px solid #e2e8f0; border-radius: 12px;
+      font-family: 'DM Mono', monospace;
+      font-size: 1.15rem; font-weight: 500; color: #0f172a;
+      background: #f8fafc;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+      outline: none;
+    }
+    .mj-input:hover { border-color: #cbd5e1; background: #f1f5f9; }
+    .mj-input:focus {
+      border-color: #3b82f6; background: #fff;
+      box-shadow: 0 0 0 4px rgba(59,130,246,.12);
+    }
+    .mj-hint { font-size: .75rem; color: #94a3b8; margin: 0; }
+
+    /* ─── CTA Button ────────────────────────────── */
+    .mj-btn {
+      width: 100%; padding: 1.1rem 1.5rem;
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: #fff; border: none; border-radius: 14px;
+      font-family: 'Sora', sans-serif;
+      font-size: 1.05rem; font-weight: 700;
+      cursor: pointer; letter-spacing: .01em;
+      display: flex; align-items: center; justify-content: center; gap: .65rem;
+      box-shadow: 0 4px 0 #0369a1, 0 6px 16px rgba(14,165,233,.35);
+      transition: all .18s ease;
+      position: relative; top: 0;
+    }
+    .mj-btn:hover {
+      background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+      box-shadow: 0 6px 0 #0369a1, 0 8px 24px rgba(14,165,233,.45);
+      top: -2px;
+    }
+    .mj-btn:active {
+      top: 2px;
+      box-shadow: 0 2px 0 #0369a1, 0 4px 12px rgba(14,165,233,.3);
+    }
+    .mj-btn-arrow { flex-shrink: 0; transition: transform .2s; }
+    .mj-btn:hover .mj-btn-arrow { transform: translateX(5px); }
+
+    /* ─── Results ───────────────────────────────── */
+    .mj-result {
+      margin-top: 1.75rem; padding: 1.5rem;
+      background: #f0f9ff;
+      border: 2px solid #bae6fd;
+      border-radius: 16px;
+    }
+    .mj-result--hidden { display: none !important; }
+    @keyframes resultPop {
+      0% { transform: scale(.97); opacity: .6; }
+      60% { transform: scale(1.01); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .mj-result--pop { animation: resultPop .35s ease; }
+
+    .mj-result-top {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: .75rem; flex-wrap: wrap; margin-bottom: 1.25rem;
+    }
+    .mj-result-heading {
+      font-family: 'Sora', sans-serif;
+      font-size: .78rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .1em; color: #0369a1;
+    }
+    .mj-res-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem;
+    }
+    @media (min-width: 540px) { .mj-res-grid { grid-template-columns: repeat(4, 1fr); } }
+    .mj-res-card {
+      background: #ffffff; border-radius: 12px;
+      padding: 1rem .75rem; text-align: center;
+      border: 1.5px solid #e0f2fe;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05);
+      transition: transform .15s, box-shadow .15s;
+    }
+    .mj-res-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+    .mj-res-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.2rem; font-weight: 500; color: #0c4a6e; line-height: 1.2;
+    }
+    .mj-res-lbl { font-size: .75rem; color: #0284c7; font-weight: 600; margin-top: .3rem; }
+    .mj-res-sub { font-size: .68rem; color: #94a3b8; margin-top: .2rem; }
+    .mj-res-note {
+      font-size: .76rem; color: #64748b; margin-top: 1rem;
+      padding-top: .75rem; border-top: 1px dashed #bae6fd;
+    }
+
+    /* ─── Status badge ──────────────────────────── */
+    .mj-status {
+      padding: .3rem .85rem; border-radius: 999px;
+      font-size: .78rem; font-weight: 700;
+    }
+    .mj-status--ok   { background: #dcfce7; color: #15803d; }
+    .mj-status--warn { background: #fef9c3; color: #a16207; }
+    .mj-status--err  { background: #fee2e2; color: #b91c1c; }
+
+    /* ─── Info box ──────────────────────────────── */
+    .mj-infobox {
+      display: flex; gap: 1rem; align-items: flex-start;
+      background: #fffbeb; border: 2px solid #fcd34d;
+      border-radius: 16px; padding: 1.25rem;
+      margin-bottom: 2.5rem; font-size: .88rem; color: #78350f; line-height: 1.65;
+    }
+    .mj-infobox-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .mj-infobox-text { flex: 1; }
+
+    /* ─── Sections ──────────────────────────────── */
+    .mj-section { margin-bottom: 2.75rem; }
+    .mj-h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.35rem; font-weight: 700;
+      color: #0f172a; margin: 0 0 1.25rem;
+      padding-bottom: .65rem;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    /* ─── Table ─────────────────────────────────── */
+    .mj-table-wrap { overflow-x: auto; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+    .mj-table { width: 100%; border-collapse: collapse; background: #fff; font-size: .88rem; }
+    .mj-table thead tr { background: #0f172a; }
+    .mj-table thead th {
+      padding: .9rem 1.1rem; text-align: left; color: #e2e8f0;
+      font-family: 'Sora', sans-serif; font-size: .75rem;
+      font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    }
+    .mj-table tbody td {
+      padding: .95rem 1.1rem; border-bottom: 1px solid #f1f5f9; color: #334155;
+    }
+    .mj-table tbody tr:last-child td { border-bottom: none; }
+    .mj-table tbody tr:hover td { background: #f8fafc; }
+    .mj-tr--hl td { background: #f0fdf4; }
+    .mj-tr--hl:hover td { background: #dcfce7 !important; }
+
+    /* ─── Pills ─────────────────────────────────── */
+    .mj-pill {
+      display: inline-block; padding: .28rem .7rem; border-radius: 999px;
+      font-size: .78rem; font-weight: 700;
+    }
+    .mj-pill--green { background: #dcfce7; color: #166534; }
+    .mj-pill--amber { background: #fef9c3; color: #854d0e; }
+    .mj-pill--gray  { background: #f1f5f9; color: #475569; }
+
+    /* ─── FAQ ───────────────────────────────────── */
+    .mj-faq-list { display: flex; flex-direction: column; gap: .6rem; }
+    .mj-faq-item {
+      background: #fff; border-radius: 14px;
+      border: 2px solid #e2e8f0; overflow: hidden;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .mj-faq-item:hover { border-color: #bae6fd; box-shadow: 0 4px 12px rgba(0,0,0,.06); }
+    .mj-faq-q {
+      width: 100%; display: flex; justify-content: space-between; align-items: center;
+      padding: 1.1rem 1.25rem; gap: 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .95rem; font-weight: 600; color: #1e293b;
+      background: none; border: none; cursor: pointer; text-align: left;
+    }
+    .mj-faq-q:hover { color: #0ea5e9; }
+    .mj-faq-chev {
+      color: #94a3b8; flex-shrink: 0;
+      transition: transform .28s ease;
+    }
+    .mj-faq-chev--open { transform: rotate(180deg); color: #0ea5e9; }
+    .mj-faq-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height .32s ease, padding .32s ease;
+      font-size: .88rem; color: #475569; line-height: 1.75;
+      padding: 0 1.25rem;
+    }
+    .mj-faq-a--open { max-height: 350px; padding: 0 1.25rem 1.1rem; }
+
+    /* ─── Related ───────────────────────────────── */
+    .mj-related { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; }
+    @media (min-width: 540px) { .mj-related { grid-template-columns: repeat(3, 1fr); } }
+    .mj-rel-card {
+      display: flex; align-items: center; gap: .65rem;
+      background: #fff; border: 2px solid #e2e8f0; border-radius: 14px;
+      padding: .9rem 1rem; text-decoration: none;
+      color: #334155; font-size: .875rem; font-weight: 600;
+      transition: all .2s ease;
+    }
+    .mj-rel-card:hover {
+      border-color: #0ea5e9; background: #f0f9ff; color: #0284c7;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(14,165,233,.15);
+    }
+    .mj-rel-ico { font-size: 1.15rem; flex-shrink: 0; }
+    .mj-rel-lbl { flex: 1; }
+    .mj-rel-arr { color: #cbd5e1; transition: transform .2s, color .2s; flex-shrink: 0; }
+    .mj-rel-card:hover .mj-rel-arr { transform: translateX(4px); color: #0ea5e9; }
+
+    /* ─── Mobile tweaks ─────────────────────────── */
+    @media (max-width: 600px) {
+      .mj-card { padding: 1.5rem 1.25rem; border-radius: 18px; }
+      .mj-kpi-divider { display: none; }
+      .mj-kpi-row { border-radius: 12px; }
+      .mj-kpi { padding: 1rem .75rem; }
+      .mj-tabs { flex-direction: column; }
+      .mj-tab { min-width: unset; }
+    }
+  </style>
+
   <Footer slot="footer" />
 </BaseLayout>

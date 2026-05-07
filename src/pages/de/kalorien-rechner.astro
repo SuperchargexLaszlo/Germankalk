@@ -2,9 +2,18 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 ---
 <BaseLayout title="Kalorienrechner 2026 – Kalorienbedarf berechnen" description="Täglichen Kalorienbedarf berechnen nach Alter, Gewicht, Größe und Aktivität. Harris-Benedict-Formel. Kostenloser Kalorienrechner 2026." canonical="https://rechnerbox.eu/de/kalorien-rechner" hreflangDE="/de/kalorien-rechner">
   <Header slot="header" />
+  <CalcHero
+    title="Kalorienrechner 2026 – Tagesbedarf berechnen"
+    subtitle="Berechnen Sie Ihren täglichen Kalorienbedarf nach der Harris-Benedict-Formel – für Ihr Gewichtziel."
+    breadcrumbLabel="Kalorienrechner"
+    country="Deutschland"
+    countryHref="/de/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Kalorienrechner</nav>
     <h1>Kalorienrechner 2026 – Tagesbedarf berechnen</h1>

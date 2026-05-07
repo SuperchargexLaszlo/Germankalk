@@ -2,9 +2,18 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 ---
 <BaseLayout title="Brutto-Netto Rechner Österreich 2026 – AK Gehaltsrechner" description="Österreichischen Nettolohn berechnen 2026: mit SV-Beiträgen, Lohnsteuer und Absetzbeträgen. AK-konform, kostenlos." canonical="https://rechnerbox.eu/at/brutto-netto-rechner" hreflangAT="/at/brutto-netto-rechner" hreflangDE="/de/brutto-netto-rechner">
   <Header slot="header" />
+  <CalcHero
+    title="Brutto-Netto Rechner Österreich 2026"
+    subtitle="Berechnen Sie Ihren Nettolohn in Österreich 2026 – mit aktuellen SV-Beiträgen, Lohnsteuer und Absetzbeträgen (AK-Methode)."
+    breadcrumbLabel="Brutto-Netto Rechner"
+    country="Oesterreich"
+    countryHref="/at/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/at/" class="hover:text-primary-600">Österreich</a> › Brutto-Netto Rechner</nav>
     <h1>Brutto-Netto Rechner Österreich 2026</h1>

@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 const schema = {
   "@context":"https://schema.org","@graph":[
   {"@type":"WebApplication","name":"TV-L Rechner 2026","url":"https://rechnerbox.eu/de/tv-l-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
@@ -40,6 +41,14 @@ const egs = Object.keys(TVL);
   schema={schema}
 >
   <Header slot="header" />
+  <CalcHero
+    title="TV-L Rechner 2026 – Gehalt Tarifvertrag Länder"
+    subtitle="TV-L Bruttogehalt 2026 nach Entgeltgruppe und Erfahrungsstufe berechnen – für Beschäftigte der Bundesländer. Aktuelle Entgelttabelle nach der Anpassung 2025."
+    breadcrumbLabel="TV-L Rechner"
+    country="Deutschland"
+    countryHref="/de/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4">
       <a href="/" class="hover:text-primary-600">Startseite</a> ›

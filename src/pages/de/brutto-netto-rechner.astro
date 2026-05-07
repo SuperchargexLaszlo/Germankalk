@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 const schema = {"@context":"https://schema.org","@graph":[
   {"@type":"WebApplication","name":"Brutto-Netto Rechner 2026","url":"https://rechnerbox.eu/de/brutto-netto-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
   {"@type":"FAQPage","mainEntity":[
@@ -22,6 +23,14 @@ const SV = { kv:0.073, pv:0.01775, rv:0.093, av:0.013 }; // AN-Anteil
   schema={schema}
 >
   <Header slot="header" />
+  <CalcHero
+    title="Brutto-Netto Rechner 2026 – Deutschland"
+    subtitle="Berechnen Sie Ihr genaues Nettogehalt für 2026 – inkl. Lohnsteuer, Solidaritätszuschlag, Kirchensteuer und alle Sozialversicherungsbeiträge."
+    breadcrumbLabel="Brutto-Netto Rechner"
+    country="Deutschland"
+    countryHref="/de/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4">
       <a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Brutto-Netto Rechner

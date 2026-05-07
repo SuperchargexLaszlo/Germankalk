@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 const schema = {
   "@context":"https://schema.org","@graph":[
   {"@type":"WebApplication","name":"Mehrwertsteuer Rechner Schweiz 2026","url":"https://rechnerbox.eu/ch/mehrwertsteuer-rechner",
@@ -26,6 +27,14 @@ const schema = {
   schema={schema}
 >
   <Header slot="header" />
+  <CalcHero
+    title="Mehrwertsteuer Rechner Schweiz 2026 – MWST"
+    subtitle="Schweizer MWST schnell berechnen: Netto zu Brutto oder Brutto zu Netto. Alle Steuersätze 2026 inkl. Normalsatz 8,1%, Sondersatz 3,8% und reduzierter Satz 2,6%."
+    breadcrumbLabel="Mehrwertsteuer Rechner"
+    country="Schweiz"
+    countryHref="/ch/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4">
       <a href="/" class="hover:text-primary-600">Startseite</a> ›

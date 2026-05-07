@@ -2,9 +2,18 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 ---
 <BaseLayout title="Arbeitszeitrechner 2026 – Arbeitszeit & Überstunden berechnen" description="Arbeitszeit berechnen: Stunden, Minuten, Überstunden und Pausen. Für Schichtarbeit, Teilzeit und Vollzeit. Kostenloser Arbeitszeitrechner 2026." canonical="https://rechnerbox.eu/de/arbeitszeit-rechner" hreflangDE="/de/arbeitszeit-rechner">
   <Header slot="header" />
+  <CalcHero
+    title="Arbeitszeitrechner 2026"
+    subtitle="Arbeitszeit, Überstunden und Nettostunden inkl. Pausen schnell und einfach berechnen."
+    breadcrumbLabel="Arbeitszeitrechner"
+    country="Deutschland"
+    countryHref="/de/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Arbeitszeitrechner</nav>
     <h1>Arbeitszeitrechner 2026</h1>

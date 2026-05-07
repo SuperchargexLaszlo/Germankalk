@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 const schema = {
   "@context":"https://schema.org","@graph":[
   {"@type":"WebApplication","name":"Stundenlohn Rechner 2026","url":"https://rechnerbox.eu/de/stundenlohn-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
@@ -21,6 +22,14 @@ const schema = {
   schema={schema}
 >
   <Header slot="header" />
+  <CalcHero
+    title="Stundenlohn Rechner 2026 – Gehalt umrechnen"
+    subtitle="Monatsgehalt in Stundenlohn umrechnen und umgekehrt – für alle Wochenarbeitszeiten. Mindestlohn 2026: 12,82 €/Stunde."
+    breadcrumbLabel="Stundenlohn Rechner"
+    country="Deutschland"
+    countryHref="/de/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4">
       <a href="/" class="hover:text-primary-600">Startseite</a> ›

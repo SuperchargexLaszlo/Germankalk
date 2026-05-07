@@ -2,10 +2,19 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 const schema={"@context":"https://schema.org","@type":"WebApplication","name":"MwSt Rechner","url":"https://rechnerbox.eu/de/mwst-rechner","applicationCategory":"FinanceApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}};
 ---
 <BaseLayout title="MwSt Rechner 2026 – Mehrwertsteuer berechnen Netto/Brutto" description="Mehrwertsteuer online berechnen: Netto zu Brutto oder Brutto zu Netto. 19% und 7% MwSt, aktuelle Sätze 2026. Kostenloser MwSt-Rechner." canonical="https://rechnerbox.eu/de/mwst-rechner" hreflangDE="/de/mwst-rechner" schema={schema}>
   <Header slot="header" />
+  <CalcHero
+    title="MwSt Rechner 2026 – Mehrwertsteuer berechnen"
+    subtitle="Mehrwertsteuer schnell und einfach berechnen – Netto zu Brutto oder Brutto zu Netto. Für 19%, 7% und andere Steuersätze."
+    breadcrumbLabel="MwSt Rechner"
+    country="Deutschland"
+    countryHref="/de/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › MwSt Rechner</nav>
     <h1>MwSt Rechner 2026 – Mehrwertsteuer berechnen</h1>

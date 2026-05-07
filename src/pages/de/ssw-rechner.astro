@@ -2,9 +2,18 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 ---
 <BaseLayout title="SSW Rechner 2026 – Schwangerschaftswoche berechnen" description="Aktuelle Schwangerschaftswoche (SSW) und voraussichtlicher Geburtstermin berechnen. Schnell, kostenlos, genau. SSW Rechner 2026." canonical="https://rechnerbox.eu/de/ssw-rechner" hreflangDE="/de/ssw-rechner">
   <Header slot="header" />
+  <CalcHero
+    title="SSW Rechner 2026 – Schwangerschaftswoche berechnen"
+    subtitle="Berechnen Sie Ihre aktuelle Schwangerschaftswoche (SSW) und den voraussichtlichen Geburtstermin (ET) – basierend auf dem ersten Tag der letzten Periode."
+    breadcrumbLabel="SSW Rechner"
+    country="Deutschland"
+    countryHref="/de/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › SSW Rechner</nav>
     <h1>SSW Rechner 2026 – Schwangerschaftswoche berechnen</h1>

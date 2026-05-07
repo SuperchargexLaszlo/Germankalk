@@ -2,9 +2,18 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 ---
 <BaseLayout title="HOAI Rechner 2026 – Architektenhonorar berechnen" description="Architekten- und Ingenieurhonorar nach HOAI 2021 schnell berechnen. Kostenloser HOAI-Rechner für Gebäude, Freianlagen und Tragwerksplanung 2026." canonical="https://rechnerbox.eu/de/hoai-rechner" hreflangDE="/de/hoai-rechner">
   <Header slot="header" />
+  <CalcHero
+    title="HOAI Rechner 2026 – Architektenhonorar"
+    subtitle="Berechnen Sie das Mindest- und Maximalhonorar für Architekten und Ingenieure nach HOAI 2021 (aktuell für 2026)."
+    breadcrumbLabel="HOAI Rechner"
+    country="Deutschland"
+    countryHref="/de/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4"><a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › HOAI Rechner</nav>
     <h1>HOAI Rechner 2026 – Architektenhonorar</h1>

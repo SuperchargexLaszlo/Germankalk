@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 const schema = {"@context":"https://schema.org","@graph":[
   {"@type":"WebApplication","name":"Pace Rechner","url":"https://rechnerbox.eu/de/pace-rechner","applicationCategory":"SportsApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
   {"@type":"FAQPage","mainEntity":[
@@ -19,6 +20,14 @@ const schema = {"@context":"https://schema.org","@graph":[
   schema={schema}
 >
   <Header slot="header" />
+  <CalcHero
+    title="Pace Rechner 2026 – Lauftempo berechnen"
+    subtitle="Berechnen Sie Ihren Pace (min/km), Ihre Geschwindigkeit (km/h) und die voraussichtliche Finishzeit für jede Laufdistanz."
+    breadcrumbLabel="Pace Rechner"
+    country="Deutschland"
+    countryHref="/de/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4">
       <a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Pace Rechner

@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 const schema = {
   "@context":"https://schema.org","@graph":[
   {"@type":"WebApplication","name":"Prozentrechner","url":"https://rechnerbox.eu/de/prozent-rechner","applicationCategory":"EducationalApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
@@ -20,6 +21,14 @@ const schema = {
   schema={schema}
 >
   <Header slot="header" />
+  <CalcHero
+    title="Prozentrechner 2026"
+    subtitle="Prozentwert, Prozentsatz und Grundwert schnell berechnen. Auch für Rabatt, Mehrwertsteuer und prozentualen Unterschied geeignet."
+    breadcrumbLabel="Prozentrechner"
+    country="Deutschland"
+    countryHref="/de/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4">
       <a href="/" class="hover:text-primary-600">Startseite</a> › <a href="/de/" class="hover:text-primary-600">Deutschland</a> › Prozentrechner

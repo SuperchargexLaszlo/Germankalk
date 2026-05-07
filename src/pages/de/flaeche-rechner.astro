@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 const schema = {
   "@context":"https://schema.org","@graph":[
   {"@type":"WebApplication","name":"Flächenrechner 2026","url":"https://rechnerbox.eu/de/flaeche-rechner","applicationCategory":"UtilitiesApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}},
@@ -31,6 +32,14 @@ const shapes = [
   schema={schema}
 >
   <Header slot="header" />
+  <CalcHero
+    title="Flächenrechner 2026 – Fläche & Umfang"
+    subtitle="Fläche und Umfang für alle wichtigen geometrischen Formen berechnen – mit Formeln und vollständigem Lösungsweg."
+    breadcrumbLabel="Flächenrechner"
+    country="Deutschland"
+    countryHref="/de/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4">
       <a href="/" class="hover:text-primary-600">Startseite</a> ›

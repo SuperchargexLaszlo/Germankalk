@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CalcHero from '../../components/CalcHero.astro';
 
 // Quellensteuer-Tarife 2026 (AN verheiratet ohne Kinder, Monatsbrutto → Satz approximiert)
 // Quellen: kantonale Quellensteuer-Tarifordnungen
@@ -50,6 +51,14 @@ const KANTONE = [
   }}
 >
   <Header slot="header" />
+  <CalcHero
+    title="Quellensteuer Rechner Schweiz 2026 – Alle Kantone"
+    subtitle="Schweizer Quellensteuer 2026 für alle 26 Kantone berechnen – für Ausländer ohne C-Ausweis (Niederlassungsbewilligung). Mit Vergleich aller Kantone."
+    breadcrumbLabel="Quellensteuer Rechner"
+    country="Schweiz"
+    countryHref="/ch/"
+  />
+
   <article class="max-w-3xl mx-auto px-4 py-8">
     <nav class="text-xs text-gray-400 mb-4">
       <a href="/" class="hover:text-primary-600">Startseite</a> ›
